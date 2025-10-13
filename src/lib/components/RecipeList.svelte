@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Recipe } from "$lib/types.svelte";
+	import type { Recipe } from "$lib/types";
 	import RecipeItem from "./RecipeItem.svelte";
 
 

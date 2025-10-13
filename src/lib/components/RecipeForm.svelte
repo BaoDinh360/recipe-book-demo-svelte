@@ -1,6 +1,7 @@
 <script lang="ts">
-	import { generateNextId } from "$lib/idGenerator.svelte";
-	import { FormState, type Recipe, type RecipeCategory, type SelectOption } from "$lib/types.svelte";
+	import { categoryOptions } from "$lib/constants";
+	import { FormState, type Recipe, type RecipeCategory, type SelectOption } from "$lib/types";
+	import { generateRecipeId } from "$lib/utils/id-generator";
 
     // local state for forms input
     let formData: {
@@ -26,13 +27,6 @@
         onSaveRecipe : (recipeData: Recipe) => void,
         onCancelEdit : () => void
     } = $props();
-
-    let categoryOptions: SelectOption[] = [
-        {label: 'Breakfast', value: 'Breakfast'},
-        {label: 'Lunch', value: 'Lunch'},
-        {label: 'Dinner', value: 'Dinner'},
-        {label: 'Desserts', value: 'Desserts'},
-    ];
 
     // run this when comp first mount
     // or when any reactive var being read inside it change
@@ -66,7 +60,8 @@
         e.preventDefault();
         console.log('recipe form: ', $state.snapshot(formData));
         const recipeData: Recipe = {
-            id: recipeEditId ?? genRecipeId(), // if edit, get recipe edit id, else gen new id
+            // id: recipeEditId ?? genRecipeId(), // if edit, get recipe edit id, else gen new id
+            id: recipeEditId ?? generateRecipeId(),
             title: formData.title,
             description: formData.description,
             instructions: formData.instructions
@@ -87,10 +82,10 @@
         }
     }
 
-    const genRecipeId = () => {
-        const prefix = 'recp-';
-        return prefix + generateNextId().toString().padStart(3, '0')
-    };
+    // const genRecipeId = () => {
+    //     const prefix = 'recp-';
+    //     return prefix + generateNextId().toString().padStart(3, '0')
+    // };
 
     const onCancelForm = () => {
         if(recipeEdit && formState === FormState.EDIT) {

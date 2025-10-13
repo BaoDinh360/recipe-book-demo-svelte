@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Recipe } from "$lib/types.svelte";
+	import type { Recipe } from "$lib/types";
 
     let viewActiveTab = $state('instructions');
 
@@ -37,14 +37,13 @@
             <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-4 text-sm text-gray-500">
                 <!-- prep time -->
                 <span class="text-base">
-                    Prep time: 
                     <span class="font-medium text-indigo-600 text-base">{recipe.prepTimeMin} Min</span>
                 </span>
                 &bullet;
                 <!-- category -->
                 <span class="font-medium text-indigo-600 text-base">{recipe.category}</span>
                 &bullet;
-                <span class="italic text-sm text-gray-400">Created: {recipe.dateCreated.toLocaleDateString()}</span>
+                <span class="italic text-sm text-gray-500">Created: {recipe.dateCreated.toLocaleDateString()}</span>
             </div>
         </div>
         <div class="card-actions justify-end pt-3 border-t border-gray-100">
@@ -79,9 +78,8 @@
             <p class="text-sm mt-2">
                 Prep time: <span class="font-medium text-indigo-600">{recipe.prepTimeMin} min</span> |
                 Category: <span class="font-medium text-indigo-600">{recipe.category}</span> |
-                Created: <span class="text-sm mt-2 text-gray-400">{recipe.dateCreated.toLocaleString()}</span>
+                Created: <span class="italic text-sm mt-2 text-gray-400">{recipe.dateCreated.toLocaleString()}</span>
             </p>
-            <!-- <p class="text-sm mt-2 text-gray-500">Date created: {recipe.dateCreated.toLocaleString()}</p> -->
         </div>
         <!-- tab container -->
         <div role="tablist" class="tabs tabs-lifted px-2">
@@ -117,8 +115,8 @@
             <p class="py-2 text-gray-600">
                 Are you sure you want to delete recipe:
             </p>
-            <p class="font-medium text-indigo-500">
-                {recipe.id} - {recipe.title}
+            <p class="font-medium">
+                {recipe.id}: <span class="text-indigo-600">{recipe.title}</span>
             </p>
         </div>
         <div class="modal-action p-2 pt-4">

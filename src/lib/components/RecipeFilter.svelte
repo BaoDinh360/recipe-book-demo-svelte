@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { type FilterCriteria, type SelectOption, type SortCriteria } from "$lib/types.svelte";
+	import { categoryOptions, sortingOptions } from "$lib/constants";
+	import { type FilterCriteria, type SelectOption, type SortCriteria } from "$lib/types";
 
     // local filter state
     let filterInput: {
@@ -15,17 +16,6 @@
     let { onFilterChange }: {
         onFilterChange: (filter: FilterCriteria) => void,
     } = $props();
-
-    const categoryOptions: SelectOption[] = [
-        {label: 'Breakfast', value: 'Breakfast'},
-        {label: 'Lunch', value: 'Lunch'},
-        {label: 'Dinner', value: 'Dinner'},
-        {label: 'Desserts', value: 'Desserts'},
-    ];
-    const sortingOptions: SelectOption[] = [
-        {label: 'Oldest', value: 'DATE_ASC'},
-        {label: 'Latest', value: 'DATE_DESC'}
-    ];
 
     const filterInputChange = () => {
         onFilterChange({...filterInput});
