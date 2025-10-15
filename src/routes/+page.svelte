@@ -55,11 +55,6 @@
         recipeList = fetchRecipesData();
         initCurrentIdData();
     })
-
-    $effect(() => {
-        // re-runs this when recipeList state changes
-        persistRecipesData(recipeList);
-    })
     
     // add + edit recipe
     const onSaveRecipe = (recipeData: Recipe) => {
@@ -79,8 +74,7 @@
         }
         console.log('Recipe list: ', $state.snapshot(recipeList));
         // persist to localStorage
-        //persistRecipes($state.snapshot(recipeList));
-
+        persistRecipesData($state.snapshot(recipeList));
         // reset child form state
         recipeEdit = null;
     }
@@ -104,6 +98,7 @@
 
         // persist to localStorage
         //persistRecipes($state.snapshot(recipeList));
+        persistRecipesData($state.snapshot(recipeList));
     }
     // filter recipe
     const onFilterRecipe = (filter: FilterCriteria) => {
@@ -118,8 +113,8 @@
 </script>
 
 <main class="container mx-auto my-12 p-6 max-w-full">
-    <div class="grid grid-cols-1 md:grid-cols-8 gap-8">
-        <div class="md:col-span-4">
+    <div class="grid grid-cols-1 md:grid-cols-9 gap-8">
+        <div class="md:col-span-5">
             <h2 class="text-2xl font-bold text-indigo-700 mb-2 pb-2 text-center">Recipe List</h2>
             <RecipeFilter onFilterChange={onFilterRecipe}/>
             <RecipeList recipeList={filteredRecipeList}
