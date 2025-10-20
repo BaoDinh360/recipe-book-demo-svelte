@@ -1,16 +1,18 @@
 <script lang="ts">
 	import { categoryOptions } from "$lib/constants";
+	import type { CreateRecipeData, UpdateRecipeData } from "$lib/recipe-types";
 	import { FormState, type Recipe, type RecipeCategory, type SelectOption } from "$lib/types";
-	import { generateRecipeId } from "$lib/utils/id-generator";
 
     // local state for forms input
     let formData: {
+        recipeCode: string
         title: string,
         description: string,
         instructions: string,
         prepTimeMin: number,
         category: RecipeCategory | undefined,
     } = $state({
+        recipeCode: '',
         title: '',
         description: '',
         instructions: '',
@@ -24,7 +26,7 @@
     let { recipeEdit, onSaveRecipe, onCancelEdit }: {
         // recipeEdit passing from parent, for mapping recipe edit data to form
         recipeEdit: Recipe | null,
-        onSaveRecipe : (recipeData: Recipe) => void,
+        onSaveRecipe : (recipeData: CreateRecipeData | UpdateRecipeData) => void,
         onCancelEdit : () => void
     } = $props();
 
@@ -36,6 +38,7 @@
             recipeEditId = recipeEdit.id;
 
             formData = {
+                recipeCode: recipeEdit.recipeCode,
                 title: recipeEdit.title,
                 description: recipeEdit.description,
                 instructions: recipeEdit.instructions.join('\n'),
@@ -47,6 +50,7 @@
             recipeEditId = null;
 
             formData = {
+                recipeCode: '',
                 title: '',
                 description: '',
                 instructions: '',
@@ -59,9 +63,23 @@
     const onSubmitForm = (e: Event) => {
         e.preventDefault();
         console.log('recipe form: ', $state.snapshot(formData));
-        const recipeData: Recipe = {
-            // id: recipeEditId ?? genRecipeId(), // if edit, get recipe edit id, else gen new id
-            id: recipeEditId ?? generateRecipeId(),
+        // const recipeData: Recipe = {
+        //     //id: recipeEditId ?? generateRecipeId(),
+        //     id: recipeEditId ?? '',
+        //     title: formData.title,
+        //     recipeCode: recipeEdit ? recipeEdit.recipeCode : '', // tam thoi set cung
+        //     description: formData.description,
+        //     instructions: formData.instructions
+        //         .split('\n') // split into string[]
+        //         .map(s => s.trim()) // foreach items, trim
+        //         .filter(Boolean), // filter in only valid string, no empty string
+        //     prepTimeMin: formData.prepTimeMin,
+        //     category: formData.category!,
+        //     dateCreated: new Date() 
+        // };
+        
+        // create common input data obj
+        let recipeInputData = {
             title: formData.title,
             description: formData.description,
             instructions: formData.instructions
@@ -70,22 +88,28 @@
                 .filter(Boolean), // filter in only valid string, no empty string
             prepTimeMin: formData.prepTimeMin,
             category: formData.category!,
-            dateCreated: new Date() 
         };
-        console.log('recipe obj: ', $state.snapshot(recipeData));
-        // parent callback
-        onSaveRecipe(recipeData);
+        if(recipeEdit && formState === FormState.EDIT) {
+            // Edit recipe mode
+            const recipeData: UpdateRecipeData = {
+                ...recipeInputData,
+                id: recipeEdit.id
+            };
+            onSaveRecipe(recipeData);
+        }
+        else {
+            // Add recipe mode
+            const recipeData: CreateRecipeData = {
+                ...recipeInputData
+            };
+            onSaveRecipe(recipeData);
+        }
         
         if(formState === FormState.ADD){
             // clear input when add mode
             resetFormInput();
         }
     }
-
-    // const genRecipeId = () => {
-    //     const prefix = 'recp-';
-    //     return prefix + generateNextId().toString().padStart(3, '0')
-    // };
 
     const onCancelForm = () => {
         if(recipeEdit && formState === FormState.EDIT) {
@@ -102,6 +126,7 @@
     const resetFormInput = () => {
         // reset input
         formData = {
+            recipeCode: '',
             title: '',
             description: '',
             instructions: '',
@@ -117,7 +142,7 @@
     <form class="p-6 space-y-4 bg-indigo-50 rounded-lg border border-indigo-200"
         onsubmit={(e) => onSubmitForm(e)}>
         {#if recipeEditId}
-            <h3 class="text-lg font-medium text-indigo-700 mb-2 pb-2">Editing recipe: {recipeEditId}</h3>
+            <h3 class="text-lg font-medium text-indigo-700 mb-2 pb-2">Editing recipe: {formData.recipeCode}</h3>
         {:else}
             <h3 class="text-lg font-medium text-indigo-700 mb-2 pb-2">Add new recipe</h3>
         {/if}

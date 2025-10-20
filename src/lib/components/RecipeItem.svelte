@@ -113,10 +113,10 @@
                 Delete recipe
             </h3>
             <p class="py-2 text-gray-600">
-                Are you sure you want to delete recipe:
+                Are you sure you want to delete this recipe:
             </p>
             <p class="font-medium">
-                {recipe.id}: <span class="text-indigo-600">{recipe.title}</span>
+                {recipe.recipeCode}: <span class="text-indigo-600">{recipe.title}</span>
             </p>
         </div>
         <div class="modal-action p-2 pt-4">

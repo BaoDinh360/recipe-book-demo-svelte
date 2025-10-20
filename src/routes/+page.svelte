@@ -2,9 +2,9 @@
 	import RecipeFilter from "$lib/components/RecipeFilter.svelte";
 	import RecipeForm from "$lib/components/RecipeForm.svelte";
 	import RecipeList from "$lib/components/RecipeList.svelte";
+	import { isUpdateRecipeDataType, type CreateRecipeData, type RecipeFormSubmissionData, type UpdateRecipeData } from "$lib/recipe-types";
 	import { type FilterCriteria, type Recipe } from "$lib/types";
-	import { initCurrentIdData } from "$lib/utils/id-generator";
-	import { fetchRecipesData, persistRecipesData } from "$lib/utils/recipe-store";
+	import { createRecipe, deleteRecipe, fetchAllRecipes, fetchRecipeById, updateRecipe } from "$lib/utils/recipe-service";
 	import { onMount } from "svelte";
 
     // load the data from external
@@ -49,34 +49,51 @@
         return result;
     });
 
-    onMount(() => {
+    onMount(async () => {
         // run code when component is mounted to DOM, run once
         // for code that run when client side rendering
-        recipeList = fetchRecipesData();
-        initCurrentIdData();
+        //recipeList = fetchRecipesData();
+        //initCurrentIdData();
+
+        // fetch data from api
+        recipeList = await fetchAllRecipes();
     })
     
     // add + edit recipe
-    const onSaveRecipe = (recipeData: Recipe) => {
-        console.log('recipeData: ', recipeData);
-        if(recipeEdit) {
-            // edit mode
-            // find index by id, access and modify it
-            const index = recipeList.findIndex(r => r.id === recipeData.id);
-            if(index === -1) {
-                console.error('Cannot find recipe with id: ', recipeData.id);
-                return;
-            }
-            recipeList[index] = recipeData;
-        } else {
-            // add mode
-            recipeList.push(recipeData);
+    const onSaveRecipe = async (recipeData: RecipeFormSubmissionData) => {
+        console.log('recipe form data: ', recipeData);
+        if(recipeEdit && isUpdateRecipeDataType(recipeData)) {
+            // Edit recipe
+            await editRecipe(recipeData);
         }
-        console.log('Recipe list: ', $state.snapshot(recipeList));
-        // persist to localStorage
-        persistRecipesData($state.snapshot(recipeList));
+        else {
+            // Add recipe
+            await addRecipe(recipeData);
+        }
         // reset child form state
         recipeEdit = null;
+    }
+    const addRecipe = async (recipeData: CreateRecipeData) => {
+        // create recipe 
+        const created = await createRecipe(recipeData);
+        if(created !== null) {
+            // push new recipe to recipe[] in client if insert success
+            recipeList.push(created);
+        }
+    }
+    const editRecipe = async (recipeData: UpdateRecipeData) => {
+        // find recipe index
+        const index = recipeList.findIndex(r => r.id === recipeData.id);
+        if(index === -1) {
+            console.error('Cannot find recipe with id: ', recipeData.id);
+            return;
+        }
+        // update recipe
+        const updated = await updateRecipe(recipeData); 
+        if (updated !== null) {
+            // update recipe in recipe[] in client if update success
+            recipeList[index] = updated;
+        }
     }
     // edit recipe (open form)
     const onOpenEditForm = (recipeId: string) => {
@@ -90,15 +107,24 @@
         }
     }
     // delete recipe
-    const onDeleteRecipe = (recipeId: string) => {
+    const onDeleteRecipe = async (recipeId: string) => {
         console.log('recipe delete: ', recipeId);
         const index = recipeList.findIndex(r => r.id === recipeId);
-        recipeList.splice(index, 1);
+        //const recipe = await fetchRecipeById(recipeId);
+        if(index === -1) {
+            console.error('Cannot find recipe with id: ', recipeId);
+            return;
+        }
+        // delete recipe from pb
+        const isDeleted = await deleteRecipe(recipeId);
+        if(isDeleted) {
+            // remove from recipe[] in client if delete success
+            recipeList.splice(index, 1);
+            // re fetch all data
+            //recipeList = await fetchAllRecipes();
+        }
         console.log('recipe list: ', $state.snapshot(recipeList));
 
-        // persist to localStorage
-        //persistRecipes($state.snapshot(recipeList));
-        persistRecipesData($state.snapshot(recipeList));
     }
     // filter recipe
     const onFilterRecipe = (filter: FilterCriteria) => {
