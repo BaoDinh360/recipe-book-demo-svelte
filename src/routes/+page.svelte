@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from "$app/navigation";
 	import RecipeFilter from "$lib/components/RecipeFilter.svelte";
 	import RecipeForm from "$lib/components/RecipeForm.svelte";
 	import RecipeList from "$lib/components/RecipeList.svelte";
@@ -139,6 +140,12 @@
 </script>
 
 <main class="container mx-auto my-12 p-6 max-w-full">
+    <div>
+        <button class="btn btn-primary" 
+            onclick={() => goto('/recipes/create')}>
+            Go to create recipe
+        </button>
+    </div>
     <div class="grid grid-cols-1 md:grid-cols-9 gap-8">
         <div class="md:col-span-5">
             <h2 class="text-2xl font-bold text-indigo-700 mb-2 pb-2 text-center">Recipe List</h2>
