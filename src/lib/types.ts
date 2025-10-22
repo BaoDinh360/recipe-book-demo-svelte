@@ -33,3 +33,9 @@ export type FilterCriteria = {
 };
 
 export type SortCriteria = 'DATE_ASC' | 'DATE_DESC';
+
+export enum PageType {
+    INDEX,
+    CREATE,
+    EDIT
+};

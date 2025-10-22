@@ -60,42 +60,6 @@
         recipeList = await fetchAllRecipes();
     })
     
-    // add + edit recipe
-    const onSaveRecipe = async (recipeData: RecipeFormSubmissionData) => {
-        console.log('recipe form data: ', recipeData);
-        if(recipeEdit && isUpdateRecipeDataType(recipeData)) {
-            // Edit recipe
-            await editRecipe(recipeData);
-        }
-        else {
-            // Add recipe
-            await addRecipe(recipeData);
-        }
-        // reset child form state
-        recipeEdit = null;
-    }
-    const addRecipe = async (recipeData: CreateRecipeData) => {
-        // create recipe 
-        const created = await createRecipe(recipeData);
-        if(created !== null) {
-            // push new recipe to recipe[] in client if insert success
-            recipeList.push(created);
-        }
-    }
-    const editRecipe = async (recipeData: UpdateRecipeData) => {
-        // find recipe index
-        const index = recipeList.findIndex(r => r.id === recipeData.id);
-        if(index === -1) {
-            console.error('Cannot find recipe with id: ', recipeData.id);
-            return;
-        }
-        // update recipe
-        const updated = await updateRecipe(recipeData); 
-        if (updated !== null) {
-            // update recipe in recipe[] in client if update success
-            recipeList[index] = updated;
-        }
-    }
     // edit recipe (open form)
     const onOpenEditForm = (recipeId: string) => {
         console.log('recipe edit id:', recipeId);
@@ -140,12 +104,6 @@
 </script>
 
 <main class="container mx-auto my-12 p-6 max-w-full">
-    <div>
-        <button class="btn btn-primary" 
-            onclick={() => goto('/recipes/create')}>
-            Go to create recipe
-        </button>
-    </div>
     <div class="grid grid-cols-1 md:grid-cols-9 gap-8">
         <div class="md:col-span-5">
             <h2 class="text-2xl font-bold text-indigo-700 mb-2 pb-2 text-center">Recipe List</h2>
@@ -155,9 +113,7 @@
                 onDelete={onDeleteRecipe}/>
         </div>
         <div class="md:col-span-4">
-            <RecipeForm {recipeEdit} 
-                {onSaveRecipe} 
-                onCancelEdit={() => recipeEdit = null}/>
+            
         </div>
     </div>
 </main>

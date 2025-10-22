@@ -47,6 +47,7 @@ export interface CreateRecipeData {
 // interface for update existing recipe
 export interface UpdateRecipeData extends CreateRecipeData {
     id: string;
+    recipeCode: string;
 }
 // custom union type
 export type RecipeFormSubmissionData = CreateRecipeData | UpdateRecipeData;

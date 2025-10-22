@@ -89,7 +89,7 @@ const mapRecipeDataToUpsertPbRecord =
     if(isUpdateRecipeDataType(recipeData)) {
         // if update recipe data, exclude id
         // exclude id from obj using destructuring
-        const { id, ...included } = recipeData;
+        const { id, recipeCode, ...included } = recipeData;
         return {
             ...included,
             instructions: JSON.stringify(included.instructions)
