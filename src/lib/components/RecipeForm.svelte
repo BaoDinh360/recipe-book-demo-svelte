@@ -94,7 +94,7 @@
 </script>
 
 <div class="container mx-auto max-w-full">
-    <form class="p-6 space-y-4"
+    <form class="space-y-4"
         onsubmit={(e) => submitForm(e)}>
         <!-- form input cols layout -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -182,7 +182,7 @@
             <button type="submit" class="btn btn-primary w-36">
                 {formState === FormState.EDIT ? 
                     'Save changes' : 
-                    'Create recipe'
+                    'Add recipe'
                 }
             </button>
         </div>

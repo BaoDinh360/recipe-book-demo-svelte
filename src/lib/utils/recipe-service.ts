@@ -1,4 +1,4 @@
-import { isUpdateRecipeDataType, type CreateRecipeData, type RecipeDetail, type RecipeFormSubmissionData, type RecipePbRecord, type UpdateRecipeData, type UpsertRecipePbRecord } from '$lib/recipe-types';
+import { isUpdateRecipeDataType, type CreateRecipeData, type RecipeDetail, type RecipeFormSubmissionData, type RecipeListItem, type RecipePbRecord, type UpdateRecipeData, type UpsertRecipePbRecord } from '$lib/recipe-types';
 import { type Recipe } from '$lib/types';
 import PocketBase from 'pocketbase';
 
@@ -19,6 +19,17 @@ export const fetchAllRecipes = async (): Promise<Recipe[]> => {
         return [];
     }
 };
+export const getPaginatedRecipeList = async (): Promise<RecipeListItem[]> => {
+    try {
+        const recipeRecords = await pb.collection(COLLECTION_NAME).getList<RecipePbRecord>(1, 50);
+        console.log('pocketbase recipe records: ', recipeRecords);
+        const recipeListItems: RecipeListItem[] = recipeRecords.items.map(mapPbRecordToRecipeListItem);
+        return recipeListItems;
+    } catch (error) {
+        console.error('Error fetch PocketBase recipes: ', error);
+        return [];
+    }
+}
 // get recipe by id
 export const fetchRecipeById = async (id: string): Promise<RecipeDetail | null> => {
     try {
@@ -58,13 +69,11 @@ export const updateRecipe = async (recipeData: UpdateRecipeData): Promise<Recipe
     }
 };
 // delete recipe by id
-export const deleteRecipe = async (id: string): Promise<boolean> => {
+export const deleteRecipe = async (id: string): Promise<void> => {
     try {
         await pb.collection(COLLECTION_NAME).delete(id);
-        return true;
     } catch (error) {
         console.error('Error delete PocketBase recipe {id}: ', id, error);
-        return false;
     }
 };
 
@@ -76,11 +85,20 @@ const mapPbRecordToRecipe = (pbRecord: RecipePbRecord): Recipe => {
         dateCreated: new Date(included.created)
     };
 }
-const mapPbRecordToRecipeDetail = (pbRecord: RecipePbRecord): RecipeDetail => {
-    // exclude props
-    const { collectionId, collectionName, updated, ...included  } = pbRecord;
+const mapPbRecordToRecipeListItem = (pbRecord: RecipePbRecord): RecipeListItem => {
+    const { instructions, collectionId, collectionName, ...included } = pbRecord;
     return {
         ...included,
+        description: included.description.trim(),
+        createdAt: new Date(included.created)
+    };
+}
+const mapPbRecordToRecipeDetail = (pbRecord: RecipePbRecord): RecipeDetail => {
+    // exclude props
+    const { collectionId, collectionName, ...included  } = pbRecord;
+    return {
+        ...included,
+        lastUpdatedAt: new Date(included.updated),
         createdAt: new Date(included.created)
     };
 }

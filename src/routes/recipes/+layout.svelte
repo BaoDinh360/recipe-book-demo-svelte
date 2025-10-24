@@ -9,9 +9,13 @@
     let layoutPageType: PageType = $derived.by(() => {
         let result : PageType = PageType.INDEX;
         const currentPageUrl = page.route.id
+        console.log('current route: ', currentPageUrl);
         switch(currentPageUrl) {
             case '/recipes':
                 result = PageType.INDEX;
+                break;
+            case '/recipes/[recipeId]':
+                result = PageType.DETAIL;
                 break;
             case '/recipes/create':
                 result = PageType.CREATE;
@@ -26,13 +30,16 @@
         let result = '';
         switch (layoutPageType) {
             case PageType.INDEX:
-                result = 'Recipes';
+                result = 'All Recipes';
+                break;
+            case PageType.DETAIL:
+                result = 'Recipes Details';
                 break;
             case PageType.CREATE:
-                result = 'Create recipe';
+                result = 'Add Recipe';
                 break;
             case PageType.EDIT:
-                result = 'Edit recipe';
+                result = 'Edit Recipe';
         }
         return result;
     });
@@ -40,59 +47,56 @@
         let result = '';
         switch (layoutPageType) {
             case PageType.INDEX:
-                result = 'View and manage your recipes';
+                result = 'View and manage all saved recipes';
+                break;
+            case PageType.DETAIL:
+                result = 'See the ingredients and instructions for this recipe';
                 break;
             case PageType.CREATE:
-                result = 'Create a new recipe';
+                result = 'Create a new recipe and save it to your collection';
                 break;
             case PageType.EDIT:
-                result = 'Edit existing recipe';
+                result = 'Update the details of an existing recipe';
         }
         return result;
     });
 
 </script>
 
-<!-- <div class="navbar bg-gray-50 rounded-xl shadow-md mb-8 w-full mx-auto border-b border-gray-100">
-    <div class="flex flex-row items-center gap-8">
-        <div class="flex">
-            <h1 class="font-bold text-gray-700 ml-4 text-xl">Recipes</h1>
-        </div>
-        <div class="flex items-center gap-3 p-2">
-            <a href="/recipes" class="btn btn-ghost text-indigo-700 hover:bg-gray-200 text-lg">
-                List
-            </a>
-            <a href="/recipes/create" class="btn btn-ghost text-indigo-700 hover:bg-gray-200 font-semibold text-lg">
-                Create
-            </a>
-        </div>
-    </div>
-</div> -->
-
 <!-- recipe top bar -->
-<div class="w-full mx-auto pl-4 pr-4 mb-6">
-    <div class="flex flex-row items-center gap-4">
-        <!-- title -->
-        <div class="flex-1 flex flex-col gap-2">
+<header class="flex justify-between items-center w-full mx-auto mt-4 mb-8">
+    <div class="flex items-center space-x-6">
+        {#if layoutPageType !== PageType.INDEX}
+            <!-- don't show back btn on index page -->
+            <button class="btn btn-ghost group hover:bg-indigo-500"
+                aria-label="Back"
+                onclick={() => goto('/recipes')}>
+                <svg class="h-6 w-6 stroke-indigo-700 group-hover:stroke-white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M20 12H4M4 12L10 6M4 12L10 18" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+            </button>
+        {/if}
+        <!-- title and description -->
+        <div class="pl-4">
             <h1 class="font-bold text-gray-600 text-2xl">{title}</h1>
             <p class="text-gray-600 text-lg">{subText}</p>
         </div>
-        <!-- right item -->
-        {#if layoutPageType === PageType.INDEX}
-            <!-- only show create button in index page -->
-            <div class="flex-none">
-                <button class="btn btn-primary w-36 font-semibold text-lg text-white"
-                    onclick={() => goto('/recipes/create')}>
-                    Create
-                </button>
-            </div>
-        {/if}
-        
     </div>
-</div>
+    <!-- right item -->
+    {#if layoutPageType === PageType.INDEX}
+        <!-- only show create button in index page -->
+        <button class="btn btn-primary btn-sm md:btn-md w-36 font-semibold text-white"
+            onclick={() => goto('/recipes/create')}>
+            Create
+        </button>
+    {/if}
+</header>
 
 <!-- child content -->
-<div class="w-full mx-auto pl-4 pr-4 rounded-xl shadow-xl bg-white border border-gray-200">
+{#if layoutPageType === PageType.INDEX || layoutPageType === PageType.DETAIL}
     {@render children?.()}
-</div>
-
+{:else}
+    <div class="w-full mx-auto pl-4 pr-4 rounded-lg shadow-md bg-white border border-gray-200">
+        <div class="container p-6 mx-auto max-w-full">
+            {@render children?.()}
+        </div>
+    </div>
+{/if}

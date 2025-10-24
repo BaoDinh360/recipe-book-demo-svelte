@@ -25,6 +25,18 @@ export interface UpsertRecipePbRecord {
     category: RecipeCategory;
 }
 
+// recipe display item list
+export interface RecipeListItem {
+    id: string;
+    recipeCode: string;
+    title: string;
+    description: string;
+    prepTimeMin: number;
+    category: RecipeCategory;
+    createdAt: Date;
+}
+
+// recipe detail
 export interface RecipeDetail {
     id: string;
     recipeCode: string;
@@ -34,6 +46,7 @@ export interface RecipeDetail {
     prepTimeMin: number;
     category: RecipeCategory;
     createdAt: Date;
+    lastUpdatedAt: Date;
 }
 
 // interface for create new recipe

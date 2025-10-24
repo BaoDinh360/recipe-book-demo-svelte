@@ -1,6 +1,7 @@
 <script lang="ts">
 	import '../app.css';
 	import favicon from '$lib/assets/favicon.svg';
+	import NotificationArea from '$lib/components/NotificationArea.svelte';
 
 	let { children } = $props();
 </script>
@@ -8,6 +9,9 @@
 <svelte:head>
 	<link rel="icon" href={favicon} />
 </svelte:head>
+
+<!-- Show notification -->
+<NotificationArea />
 
 <!-- sidebar layout -->
 <div class="flex min-h-screen">

@@ -1,110 +1,89 @@
 <script lang="ts">
-	import type { Recipe } from "$lib/types";
+	import { goto, invalidate } from "$app/navigation";
+	import type { RecipeListItem } from "$lib/recipe-types";
+	import { deleteRecipe } from "$lib/utils/recipe-service";
+	import ConfirmActionModal from "./ConfirmActionModal.svelte";
 
-    let viewActiveTab = $state('instructions');
-
-    let { recipe, onEdit, onDelete }: {
-        recipe: Recipe,
-        onEdit: (recipeId: string) => void,
-        onDelete: (recipeId: string) => void
+    let { recipe, 
+    }: {
+        recipe: RecipeListItem,
     } = $props();
 
-    let viewModalRef : HTMLDialogElement;
-    let deleteModalRef: HTMLDialogElement;
+    let deleteModalRef: ConfirmActionModal;
 
-    const openModal = () => {
-        viewModalRef.showModal();
-    }
-    const openDeleteModal = () => {
-        deleteModalRef.showModal();
-    }
-
-    const onClickDeleteBtn = (recipeId: string) => {
-        onDelete(recipeId);
-        deleteModalRef.close();
-    }
+    const confirmDeleteRecipe = async () => {
+        try {
+            await deleteRecipe(recipe.id);
+            // trigger page.ts re run load func
+            invalidate('app:recipes');
+        } catch (error) {
+            console.error('Error deleting recipe: ', recipe.id);   
+        }
+    };
 
 </script>
 
 <!-- card recipe item -->
-<div class="card shadow-md border border-indigo-100">
-    <div class="card-body p-6 space-y-3">
-        <div>
-            <h4 class="card-title text-xl text-indigo-700 font-medium">
-                {recipe.title}
-            </h4>
-            <!-- metadata -->
-            <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-4 text-sm text-gray-500">
-                <!-- prep time -->
-                <span class="text-base">
-                    <span class="font-medium text-indigo-600 text-base">{recipe.prepTimeMin} Min</span>
-                </span>
-                &bullet;
-                <!-- category -->
-                <span class="font-medium text-indigo-600 text-base">{recipe.category}</span>
-                &bullet;
-                <span class="italic text-sm text-gray-500">Created: {recipe.dateCreated.toLocaleDateString()}</span>
+<div class="card bg-white border border-gray-200 rounded-lg">
+    <div class="card-body p-6 flex flex-col">
+        <!-- title -->
+        <h2 class="card-title text-lg font-semibold mb-2 leading-tight">
+            {recipe.title}
+        </h2>
+        <!-- category badge -->
+        <span class="mb-4 p-4 badge badge-lg bg-yellow-100 text-yellow-800 font-semibold">
+            {recipe.category}
+        </span>
+        <p class="text-sm text-gray-500 mt-2 flex-grow">
+            {recipe.description}
+        </p>
+        <!-- metadata -->
+        <div class="space-y-3 pt-2 border-t border-gray-100">
+            <!-- recipe code -->
+            <div class="flex items-center justify-start text-sm gap-2">
+                <span class="p-2 font-medium bg-gray-100">Recipe code: {recipe.recipeCode}</span>
+            </div>
+            <!-- prep time -->
+            <div class="flex items-center justify-start text-sm gap-2">
+                <span class="text-gray-600 font-medium">Prep time:</span>
+                <span class="font-semibold text-indigo-700">{recipe.prepTimeMin} min</span>
             </div>
         </div>
-        <div class="card-actions justify-end pt-3 border-t border-gray-100">
+        <div class="pt-4">
+            <p class="text-xs text-gray-400">
+                {recipe.createdAt.toLocaleString()}
+            </p>
+        </div>
+        <!-- card footer action -->
+        <div class="card-actions flex justify-end pt-4 border-t border-gray-100">
             <button class="btn btn-sm btn-outline btn-info"
-                onclick={openModal}>
+                onclick={() => goto(`/recipes/${recipe.id}`)}>
                 View
             </button>
             <button class="btn btn-sm btn-outline btn-success"
-                onclick={() => onEdit(recipe.id)}>
+                onclick={() => goto(`/recipes/edit/${recipe.id}`)}>
                 Edit
             </button>
             <button class="btn btn-sm btn-outline btn-error"
-                onclick={openDeleteModal}>
+                onclick={() => deleteModalRef.showModal()}>
                 Delete
             </button>
         </div>
     </div>
 </div>
 
-<!-- detail modal dialog -->
-<dialog class="modal" id={recipe.id + '_modal'} bind:this={viewModalRef}>
-    <div class="modal-box p-0 w-11/12 max-w-2xl max-h-11/12">
-        <!-- close X -->
-        <form method="dialog">
-            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
-        </form>
-        <!-- fixed section -->
-        <div class="p-6">
-            <h3 class="font-bold text-2xl text-indigo-700">
-                {recipe.title}
-            </h3>
-            <p class="text-sm mt-2">
-                Prep time: <span class="font-medium text-indigo-600">{recipe.prepTimeMin} min</span> |
-                Category: <span class="font-medium text-indigo-600">{recipe.category}</span> |
-                Created: <span class="italic text-sm mt-2 text-gray-400">{recipe.dateCreated.toLocaleString()}</span>
-            </p>
-        </div>
-        <!-- tab container -->
-        <div role="tablist" class="tabs tabs-lifted px-2">
-            <!-- tab 1 instructions -->
-            {@render instructionsTab(recipe.instructions)}
-            <!-- tab 2 descriptions -->
-            {@render descriptionTab(recipe.description)}
-        </div>
-        <!-- Close Button (Bottom) fixed -->
-        <div class="modal-action p-4 mt-0">
-            <form method="dialog" class="w-full flex justify-end">
-                <button class="btn btn-outline">Close</button>
-            </form>
-        </div>
-    </div>
-    <!-- This outer form allows closing the modal by clicking outside the box -->
-    <form method="dialog" class="modal-backdrop">
-        <button>close</button>
-    </form>
-</dialog>
+<!-- delete modal -->
+<ConfirmActionModal 
+    bind:this={deleteModalRef}
+    title='Confirm Recipe Deletion'
+    message={`Are you sure you want to permanently delete ${recipe.recipeCode}: ${recipe.title}?`}
+    actionLabel='Delete'
+    modalStyle='ERROR'
+    onConfirm={confirmDeleteRecipe}
+    onCancel={() => {}} />
 
-<!-- confirm delete modal -->
-<dialog class="modal" id={recipe.id + '_modal_delete'} bind:this={deleteModalRef}>
+<!-- <dialog class="modal" id={recipe.id + '_modal_delete'} bind:this={deleteModalRef}>
     <div class="modal-box">
-        <!-- close X -->
         <form method="dialog">
             <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
         </form>
@@ -122,67 +101,17 @@
         <div class="modal-action p-2 pt-4">
             <div class="w-full flex flex-row justify-end gap-2.5">
                 <button class="btn btn-error"
-                    onclick={() => onClickDeleteBtn(recipe.id)}>Delete</button>
-                <!-- close modal -->
+                    >Delete</button>
                 <form method="dialog">
                     <button class="btn btn-outline">Close</button>
                 </form> 
             </div>
         </div>
     </div>
-    <!-- This outer form allows closing the modal by clicking outside the box -->
     <form method="dialog" class="modal-backdrop">
         <button>close</button>
     </form>
-</dialog>
-
-<!-- SNIPPETS SECTION -->
-{#snippet descriptionTab(description: string | undefined)}
-    <!-- <input type="radio" name="recipe_tabs" role="tab" class="tab"
-        aria-label="Descriptions" /> -->
-    <button role="tab" class="tab" class:tab-active={viewActiveTab === 'descriptions'}
-        onclick={() => viewActiveTab = 'descriptions'}>
-        Descriptions
-    </button>
-    <div role="tabpanel" class="tab-content rounded-box p-0 w-full">
-        <!-- scroll wrapper zone -->
-        <div class="p-4 h-72 overflow-y-auto">
-            {#if description === undefined || description === ''}
-                <p class="mt-2 mb-2 text-gray-600">No description</p>
-            {:else}
-                <h4 class="font-semibold text-lg mt-2 mb-1 text-indigo-400">
-                    Description:
-                </h4>
-                <p class="mb-4 text-gray-600">
-                    {description}
-                </p>
-            {/if}
-        </div>
-    </div>
-{/snippet}
-{#snippet instructionsTab(instructions: string[])}
-    <!-- <input type="radio" name="recipe_tabs" role="tab" class="tab"
-        aria-label="Instructions" /> -->
-    <button role="tab" class="tab" class:tab-active={viewActiveTab === 'instructions'}
-        onclick={() => viewActiveTab = 'instructions'}>
-        Instructions
-    </button>
-    <div role="tabpanel" class="tab-content p-0 w-full">
-        <!-- scroll wrapper zone -->
-        <div class="p-4 h-72 overflow-y-auto">
-            {#if instructions.length <= 0}
-                <p class="mt-2 mb-2 text-gray-600">No instructions</p>
-            {:else}
-                <h4 class="font-semibold text-lg mt-2 mb-1 text-indigo-400">Instructions:</h4>
-                <ol class="list-decimal list-inside space-y-1 pl-4 text-gray-700">
-                    {#each instructions as instruction}
-                        <li>{instruction}</li>
-                    {/each}
-                </ol>
-            {/if}
-        </div>
-    </div>
-{/snippet}
+</dialog> -->
 
 <style>
 

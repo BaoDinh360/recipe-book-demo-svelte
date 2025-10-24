@@ -9,8 +9,6 @@
 
     let { data }: PageProps = $props();
 
-    const { recipeData } = data;
-
     const onUpdateRecipe = async (recipeData: UpdateRecipeData) : Promise<void> => {
         console.log('recipeData received: ', recipeData);
         try {
@@ -36,7 +34,7 @@
 </script>
 
 <RecipeForm 
-    recipeToEdit={recipeData}
+    recipeToEdit={data.recipeData}
     onSubmit={(recipeData) => onUpdateRecipe(recipeData as UpdateRecipeData)}
     {onCancel}
     />

@@ -10,9 +10,6 @@
 
     // load the data from external
     let recipeList = $state<Recipe[]>([]);
-    // recipe pass as props to RecipeForm to edit
-    // control which mode RecipForm is (Add, Edit)
-    let recipeEdit = $state<Recipe | null>(null);
 
     // state for filter, sort
     let filterBy: FilterCriteria = $state({
@@ -59,38 +56,6 @@
         // fetch data from api
         recipeList = await fetchAllRecipes();
     })
-    
-    // edit recipe (open form)
-    const onOpenEditForm = (recipeId: string) => {
-        console.log('recipe edit id:', recipeId);
-        const recipe = recipeList.find(r => r.id === recipeId);
-        if(recipe) {
-            recipeEdit = recipe;
-        }
-        else {
-            console.log('cannot found recipe by id:', recipeId);
-        }
-    }
-    // delete recipe
-    const onDeleteRecipe = async (recipeId: string) => {
-        console.log('recipe delete: ', recipeId);
-        const index = recipeList.findIndex(r => r.id === recipeId);
-        //const recipe = await fetchRecipeById(recipeId);
-        if(index === -1) {
-            console.error('Cannot find recipe with id: ', recipeId);
-            return;
-        }
-        // delete recipe from pb
-        const isDeleted = await deleteRecipe(recipeId);
-        if(isDeleted) {
-            // remove from recipe[] in client if delete success
-            recipeList.splice(index, 1);
-            // re fetch all data
-            //recipeList = await fetchAllRecipes();
-        }
-        console.log('recipe list: ', $state.snapshot(recipeList));
-
-    }
     // filter recipe
     const onFilterRecipe = (filter: FilterCriteria) => {
         filterBy = {
@@ -108,9 +73,9 @@
         <div class="md:col-span-5">
             <h2 class="text-2xl font-bold text-indigo-700 mb-2 pb-2 text-center">Recipe List</h2>
             <RecipeFilter onFilterChange={onFilterRecipe}/>
-            <RecipeList recipeList={filteredRecipeList}
+            <!-- <RecipeList recipeList={filteredRecipeList}
                 onEdit={onOpenEditForm} 
-                onDelete={onDeleteRecipe}/>
+                onDelete={onDeleteRecipe}/> -->
         </div>
         <div class="md:col-span-4">
             
