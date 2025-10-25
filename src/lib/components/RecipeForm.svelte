@@ -12,7 +12,6 @@
 
     const defaultFormData = {
         id: undefined,
-        recipeCode: undefined,
         title: '',
         description: '',
         instructions: '',
@@ -25,7 +24,6 @@
     // Add form mode won't have id, recipeCode
     let formData: {
         id: string | undefined,
-        recipeCode: string | undefined,
         title: string,
         description: string,
         instructions: string,
@@ -97,35 +95,32 @@
     <form class="space-y-4"
         onsubmit={(e) => submitForm(e)}>
         <!-- form input cols layout -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-3">
             <!-- title -->
             <div class="md:col-span-2 form-control w-full">
                 <label class="label" for="title">
-                    <span class="label-text text-base text-indigo-700 font-medium">
+                    <span class="label-text text-base text-indigo-700 font-semibold">
                         Title
                     </span>
                 </label>
                 <input class="input input-bordered w-full" 
                     type="text" id="title" bind:value={formData.title}/>
             </div>
-            <div class="form-control w-full">
-                <!-- if edit, show recipe code readonly -->
-                {#if formState === FormState.EDIT && recipeToEdit}
-                    <label class="label" for="recipeCode">
-                        <span class="label-text text-base text-indigo-700 font-medium">
-                            Recipe code
-                        </span>
-                    </label>
-                    <input class="input input-ghost w-full bg-gray-100
-                        text-indigo-700 font-medium" 
-                        readonly type="text" id="recipeCode" 
-                        value={formData.recipeCode}/>
-                {/if}
-            </div>
+            {#if formState === FormState.EDIT && recipeToEdit}
+                <!-- show recipe code in edit page -->
+                <div class="w-full self-end">
+                    <div class="flex items-center justify-between bg-gray-100 rounded-lg p-3">
+                        <span class="font-semibold text-indigo-700 text-base">Recipe Code</span>
+                        <span class="font-semibold text-gray-700">{recipeToEdit.recipeCode}</span>
+                    </div>
+                </div>
+            {:else}
+                <div class="form-control w-full"></div>
+            {/if}
             <!-- category -->
             <div class="form-control w-full">
                 <label class="label" for="category">
-                    <span class="label-text text-base text-indigo-700 font-medium">
+                    <span class="label-text text-base text-indigo-700 font-semibold">
                         Category
                     </span>    
                 </label>
@@ -140,7 +135,7 @@
             <!-- prep time -->
             <div class="form-control w-full">
                 <label class="label" for="prepTime">
-                    <span class="label-text text-base text-indigo-700 font-medium">
+                    <span class="label-text text-base text-indigo-700 font-semibold">
                         Prep time
                     </span>
                 </label>
@@ -153,7 +148,7 @@
             <!-- instructions(separated by ',') -->
             <div class="md:col-span-3 form-control w-full">
                 <label class="label" for="instruction">
-                    <span class="label-text text-base text-indigo-700 font-medium">
+                    <span class="label-text text-base text-indigo-700 font-semibold">
                         Instructions, 1 per line
                     </span>    
                 </label>
@@ -164,7 +159,7 @@
             <!-- description -->
             <div class="md:col-span-3 form-control w-full">
                 <label class="label" for="desc">
-                    <span class="label-text text-base text-indigo-700 font-medium">
+                    <span class="label-text text-base text-indigo-700 font-semibold">
                         Description
                     </span>
                 </label>
@@ -179,7 +174,7 @@
                 onclick={onCancelForm}>
                 Cancel
             </button>
-            <button type="submit" class="btn btn-primary w-36">
+            <button type="submit" class="btn btn-primary w-36 text-white font-semibold">
                 {formState === FormState.EDIT ? 
                     'Save changes' : 
                     'Add recipe'

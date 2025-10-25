@@ -31,7 +31,7 @@ export const getPaginatedRecipeList = async (): Promise<RecipeListItem[]> => {
     }
 }
 // get recipe by id
-export const fetchRecipeById = async (id: string): Promise<RecipeDetail | null> => {
+export const getRecipeById = async (id: string): Promise<RecipeDetail | null> => {
     try {
         const record = await pb.collection(COLLECTION_NAME).getOne<RecipePbRecord>(id);
         console.log('pocketbase recipe: {id} record', id, record);
@@ -51,7 +51,7 @@ export const createRecipe = async (recipeData: CreateRecipeData): Promise<Recipe
         const newRecipe: Recipe = mapPbRecordToRecipe(record);
         return newRecipe;
     } catch (error) {
-        console.error('Error insert PocketBase recipe: ', error);
+        console.error('Exception error insert PocketBase recipe: ', error);
         return null;
     }
 };
@@ -64,7 +64,7 @@ export const updateRecipe = async (recipeData: UpdateRecipeData): Promise<Recipe
         const updatedRecipe: Recipe = mapPbRecordToRecipe(record);
         return updatedRecipe;
     } catch (error) {
-        console.error('Error update PocketBase recipe {id}: ', id, error);
+        console.error('Exception error update PocketBase recipe {id}: ', id, error);
         return null;
     }
 };
@@ -73,7 +73,7 @@ export const deleteRecipe = async (id: string): Promise<void> => {
     try {
         await pb.collection(COLLECTION_NAME).delete(id);
     } catch (error) {
-        console.error('Error delete PocketBase recipe {id}: ', id, error);
+        console.error('Exception error delete PocketBase recipe {id}: ', id, error);
     }
 };
 

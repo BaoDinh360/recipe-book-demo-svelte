@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto, invalidate } from "$app/navigation";
 	import type { RecipeListItem } from "$lib/recipe-types";
+	import { notifyError, notifySuccess } from "$lib/stores/notification-stores";
 	import { deleteRecipe } from "$lib/utils/recipe-service";
 	import ConfirmActionModal from "./ConfirmActionModal.svelte";
 
@@ -12,22 +13,28 @@
     let deleteModalRef: ConfirmActionModal;
 
     const confirmDeleteRecipe = async () => {
+        let notiMessage = '';
         try {
             await deleteRecipe(recipe.id);
             // trigger page.ts re run load func
             invalidate('app:recipes');
+
+            notiMessage = `Delete recipe: ${recipe.recipeCode} success!`;
+            notifySuccess(notiMessage);
         } catch (error) {
-            console.error('Error deleting recipe: ', recipe.id);   
+            console.error('An exception occurs: ', error);
+            notiMessage = `An error occurs when deleting recipe: ${recipe.recipeCode}!`;
+            notifyError(notiMessage);
         }
     };
 
 </script>
 
 <!-- card recipe item -->
-<div class="card bg-white border border-gray-200 rounded-lg">
+<div class="card bg-white border border-gray-200 rounded-lg shadow-md">
     <div class="card-body p-6 flex flex-col">
         <!-- title -->
-        <h2 class="card-title text-lg font-semibold mb-2 leading-tight">
+        <h2 class="card-title text-lg font-semibold mb-4 leading-tight text-indigo-700">
             {recipe.title}
         </h2>
         <!-- category badge -->
@@ -38,7 +45,7 @@
             {recipe.description}
         </p>
         <!-- metadata -->
-        <div class="space-y-3 pt-2 border-t border-gray-100">
+        <div class="space-y-3 pt-2 border-t border-gray-100 pt-4">
             <!-- recipe code -->
             <div class="flex items-center justify-start text-sm gap-2">
                 <span class="p-2 font-medium bg-gray-100">Recipe code: {recipe.recipeCode}</span>

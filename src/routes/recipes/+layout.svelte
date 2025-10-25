@@ -64,7 +64,7 @@
 </script>
 
 <!-- recipe top bar -->
-<header class="flex justify-between items-center w-full mx-auto mt-4 mb-8">
+<header class="flex justify-between items-center w-full mx-auto mb-4">
     <div class="flex items-center space-x-6">
         {#if layoutPageType !== PageType.INDEX}
             <!-- don't show back btn on index page -->
@@ -94,7 +94,7 @@
 {#if layoutPageType === PageType.INDEX || layoutPageType === PageType.DETAIL}
     {@render children?.()}
 {:else}
-    <div class="w-full mx-auto pl-4 pr-4 rounded-lg shadow-md bg-white border border-gray-200">
+    <div class="w-full mx-auto px-4 rounded-lg shadow-md bg-white border border-gray-200">
         <div class="container p-6 mx-auto max-w-full">
             {@render children?.()}
         </div>

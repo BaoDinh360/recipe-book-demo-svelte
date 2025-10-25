@@ -2,26 +2,31 @@
     import { goto } from "$app/navigation";
 	import RecipeForm from "$lib/components/RecipeForm.svelte";
 	import type { CreateRecipeData } from "$lib/recipe-types";
+	import { notifyError, notifySuccess } from "$lib/stores/notification-stores";
 	import { createRecipe } from "$lib/utils/recipe-service";
 
     // path: /recipes/create/
 
     const onCreateRecipe = async(recipeData: CreateRecipeData): Promise<void> => {
-        console.log('recipeData received: ', recipeData);
+        let notiMessage = '';
         try {
             // create recipe
             const created = await createRecipe(recipeData);
             if(created !== null) {
-                // temp: use toast msg later
-                console.log('Create new recipe success: ', created);
                 // go back to index /recipes page
                 await goto('/recipes');
+                // show success noti
+                notiMessage = `Create new recipe: ${created.recipeCode} success!`;
+                notifySuccess(notiMessage);
             }
             else {
-                console.log('Failed to create recipe, return null');
+                notiMessage = 'Failed to create new recipe!';
+                notifyError(notiMessage);
             }
         } catch (error) {
-            console.error('Failed to create recipe: ', error);
+            console.error('An exception occurs: ', error);
+            notiMessage = 'An error occurs when creating new recipe!';
+            notifyError(notiMessage);
         }
     }
     const onCancel = () => {
