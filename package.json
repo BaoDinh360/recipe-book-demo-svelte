@@ -39,6 +39,7 @@
 		"vite": "^7.0.4"
 	},
 	"dependencies": {
+		"@lucide/svelte": "^0.548.0",
 		"pocketbase": "^0.26.2"
 	}
 }

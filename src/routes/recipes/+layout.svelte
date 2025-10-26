@@ -3,6 +3,7 @@
 	import { page } from '$app/state';
 	import { PageType } from '$lib/types';
     import '../../app.css';
+    import { MoveLeft, SquarePlus } from '@lucide/svelte';
     let { children } = $props();
 
     
@@ -71,7 +72,8 @@
             <button class="btn btn-ghost group hover:bg-indigo-500"
                 aria-label="Back"
                 onclick={() => goto('/recipes')}>
-                <svg class="h-6 w-6 stroke-indigo-700 group-hover:stroke-white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M20 12H4M4 12L10 6M4 12L10 18" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+                <!-- lucide icon -->
+                <MoveLeft class="h-6 w-6 stroke-indigo-700 group-hover:stroke-white"/>
             </button>
         {/if}
         <!-- title and description -->
@@ -85,6 +87,7 @@
         <!-- only show create button in index page -->
         <button class="btn btn-primary btn-sm md:btn-md w-36 font-semibold text-white"
             onclick={() => goto('/recipes/create')}>
+            <SquarePlus />
             Create
         </button>
     {/if}

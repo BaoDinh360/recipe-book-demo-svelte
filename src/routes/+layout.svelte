@@ -2,6 +2,7 @@
 	import '../app.css';
 	import favicon from '$lib/assets/favicon.svg';
 	import NotificationArea from '$lib/components/NotificationArea.svelte';
+	import { BookOpenText, ChefHat, HouseHeart } from '@lucide/svelte';
 
 	let { children } = $props();
 </script>
@@ -20,22 +21,23 @@
 		sticky top-0 h-screen hidden md:flex transition-all duration-300">
 		<!-- App title -->
 		<a href="/" class="text-2xl font-extrabold mb-8 pt-2 overflow-hidden whitespace-nowrap">
-			Recipe Book
+			<div class="flex items-center gap-1 lg:gap-2">
+				<BookOpenText class="h-6 w-6" />
+				Recipe Book
+			</div>	
 		</a>
 		<!-- Menu -->
 		<ul class="menu p-0 space-y-1 flex-grow flex flex-col gap-3">
 			<li class="rounded-lg">
 				<a href="/" class="text-white font-semibold flex items-center gap-4 p-3">
-					<!-- Icon for Home -->
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-5a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" /></svg>
+					<HouseHeart class="h-5 w-5 flex-shrink-0" />
 					<span class="sidebar-title overflow-hidden whitespace-nowrap">Home</span>
 				</a>
 			</li>
 			<li class="rounded-lg">
 				<a href="/recipes" class="text-white font-semibold flex items-center gap-4 p-3">
-					<!-- Icon for Home -->
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-5a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" /></svg>
-					<span class="sidebar-title overflow-hidden whitespace-nowrap">Recipe</span>
+					<ChefHat class="h-5 w-5 flex-shrink-0" />
+					<span class="sidebar-title overflow-hidden whitespace-nowrap">Recipes</span>
 				</a>
 			</li>
 		</ul>

@@ -3,16 +3,22 @@
 	import type { RecipeListItem } from "$lib/recipe-types";
 	import { notifyError, notifySuccess } from "$lib/stores/notification-stores";
 	import { deleteRecipe } from "$lib/utils/recipe-service";
+	import CategoryBadge from "./CategoryBadge.svelte";
 	import ConfirmActionModal from "./ConfirmActionModal.svelte";
+    import { Eye, SquarePen, Trash2 } from '@lucide/svelte';
 
     let { recipe, 
     }: {
-        recipe: RecipeListItem,
+        recipe: RecipeListItem | undefined,
     } = $props();
 
-    let deleteModalRef: ConfirmActionModal;
+    let deleteModalRef: ConfirmActionModal | undefined = $state();
 
     const confirmDeleteRecipe = async () => {
+        if(!recipe) {
+            // do nothing if undefined
+            return;
+        }
         let notiMessage = '';
         try {
             await deleteRecipe(recipe.id);
@@ -30,95 +36,71 @@
 
 </script>
 
-<!-- card recipe item -->
-<div class="card bg-white border border-gray-200 rounded-lg shadow-md">
-    <div class="card-body p-6 flex flex-col">
-        <!-- title -->
-        <h2 class="card-title text-lg font-semibold mb-4 leading-tight text-indigo-700">
-            {recipe.title}
-        </h2>
-        <!-- category badge -->
-        <span class="mb-4 p-4 badge badge-lg bg-yellow-100 text-yellow-800 font-semibold">
-            {recipe.category}
-        </span>
-        <p class="text-sm text-gray-500 mt-2 flex-grow">
-            {recipe.description}
-        </p>
-        <!-- metadata -->
-        <div class="space-y-3 pt-2 border-t border-gray-100 pt-4">
-            <!-- recipe code -->
-            <div class="flex items-center justify-start text-sm gap-2">
-                <span class="p-2 font-medium bg-gray-100">Recipe code: {recipe.recipeCode}</span>
+<!-- conditionally render ui if recipe has data to avoid race condition -->
+{#if !recipe}
+    <!-- fallback state (avoid race condition) -->
+    <p>Recipe data is not available</p>
+{:else}
+    <!-- card recipe item -->
+    <div class="card bg-white border border-gray-200 rounded-lg shadow-md">
+        <div class="card-body p-6 flex flex-col">
+            <!-- title -->
+            <h2 class="card-title text-lg font-semibold mb-4 leading-tight text-indigo-700">
+                {recipe.title}
+            </h2>
+            <!-- category badge -->
+            <CategoryBadge category={recipe.category} />
+            <p class="text-sm text-gray-600 mt-2 flex-grow">
+                {recipe.description}
+            </p>
+            <!-- metadata -->
+            <div class="space-y-3 pt-2 border-t border-gray-100 pt-4">
+                <!-- recipe code -->
+                <div class="flex items-center justify-start text-sm gap-2">
+                    <span class="p-2 font-medium bg-gray-100 rounded-md">
+                        Recipe code: {recipe.recipeCode}
+                    </span>
+                </div>
+                <!-- prep time -->
+                <div class="flex items-center justify-start text-sm gap-2">
+                    <span class="text-gray-600 font-medium">Prep time:</span>
+                    <span class="font-semibold text-indigo-700">{recipe.prepTimeMin} min</span>
+                </div>
             </div>
-            <!-- prep time -->
-            <div class="flex items-center justify-start text-sm gap-2">
-                <span class="text-gray-600 font-medium">Prep time:</span>
-                <span class="font-semibold text-indigo-700">{recipe.prepTimeMin} min</span>
+            <div class="pt-4">
+                <p class="text-xs text-gray-400 italic">
+                    {recipe.createdAt.toLocaleDateString('vi-VN')}, 
+                    {recipe.createdAt.toLocaleTimeString('vi-VN', {hour12: false})}
+                </p>
             </div>
-        </div>
-        <div class="pt-4">
-            <p class="text-xs text-gray-400">
-                {recipe.createdAt.toLocaleString()}
-            </p>
-        </div>
-        <!-- card footer action -->
-        <div class="card-actions flex justify-end pt-4 border-t border-gray-100">
-            <button class="btn btn-sm btn-outline btn-info"
-                onclick={() => goto(`/recipes/${recipe.id}`)}>
-                View
-            </button>
-            <button class="btn btn-sm btn-outline btn-success"
-                onclick={() => goto(`/recipes/edit/${recipe.id}`)}>
-                Edit
-            </button>
-            <button class="btn btn-sm btn-outline btn-error"
-                onclick={() => deleteModalRef.showModal()}>
-                Delete
-            </button>
-        </div>
-    </div>
-</div>
-
-<!-- delete modal -->
-<ConfirmActionModal 
-    bind:this={deleteModalRef}
-    title='Confirm Recipe Deletion'
-    message={`Are you sure you want to permanently delete ${recipe.recipeCode}: ${recipe.title}?`}
-    actionLabel='Delete'
-    modalStyle='ERROR'
-    onConfirm={confirmDeleteRecipe}
-    onCancel={() => {}} />
-
-<!-- <dialog class="modal" id={recipe.id + '_modal_delete'} bind:this={deleteModalRef}>
-    <div class="modal-box">
-        <form method="dialog">
-            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
-        </form>
-        <div class="p-2 mb-4">
-            <h3 class="font-bold text-2xl text-red-500 mb-4">
-                Delete recipe
-            </h3>
-            <p class="py-2 text-gray-600">
-                Are you sure you want to delete this recipe:
-            </p>
-            <p class="font-medium">
-                {recipe.recipeCode}: <span class="text-indigo-600">{recipe.title}</span>
-            </p>
-        </div>
-        <div class="modal-action p-2 pt-4">
-            <div class="w-full flex flex-row justify-end gap-2.5">
-                <button class="btn btn-error"
-                    >Delete</button>
-                <form method="dialog">
-                    <button class="btn btn-outline">Close</button>
-                </form> 
+            <!-- card footer action -->
+            <div class="card-actions flex justify-end pt-4 border-t border-gray-100">
+                <button class="btn btn-sm btn-outline btn-info group lg:tooltip" data-tip="View recipe details"
+                    onclick={() => goto(`/recipes/${recipe.id}`)}>
+                    <Eye class="h-4 w-4 group-hover:stroke-white"/>
+                </button>
+                <button class="btn btn-sm btn-outline btn-success group lg:tooltip" data-tip="Edit recipe"
+                    onclick={() => goto(`/recipes/edit/${recipe.id}`)}>
+                    <SquarePen class="h-4 w-4 group-hover:stroke-white"/>
+                </button>
+                <button class="btn btn-sm btn-outline btn-error group lg:tooltip" data-tip="Delete recipe"
+                    onclick={() => deleteModalRef!.showModal()}>
+                    <Trash2 class="h-4 w-4 group-hover:stroke-white" />
+                </button>
             </div>
         </div>
     </div>
-    <form method="dialog" class="modal-backdrop">
-        <button>close</button>
-    </form>
-</dialog> -->
+
+    <!-- delete modal -->
+    <ConfirmActionModal 
+        bind:this={deleteModalRef}
+        title='Confirm Recipe Deletion'
+        message={`Are you sure you want to permanently delete ${recipe.recipeCode}: ${recipe.title}?`}
+        actionLabel='Delete'
+        modalStyle='ERROR'
+        onConfirm={confirmDeleteRecipe}
+        onCancel={() => {}} />
+{/if}
 
 <style>
 
