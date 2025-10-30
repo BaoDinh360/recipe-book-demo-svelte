@@ -1,5 +1,4 @@
-import { isUpdateRecipeDataType, type CreateRecipeData, type RecipeDetail, type RecipeFormSubmissionData, type RecipeListItem, type RecipePbRecord, type UpdateRecipeData, type UpsertRecipePbRecord } from '$lib/recipe-types';
-import { type Recipe } from '$lib/types';
+import { isUpdateRecipeDataType, type CreateRecipeData, type RecipeDetail, type RecipeFilterCriteria, type RecipeFormSubmissionData, type RecipeListItem, type RecipeListPagination, type RecipePbRecord, type UpdateRecipeData, type UpsertRecipePbRecord } from '$lib/recipe-types';
 import PocketBase from 'pocketbase';
 
 const POCKETBASE_URL = 'http://127.0.0.1:8090';
@@ -7,27 +6,56 @@ const POCKETBASE_URL = 'http://127.0.0.1:8090';
 const pb: PocketBase = new PocketBase(POCKETBASE_URL);
 const COLLECTION_NAME = 'recipes';
 
-// get all recipes
-export const fetchAllRecipes = async (): Promise<Recipe[]> => {
+// get paginated recipes, optional: filter, sort
+export const getPaginatedRecipeList = async (currentPage: number, itemsPerPage: number, 
+    recipeFilters: RecipeFilterCriteria
+): 
+    Promise<RecipeListPagination | undefined> => {
     try {
-        const recipeRecords = await pb.collection(COLLECTION_NAME).getList<RecipePbRecord>(1, 50);
+        // construct pocketbase filter
+        const { text, category, prepTimeMin, sortBy } = recipeFilters;
+
+        const pbFilters: string[] = [];
+        const pbSorts: string[] = [];
+        // filters
+        if(text) {
+            // search contains text
+            pbFilters.push(`(recipeCode~"${text}" || title~"${text}" || description~"${text}")`);
+        }
+        if(category) {
+            pbFilters.push(`category="${category}"`);
+        }
+        if(prepTimeMin) {
+            pbFilters.push(`prepTimeMin<=${prepTimeMin}`);
+        }
+
+        // sort by
+        if(sortBy) {
+            pbSorts.push(`${sortBy}`);
+        }
+
+        // join filters into a final string
+        const filterString =  pbFilters.length > 0 ? pbFilters.join('&&') : undefined;
+        const sortString = pbSorts.length > 0 ? pbSorts.join(',') : undefined;
+        console.log('Recipe filter, sorts string: ', filterString, sortString);
+
+        const recipeRecords = await pb.collection(COLLECTION_NAME).getList<RecipePbRecord>(
+            currentPage, itemsPerPage, {
+                filter: filterString,
+                sort: sortString,
+            });
         console.log('pocketbase recipe records: ', recipeRecords);
-        const recipes: Recipe[] = recipeRecords.items.map(mapPbRecordToRecipe);
-        return recipes;
+
+        // destructuring
+        const { page, perPage, totalPages, totalItems, items } = recipeRecords;
+        const recipeListPagination: RecipeListPagination = {
+            page, perPage, totalPages, totalItems,
+            items: items.map(mapPbRecordToRecipeListItem)
+        };
+        return recipeListPagination;
     } catch (error) {
         console.error('Error fetch PocketBase recipes: ', error);
-        return [];
-    }
-};
-export const getPaginatedRecipeList = async (): Promise<RecipeListItem[]> => {
-    try {
-        const recipeRecords = await pb.collection(COLLECTION_NAME).getList<RecipePbRecord>(1, 50);
-        console.log('pocketbase recipe records: ', recipeRecords);
-        const recipeListItems: RecipeListItem[] = recipeRecords.items.map(mapPbRecordToRecipeListItem);
-        return recipeListItems;
-    } catch (error) {
-        console.error('Error fetch PocketBase recipes: ', error);
-        return [];
+        return undefined;
     }
 }
 // get recipe by id
@@ -43,26 +71,24 @@ export const getRecipeById = async (id: string): Promise<RecipeDetail | null> =>
     }
 };
 // create new recipe
-export const createRecipe = async (recipeData: CreateRecipeData): Promise<Recipe | null> => {
+export const createRecipe = async (recipeData: CreateRecipeData): Promise<RecipePbRecord | null> => {
     try {
         const data: UpsertRecipePbRecord = mapRecipeDataToUpsertPbRecord(recipeData);
         // return new insert record
-        const record = await pb.collection(COLLECTION_NAME).create<RecipePbRecord>(data);
-        const newRecipe: Recipe = mapPbRecordToRecipe(record);
-        return newRecipe;
+        const newRecord = await pb.collection(COLLECTION_NAME).create<RecipePbRecord>(data);
+        return newRecord;
     } catch (error) {
         console.error('Exception error insert PocketBase recipe: ', error);
         return null;
     }
 };
 // update recipe by id
-export const updateRecipe = async (recipeData: UpdateRecipeData): Promise<Recipe | null> => {
+export const updateRecipe = async (recipeData: UpdateRecipeData): Promise<RecipePbRecord | null> => {
     const id = recipeData.id;
     try {
         const data: UpsertRecipePbRecord = mapRecipeDataToUpsertPbRecord(recipeData);
-        const record = await pb.collection(COLLECTION_NAME).update<RecipePbRecord>(id, data);
-        const updatedRecipe: Recipe = mapPbRecordToRecipe(record);
-        return updatedRecipe;
+        const updatedRecord = await pb.collection(COLLECTION_NAME).update<RecipePbRecord>(id, data);
+        return updatedRecord;
     } catch (error) {
         console.error('Exception error update PocketBase recipe {id}: ', id, error);
         return null;
@@ -77,14 +103,6 @@ export const deleteRecipe = async (id: string): Promise<void> => {
     }
 };
 
-// mapping helper
-const mapPbRecordToRecipe = (pbRecord: RecipePbRecord): Recipe => {
-    const { collectionId, collectionName, ...included  } = pbRecord;
-    return {
-        ... included,
-        dateCreated: new Date(included.created)
-    };
-}
 const mapPbRecordToRecipeListItem = (pbRecord: RecipePbRecord): RecipeListItem => {
     const { instructions, collectionId, collectionName, ...included } = pbRecord;
     return {

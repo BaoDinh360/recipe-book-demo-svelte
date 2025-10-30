@@ -8,8 +8,8 @@ export const categoryOptions: SelectOption[] = [
 ];
 
 export const sortingOptions: SelectOption[] = [
-    {label: 'Oldest', value: 'DATE_ASC'},
-    {label: 'Latest', value: 'DATE_DESC'}
+    {label: 'Oldest', value: 'created'},
+    {label: 'Latest', value: '-created'}
 ];
 
 const ITEMS_PER_PAGE_ARR = [3, 6, 9];

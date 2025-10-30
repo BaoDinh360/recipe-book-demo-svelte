@@ -36,6 +36,15 @@ export interface RecipeListItem {
     createdAt: Date;
 }
 
+// recipe list items with pagination
+export interface RecipeListPagination {
+    page: number;
+    perPage: number;
+    totalPages: number;
+    totalItems: number;
+    items: RecipeListItem[];
+}
+
 // recipe detail
 export interface RecipeDetail {
     id: string;
@@ -69,4 +78,12 @@ export const isUpdateRecipeDataType = (data: RecipeFormSubmissionData): data is 
     // to be UpdateRecipeData
     return (data as UpdateRecipeData).id !== undefined &&
         typeof(data as UpdateRecipeData).id === 'string';
+}
+
+// recipe filter
+export interface RecipeFilterCriteria {
+    text: string | undefined;
+    category: RecipeCategory | undefined;
+    prepTimeMin: number | undefined;
+    sortBy: string | undefined;
 }

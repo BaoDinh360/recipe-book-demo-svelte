@@ -1,58 +1,75 @@
 <script lang="ts">
+	import { goto } from "$app/navigation";
+	import { page } from "$app/state";
 	import { itemsPerPageOptions } from "$lib/constants";
+	import { ChevronLeft, ChevronRight } from "@lucide/svelte";
 
 
-    let { currentPage, totalPages, itemsPerPage, totalItems, 
-        onPageChange, onItemsPerPageChange }: {
+    let { currentPage, totalPages, itemsPerPage, totalItems,
+    }: {
         currentPage: number,
         totalPages: number,
         itemsPerPage: number,
         totalItems: number,
-        onPageChange: (pageNum: number) => void,
-        onItemsPerPageChange: (itemsPerPage: number) => void
     } = $props();
 
-    // derived values from props, use as local state
-    // when props values changes, these also reactively changes
-    let pageSelected: number = $derived(currentPage);
-    let perPageSelected: number = $derived(itemsPerPage);
-
-    const onSelectPerPage = () => {
-        if(itemsPerPage !== perPageSelected) {
-            onItemsPerPageChange(perPageSelected);
-        }
+    const onPaginationStateChange = ({currentPage, perPage}: {currentPage: number, perPage: number}) => {
+        // update url query params --> trigger re run load func re fetch data
+        const searchParams = new URLSearchParams(page.url.searchParams);
+        searchParams.set('page', String(currentPage));
+        searchParams.set('perPage', String(perPage));
+        
+        console.log('new url query params: ', searchParams);
+        goto(`?${searchParams.toString()}`, { replaceState: true, noScroll: true });
     }
 
-    const onSelectPage = () => {
+    const onSelectPerPage = (e: Event) => {
+        // change perPage, currentPage
+        const perPageSelected = Number((e.target as HTMLSelectElement).value);
+        if(itemsPerPage !== perPageSelected) {
+            // only perform when current perPage <> selected perPage
+            // reset page params when change items per page
+            onPaginationStateChange({currentPage: 1, perPage: perPageSelected});
+        }
+    }
+    const onSelectPage = (e: Event) => {
+        // only change currentPage
+        const pageSelected = Number((e.target as HTMLSelectElement).value);
         if(pageSelected >= 1 && 
             pageSelected <= totalPages && 
             currentPage !== pageSelected){
-            onPageChange(pageSelected);
+            // perPage read value from props
+            onPaginationStateChange({currentPage: pageSelected, perPage: itemsPerPage});
         }
     }
     const nextPage = () => {
+        // change currentPage only
         if(currentPage < totalPages) {
             let pageNum: number = currentPage + 1;
-            onPageChange(pageNum);
+            // perPage read value from props
+            onPaginationStateChange({currentPage: pageNum, perPage: itemsPerPage});
         }
     };
     const previousPage = () => {
+        // change currentPage only
         if(currentPage > 1) {
             let pageNum: number = currentPage - 1;
-            onPageChange(pageNum);
+            // perPage read value from props
+            onPaginationStateChange({currentPage: pageNum, perPage: itemsPerPage});
         }
     };
 
 </script>
 
-<div class="mt-6 flex flex-col sm:flex-row items-center justify-between p-3 text-sm">
+<div class="flex flex-col md:flex-row items-center justify-between mb-6  p-3 rounded-lg
+    bg-white border border-gray-100 shadow-sm">
     <!-- items count, items per page -->
     <div class="flex items-center gap-8 mb-3 sm:mb-0">
         <!-- items per page -->
         <div class="flex items-center gap-2">
-            <span class="text-gray-600 whitespace-nowrap hidden sm:inline">Per page:</span>
+            <span class="text-gray-600 whitespace-nowrap hidden sm:block">Per page:</span>
             <select class="select select-bordered select-sm" id="perPage"
-                bind:value={perPageSelected}
+                value={itemsPerPage}
                 onchange={onSelectPerPage}>
                 {#each itemsPerPageOptions as {label, value} }
                     <option value={value}>{label}</option>
@@ -67,18 +84,19 @@
     <!-- page navigation -->
     <div class="flex items-center gap-4">
         <!-- previous -->
-        <button class="btn btn-outline btn-neutral btn-sm group text-black" 
+        <button class="btn btn-ghost btn-sm group text-black" 
             aria-label="Prev"
             disabled={currentPage === 1}
             onclick={previousPage}>
-            <svg class="group-hover:text-white fill-current" width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" transform="rotate(0)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M16.7,15.3L13.4,12l3.3-3.3c0.4-0.4,0.4-1,0-1.4c-0.4-0.4-1-0.4-1.4,0l-4,4c0,0,0,0,0,0c-0.4,0.4-0.4,1,0,1.4l4,4c0.2,0.2,0.4,0.3,0.7,0.3c0.3,0,0.5-0.1,0.7-0.3C17.1,16.3,17.1,15.7,16.7,15.3z M8,7C7.4,7,7,7.4,7,8v8c0,0.6,0.4,1,1,1s1-0.4,1-1V8C9,7.4,8.6,7,8,7z"></path></g></svg>
+            <ChevronLeft class="h-4 w-4 stroke-current" strokeWidth=3 />
+            Prev
         </button>
         <!-- page select -->
         <div class="flex items-center gap-1 whitespace-nowrap">
             <span class="text-gray-600">Page</span>
             <select class="select select-bordered select-sm" id="currPage"
                 disabled={totalPages === 1}
-                bind:value={pageSelected}
+                value={currentPage}
                 onchange={onSelectPage}>
                 {#each Array(totalPages).keys() as pageNum }
                     <option value={pageNum + 1}>{pageNum + 1}</option>
@@ -87,11 +105,12 @@
             <span class="text-gray-600"> of {totalPages}</span>
         </div>
         <!-- next -->
-        <button class="btn btn-outline btn-neutral btn-sm group text-black" 
+        <button class="btn btn-ghost btn-sm group text-black" 
             aria-label="Next"
             disabled={currentPage === totalPages}
             onclick={nextPage}>
-            <svg class="group-hover:text-white fill-current" width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" transform="rotate(180)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M16.7,15.3L13.4,12l3.3-3.3c0.4-0.4,0.4-1,0-1.4c-0.4-0.4-1-0.4-1.4,0l-4,4c0,0,0,0,0,0c-0.4,0.4-0.4,1,0,1.4l4,4c0.2,0.2,0.4,0.3,0.7,0.3c0.3,0,0.5-0.1,0.7-0.3C17.1,16.3,17.1,15.7,16.7,15.3z M8,7C7.4,7,7,7.4,7,8v8c0,0.6,0.4,1,1,1s1-0.4,1-1V8C9,7.4,8.6,7,8,7z"></path></g></svg>
+            Next
+            <ChevronRight class="h-5 w-5 stroke-current"/>
         </button>
     </div>
 </div>

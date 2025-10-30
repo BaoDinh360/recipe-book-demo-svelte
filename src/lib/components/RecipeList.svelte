@@ -1,7 +1,5 @@
 <script lang="ts">
 	import type { RecipeListItem } from "$lib/recipe-types";
-	import type { Recipe } from "$lib/types";
-	import Pagination from "./Pagination.svelte";
 	import RecipeItem from "./RecipeItem.svelte";
 
     const ITEMS_PER_PAGE = 3;
@@ -71,7 +69,7 @@
 <div class="w-full mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
     {#if totalItems <= 0}
         <p class="md:col-span-2 text-gray-500 mt-1 text-lg text-center">
-            No recipe on the list. Start by adding one
+            No recipe data
         </p>
     {:else}
         {#each recipeList as listItem (listItem.id) }
