@@ -44,7 +44,7 @@ export const getPaginatedRecipeList = async (currentPage: number, itemsPerPage: 
                 filter: filterString,
                 sort: sortString,
             });
-        console.log('pocketbase recipe records: ', recipeRecords);
+        console.log('recipe records returned: ', recipeRecords.totalItems);
 
         // destructuring
         const { page, perPage, totalPages, totalItems, items } = recipeRecords;
@@ -72,27 +72,17 @@ export const getRecipeById = async (id: string): Promise<RecipeDetail | null> =>
 };
 // create new recipe
 export const createRecipe = async (recipeData: CreateRecipeData): Promise<RecipePbRecord | null> => {
-    try {
-        const data: UpsertRecipePbRecord = mapRecipeDataToUpsertPbRecord(recipeData);
-        // return new insert record
-        const newRecord = await pb.collection(COLLECTION_NAME).create<RecipePbRecord>(data);
-        return newRecord;
-    } catch (error) {
-        console.error('Exception error insert PocketBase recipe: ', error);
-        return null;
-    }
+    const data: UpsertRecipePbRecord = mapRecipeDataToUpsertPbRecord(recipeData);
+    // return new insert record
+    const newRecord = await pb.collection(COLLECTION_NAME).create<RecipePbRecord>(data);
+    return newRecord;
 };
 // update recipe by id
 export const updateRecipe = async (recipeData: UpdateRecipeData): Promise<RecipePbRecord | null> => {
     const id = recipeData.id;
-    try {
-        const data: UpsertRecipePbRecord = mapRecipeDataToUpsertPbRecord(recipeData);
-        const updatedRecord = await pb.collection(COLLECTION_NAME).update<RecipePbRecord>(id, data);
-        return updatedRecord;
-    } catch (error) {
-        console.error('Exception error update PocketBase recipe {id}: ', id, error);
-        return null;
-    }
+    const data: UpsertRecipePbRecord = mapRecipeDataToUpsertPbRecord(recipeData);
+    const updatedRecord = await pb.collection(COLLECTION_NAME).update<RecipePbRecord>(id, data);
+    return updatedRecord;
 };
 // delete recipe by id
 export const deleteRecipe = async (id: string): Promise<void> => {

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { notifications, removeNotification, type NotificationType } from "$lib/stores/notification-stores";
 	import { fly } from "svelte/transition";
-    import { Check, CircleX, X } from "@lucide/svelte";
+    import { CheckIcon, CircleXIcon, XIcon } from '$lib/icons';
 
     const getAlertType = (notiType: NotificationType) => {
         switch(notiType) {
@@ -20,7 +20,7 @@
 
 </script>
 
-<div class="toast toast-end z-[9999]">
+<div class="toast toast-top toast-center z-[9999]">
     {#each $notifications as noti (noti.id) }
         <div class="alert {getAlertType(noti.notiType)} text-white p-4"
             in:fly={{ y: 20, duration: 300 }}
@@ -30,10 +30,11 @@
             {:else if noti.notiType === 'ERROR'}
                 {@render errorIcon()}
             {/if}
-            <span>{noti.message}</span>
+            <!-- <span>{noti.message}</span> -->
+             <pre class="px-3 font-semibold">{noti.message}</pre>
             <button class="btn btn-ghost btn-xs btn-circle" aria-label="close"
                 onclick={() => removeNotification(noti.id)}>
-                <X class="h-5 w-5 stroke-white" strokeWidth=3 />
+                <XIcon class="h-5 w-5 stroke-white" strokeWidth=3 />
             </button>
         </div>
     {/each}
@@ -58,11 +59,11 @@
 </div>
 
 {#snippet successIcon()}
-    <Check class="h-7 w-7 stroke-white"/>
+    <CheckIcon class="h-7 w-7 stroke-white"/>
 {/snippet}
 
 {#snippet errorIcon()}
-    <CircleX class="h-7 w-7 stroke-white" />
+    <CircleXIcon class="h-7 w-7 stroke-white" />
 {/snippet}
 
 <style>

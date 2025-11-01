@@ -5,7 +5,7 @@
 	import { deleteRecipe } from "$lib/utils/recipe-service";
 	import CategoryBadge from "./CategoryBadge.svelte";
 	import ConfirmActionModal from "./ConfirmActionModal.svelte";
-    import { Eye, SquarePen, Trash2 } from '@lucide/svelte';
+    import { EyeIcon, SquarePenIcon, Trash2Icon } from '$lib/icons';
 
     let { recipe, 
     }: {
@@ -77,15 +77,15 @@
             <div class="card-actions flex justify-end pt-4 border-t border-gray-100">
                 <button class="btn btn-sm btn-outline btn-info group lg:tooltip" data-tip="View recipe details"
                     onclick={() => goto(`/recipes/${recipe.id}`)}>
-                    <Eye class="h-4 w-4 group-hover:stroke-white"/>
+                    <EyeIcon class="h-4 w-4 group-hover:stroke-white"/>
                 </button>
                 <button class="btn btn-sm btn-outline btn-success group lg:tooltip" data-tip="Edit recipe"
                     onclick={() => goto(`/recipes/edit/${recipe.id}`)}>
-                    <SquarePen class="h-4 w-4 group-hover:stroke-white"/>
+                    <SquarePenIcon class="h-4 w-4 group-hover:stroke-white"/>
                 </button>
                 <button class="btn btn-sm btn-outline btn-error group lg:tooltip" data-tip="Delete recipe"
                     onclick={() => deleteModalRef!.showModal()}>
-                    <Trash2 class="h-4 w-4 group-hover:stroke-white" />
+                    <Trash2Icon class="h-4 w-4 group-hover:stroke-white" />
                 </button>
             </div>
         </div>

@@ -3,6 +3,7 @@
 	import type { CreateRecipeData, RecipeFormSubmissionData, UpdateRecipeData } from "$lib/recipe-types";
 	import { FormState, type RecipeCategory } from "$lib/types";
 	import { onMount } from "svelte";
+    import { z } from "zod";
 
     let { recipeToEdit, onSubmit, onCancel }: {
         recipeToEdit?: UpdateRecipeData | undefined,
@@ -16,7 +17,7 @@
         description: '',
         instructions: '',
         prepTimeMin: 0,
-        category: undefined
+        category: ''
     };
     // if recipeToEdit obj is passed in, set formData input local state to recipeToEdit value
     // esle use the defaultFormData value
@@ -28,9 +29,13 @@
         description: string,
         instructions: string,
         prepTimeMin: number,
-        category: RecipeCategory | undefined, }
+        category: RecipeCategory | string, }
     = $state(recipeToEdit ? 
-        {...recipeToEdit, instructions: recipeToEdit.instructions.join('\n')}: 
+        {
+            ...recipeToEdit, 
+            instructions: recipeToEdit.instructions.length <= 0 ? '' 
+                : recipeToEdit.instructions.join('\n')
+        }: 
         {...defaultFormData}
     );
     // update formState mode based on recipeToEdit props
@@ -40,24 +45,57 @@
         return FormState.ADD;
     });
 
-    onMount(() => {
-        console.log('comp local state: ', $state.snapshot(formData));
-        console.log('form state mode: ', $state.snapshot(formState));
-    })
+    type RecipeFormErrors = {
+        title: string | undefined,
+        category: string | undefined,
+        prepTimeMin: string | undefined
+    };
+    // client side input validation
+    // display input error msg
+    let formErrors: RecipeFormErrors = $state({
+        title: undefined,
+        category: undefined,
+        prepTimeMin: undefined
+    });
+    // zod schema
+    const recipeSchema = z.object({
+        title: z.string()
+            .nonempty('Please input title')
+            .max(500, 'Title must not exceed 500 characters'),
+        category: z.string()
+            .nonempty('Please select category'),
+        prepTimeMin: z.number()
+            .positive('Please input a positive number')
+    });
 
     const submitForm = (e: Event) => {
         e.preventDefault();
         console.log('recipe form data: ', $state.snapshot(formData));
-
+        // validate form 
+        const validateResult = recipeSchema.safeParse(formData);
+        console.log('form validate result: ', validateResult);
+        // form invalid
+        if (!validateResult.success) {
+            resetFormErrors();
+            for(const issue of validateResult.error.issues) {
+                // mapping erros with keys
+                let key = issue.path[0] as keyof RecipeFormErrors;
+                formErrors[key] = issue.message;
+            }
+            return;
+        }
+        resetFormErrors();
+        // form valid
         const recipeInputData = {
             title: formData.title,
             description: formData.description,
-            instructions: formData.instructions
+            instructions: formData.instructions === '' ? [] :
+                formData.instructions
                 .split('\n') // split into string[]
                 .map(s => s.trim()) // foreach items, trim
                 .filter(Boolean), // filter in only valid string, no empty string
             prepTimeMin: formData.prepTimeMin,
-            category: formData.category!,
+            category: formData.category as RecipeCategory,
         }
         if(formState === FormState.EDIT && recipeToEdit) {
             // edit recipe
@@ -88,6 +126,13 @@
         // reset input
         formData = {...defaultFormData};
     }
+    const resetFormErrors = () => {
+        formErrors = {
+            title: undefined,
+            category: undefined,
+            prepTimeMin: undefined
+        };
+    }
 
 </script>
 
@@ -99,12 +144,14 @@
             <!-- title -->
             <div class="md:col-span-2 form-control w-full">
                 <label class="label" for="title">
-                    <span class="label-text text-base text-indigo-700 font-semibold">
+                    <span class="label-text text-base text-indigo-700 font-semibold input-required">
                         Title
                     </span>
                 </label>
-                <input class="input input-bordered w-full" 
-                    type="text" id="title" bind:value={formData.title}/>
+                <input class="input input-bordered w-full" class:input-error={formErrors.title} 
+                    type="text" id="title" bind:value={formData.title}
+                    onchange={() => formErrors.title = undefined}/>
+                {@render showInputError(formErrors.title)}
             </div>
             {#if formState === FormState.EDIT && recipeToEdit}
                 <!-- show recipe code in edit page -->
@@ -120,30 +167,35 @@
             <!-- category -->
             <div class="form-control w-full">
                 <label class="label" for="category">
-                    <span class="label-text text-base text-indigo-700 font-semibold">
+                    <span class="label-text text-base text-indigo-700 font-semibold input-required">
                         Category
                     </span>    
                 </label>
-                <select class="select select-bordered w-full" id="category"
-                    bind:value={formData.category}>
-                    <option disabled value={undefined}>Select category</option>
+                <select class="select select-bordered w-full" class:input-error={formErrors.category}
+                    id="category" bind:value={formData.category}
+                    onchange={() => formErrors.category = undefined}>
+                    <option disabled value={''}>Select category</option>
                     {#each categoryOptions as option }
                         <option value={option.value}>{option.label}</option>
                     {/each}
                 </select>
+                {@render showInputError(formErrors.category)}
             </div>
             <!-- prep time -->
             <div class="form-control w-full">
                 <label class="label" for="prepTime">
-                    <span class="label-text text-base text-indigo-700 font-semibold">
+                    <span class="label-text text-base text-indigo-700 font-semibold input-required">
                         Prep time
                     </span>
                 </label>
-                <label class="input input-bordered w-full flex items-center gap-2">
+                <label class="input input-bordered w-full flex items-center gap-2"
+                    class:input-error={formErrors.prepTimeMin}>
                     <input class="grow" 
-                        type="number" id="prepTime" bind:value={formData.prepTimeMin}/>
+                        type="number" id="prepTime" bind:value={formData.prepTimeMin}
+                        onchange={() => formErrors.prepTimeMin = undefined}/>
                     Min
                 </label>
+                {@render showInputError(formErrors.prepTimeMin)}
             </div>
             <!-- instructions(separated by ',') -->
             <div class="md:col-span-3 form-control w-full">
@@ -183,6 +235,12 @@
         </div>
     </form>
 </div>
+
+{#snippet showInputError(message: string | undefined)}
+    {#if message}
+        <p class="input-error-msg">{message}</p>
+    {/if}
+{/snippet}
 
 <style>
 

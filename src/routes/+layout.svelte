@@ -2,7 +2,7 @@
 	import '../app.css';
 	import favicon from '$lib/assets/favicon.svg';
 	import NotificationArea from '$lib/components/NotificationArea.svelte';
-	import { BookOpenText, ChefHat, HouseHeart } from '@lucide/svelte';
+	import { BookOpenTextIcon, ChefHatIcon, HouseHeartIcon } from '$lib/icons';
 
 	let { children } = $props();
 </script>
@@ -22,7 +22,7 @@
 		<!-- App title -->
 		<a href="/" class="text-2xl font-extrabold mb-8 pt-2 overflow-hidden whitespace-nowrap">
 			<div class="flex items-center gap-1 lg:gap-2">
-				<BookOpenText class="h-6 w-6" />
+				<BookOpenTextIcon class="h-6 w-6" />
 				Recipe Book
 			</div>	
 		</a>
@@ -30,13 +30,13 @@
 		<ul class="menu p-0 space-y-1 flex-grow flex flex-col gap-3">
 			<li class="rounded-lg">
 				<a href="/" class="text-white font-semibold flex items-center gap-4 p-3">
-					<HouseHeart class="h-5 w-5 flex-shrink-0" />
+					<HouseHeartIcon class="h-5 w-5 flex-shrink-0" />
 					<span class="sidebar-title overflow-hidden whitespace-nowrap">Home</span>
 				</a>
 			</li>
 			<li class="rounded-lg">
 				<a href="/recipes" class="text-white font-semibold flex items-center gap-4 p-3">
-					<ChefHat class="h-5 w-5 flex-shrink-0" />
+					<ChefHatIcon class="h-5 w-5 flex-shrink-0" />
 					<span class="sidebar-title overflow-hidden whitespace-nowrap">Recipes</span>
 				</a>
 			</li>

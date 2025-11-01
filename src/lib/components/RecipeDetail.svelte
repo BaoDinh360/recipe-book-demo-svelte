@@ -5,8 +5,7 @@
 	import { deleteRecipe } from "$lib/utils/recipe-service";
 	import CategoryBadge from "./CategoryBadge.svelte";
 	import ConfirmActionModal from "./ConfirmActionModal.svelte";
-    import { Calendar, Clipboard, Clock4, Download, Info, ListChecks, Tag } from '@lucide/svelte';
-
+    import { CalendarIcon, ClipboardIcon, Clock4Icon, DownloadIcon, InfoIcon, ListChecksIcon, TagIcon } from '$lib/icons';
 
     let { recipeDetails }: {
         recipeDetails: RecipeDetail | undefined
@@ -57,7 +56,7 @@
             <!-- instructions -->
             <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
                 <div class="flex items-center gap-1 lg:gap-2 mb-6 pb-2 border-b border-gray-100">
-                    <ListChecks class="h-5 w-5 stroke-indigo-700"/>
+                    <ListChecksIcon class="h-5 w-5 stroke-indigo-700"/>
                     <h2 class="text-xl font-bold text-indigo-700">
                         Instructions
                     </h2>
@@ -75,7 +74,7 @@
         <div class="lg:col-span-2">
             <div class="lg:sticky lg:top-10 bg-white p-6 rounded-lg shadow-md border-t-4 border-indigo-600">
                 <div class="flex items-center gap-1 lg:gap-2 mb-4">
-                    <Info class="h-5 w-5 stroke-indigo-700" />
+                    <InfoIcon class="h-5 w-5 stroke-indigo-700" />
                     <h2 class="text-xl font-bold text-indigo-700">Details</h2>
                 </div>
                 <div class="space-y-4">
@@ -83,7 +82,7 @@
                     <div class="flex items-center justify-between p-3
                         bg-gray-50 rounded-lg text-sm font-medium">
                         <div class="flex items-center text-gray-700 gap-1">
-                        <Clipboard class="h-5 w-5 stroke-indigo-700" />
+                        <ClipboardIcon class="h-5 w-5 stroke-indigo-700" />
                             Recipe Code
                         </div>
                         <span class="font-semibold text-gray-800">
@@ -93,7 +92,7 @@
                     <!-- category -->
                     <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg text-sm font-medium">
                         <div class="flex items-center text-gray-700 gap-1">
-                            <Tag class="h-5 w-5 stroke-indigo-700" />
+                            <TagIcon class="h-5 w-5 stroke-indigo-700" />
                             Category
                         </div>
                         <CategoryBadge category={recipeDetails.category} />
@@ -104,7 +103,7 @@
                     <!-- prepTimeMin -->
                     <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg text-sm font-medium">
                         <div class="flex items-center text-gray-700 gap-1">
-                            <Clock4 class="h-5 w-5 stroke-indigo-700" />
+                            <Clock4Icon class="h-5 w-5 stroke-indigo-700" />
                             Prep Time
                         </div>
                         <span class="font-bold text-indigo-700">
@@ -114,7 +113,7 @@
                     <!-- createdAt -->
                     <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg text-sm font-medium">
                         <div class="flex items-center text-gray-700 gap-1">
-                            <Calendar class="h-5 w-5 stroke-indigo-700" />
+                            <CalendarIcon class="h-5 w-5 stroke-indigo-700" />
                             Created
                         </div>
                         <span class="text-gray-600 font-normal text-xs italic">
@@ -125,7 +124,7 @@
                     <!-- lastUpdatedAt -->
                     <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg text-sm font-medium">
                         <div class="flex items-center text-gray-700 gap-1">
-                            <Download class="h-5 w-5 stroke-indigo-700" />
+                            <DownloadIcon class="h-5 w-5 stroke-indigo-700" />
                             Last Updated
                         </div>
                         <span class="text-gray-600 font-normal text-xs italic">

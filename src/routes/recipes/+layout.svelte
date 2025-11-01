@@ -3,7 +3,7 @@
 	import { page } from '$app/state';
 	import { PageType } from '$lib/types';
     import '../../app.css';
-    import { MoveLeft, SquarePlus } from '@lucide/svelte';
+    import { MoveLeftIcon, SquarePlusIcon } from '$lib/icons';
     let { children } = $props();
 
     
@@ -73,7 +73,7 @@
                 aria-label="Back"
                 onclick={() => goto('/recipes')}>
                 <!-- lucide icon -->
-                <MoveLeft class="h-6 w-6 stroke-indigo-700 group-hover:stroke-white"/>
+                <MoveLeftIcon class="h-6 w-6 stroke-indigo-700 group-hover:stroke-white"/>
             </button>
         {/if}
         <!-- title and description -->
@@ -87,7 +87,7 @@
         <!-- only show create button in index page -->
         <button class="btn btn-primary btn-sm md:btn-md w-36 font-semibold text-white"
             onclick={() => goto('/recipes/create')}>
-            <SquarePlus />
+            <SquarePlusIcon />
             Create
         </button>
     {/if}

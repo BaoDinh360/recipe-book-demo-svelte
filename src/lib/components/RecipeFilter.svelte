@@ -4,7 +4,7 @@
 	import { categoryOptions, sortingOptions } from "$lib/constants";
 	import type { RecipeFilterCriteria } from "$lib/recipe-types";
 	import { type RecipeCategory, type SelectOption } from "$lib/types";
-	import { Search } from "@lucide/svelte";
+	import { SearchIcon } from '$lib/icons';
 
     // local filter state
     // let filterInput: {
@@ -100,7 +100,7 @@
             <label class="input input-bordered input-sm flex items-center gap-2">
                 <input type="text" class="grow" placeholder="Title, code..." id="search" 
                     bind:value={filterInput.text}/>
-                <Search class="h-5 w-5 stroke-gray-600" />
+                <SearchIcon class="h-5 w-5 stroke-gray-600" />
             </label>
         </div>
         <div class="form-control md:col-span-1">

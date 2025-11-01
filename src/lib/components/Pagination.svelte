@@ -2,8 +2,7 @@
 	import { goto } from "$app/navigation";
 	import { page } from "$app/state";
 	import { itemsPerPageOptions } from "$lib/constants";
-	import { ChevronLeft, ChevronRight } from "@lucide/svelte";
-
+    import { ChevronLeftIcon, ChevronRightIcon } from '$lib/icons';
 
     let { currentPage, totalPages, itemsPerPage, totalItems,
     }: {
@@ -88,7 +87,7 @@
             aria-label="Prev"
             disabled={currentPage === 1}
             onclick={previousPage}>
-            <ChevronLeft class="h-4 w-4 stroke-current" strokeWidth=3 />
+            <ChevronLeftIcon class="h-4 w-4 stroke-current" strokeWidth=3 />
             Prev
         </button>
         <!-- page select -->
@@ -110,7 +109,7 @@
             disabled={currentPage === totalPages}
             onclick={nextPage}>
             Next
-            <ChevronRight class="h-5 w-5 stroke-current"/>
+            <ChevronRightIcon class="h-5 w-5 stroke-current"/>
         </button>
     </div>
 </div>
