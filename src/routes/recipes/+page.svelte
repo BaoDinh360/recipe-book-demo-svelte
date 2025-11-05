@@ -1,8 +1,11 @@
 <script lang="ts">
+	import { page } from "$app/state";
 	import Pagination from "$lib/components/Pagination.svelte";
 	import RecipeFilter from "$lib/components/RecipeFilter.svelte";
 	import RecipeList from "$lib/components/RecipeList.svelte";
 	import type { RecipeFilterCriteria } from "$lib/recipe-types";
+	import { lastRecipeUrl } from "$lib/stores/navigation-state";
+	import { notifyError } from "$lib/stores/notification-stores";
 	import type { PageProps } from "./$types";
 	
     // /recipes/index
@@ -21,6 +24,16 @@
         }
         return result;
     })
+    
+    $effect(() => {
+        if(data.errorMsg) {
+            notifyError(data.errorMsg);
+        }
+    })
+    $effect(() => {
+        lastRecipeUrl.set(page.url.pathname + page.url.search);
+    })
+
     
 </script>
 

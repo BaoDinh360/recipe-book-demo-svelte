@@ -4,6 +4,7 @@
 	import { PageType } from '$lib/types';
     import '../../app.css';
     import { MoveLeftIcon, SquarePlusIcon } from '$lib/icons';
+	import { navigateToRecipes } from '$lib/utils/navigation';
     let { children } = $props();
 
     
@@ -71,7 +72,7 @@
             <!-- don't show back btn on index page -->
             <button class="btn btn-ghost group hover:bg-indigo-500"
                 aria-label="Back"
-                onclick={() => goto('/recipes')}>
+                onclick={async () => await navigateToRecipes()}>
                 <!-- lucide icon -->
                 <MoveLeftIcon class="h-6 w-6 stroke-indigo-700 group-hover:stroke-white"/>
             </button>

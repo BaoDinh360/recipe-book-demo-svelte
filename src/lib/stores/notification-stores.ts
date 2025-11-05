@@ -44,4 +44,4 @@ export const removeNotification = (id: number) => {
 }
 
 export const notifySuccess = (message: string) => addNotification(message, 'SUCCESS', true);
-export const notifyError = (message: string) => addNotification(message, 'ERROR', false);
+export const notifyError = (message: string) => addNotification(message, 'ERROR', true);

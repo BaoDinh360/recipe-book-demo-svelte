@@ -6,6 +6,7 @@
 	import CategoryBadge from "./CategoryBadge.svelte";
 	import ConfirmActionModal from "./ConfirmActionModal.svelte";
     import { CalendarIcon, ClipboardIcon, Clock4Icon, DownloadIcon, InfoIcon, ListChecksIcon, TagIcon } from '$lib/icons';
+	import { navigateToRecipes } from "$lib/utils/navigation";
 
     let { recipeDetails }: {
         recipeDetails: RecipeDetail | undefined
@@ -21,8 +22,8 @@
         let notiMessage = '';
         try {
             await deleteRecipe(recipeDetails.id);
-            // back to index 
-            goto('/recipes')
+            // back to index /recipes 
+            navigateToRecipes();
 
             notiMessage = `Delete recipe: ${recipeDetails.recipeCode} success!`;
             notifySuccess(notiMessage);
