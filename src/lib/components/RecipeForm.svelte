@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { categoryOptions } from "$lib/constants";
-	import type { CreateRecipeData, RecipeFormSubmissionData, UpdateRecipeData } from "$lib/recipe-types";
-	import { FormState, type RecipeCategory } from "$lib/types";
-	import { onMount } from "svelte";
+	import type { CreateRecipeData, RecipeCategory, RecipeFormSubmissionData, UpdateRecipeData } from "$lib/recipe-types";
+	import { FormState } from "$lib/types";
     import { z } from "zod";
 
     let { recipeToEdit, onSubmit, onCancel }: {

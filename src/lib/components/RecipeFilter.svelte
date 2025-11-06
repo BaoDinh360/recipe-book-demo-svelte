@@ -2,20 +2,8 @@
 	import { goto } from "$app/navigation";
 	import { page } from "$app/state";
 	import { categoryOptions, sortingOptions } from "$lib/constants";
-	import type { RecipeFilterCriteria } from "$lib/recipe-types";
-	import { type RecipeCategory, type SelectOption } from "$lib/types";
+	import type { RecipeCategory, RecipeFilterCriteria } from "$lib/recipe-types";
 	import { SearchIcon } from '$lib/icons';
-
-    // local filter state
-    // let filterInput: {
-    //     category: string | null,
-    //     prepTimeMin: number | null,
-    //     sortBy: SortCriteria
-    // } = $state({
-    //     category: null,
-    //     prepTimeMin: null,
-    //     sortBy: 'DATE_ASC'
-    // });
 
     let { recipeFilters }: 
     { recipeFilters: RecipeFilterCriteria } = $props();

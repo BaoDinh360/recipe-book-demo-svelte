@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { RecipeCategory } from "$lib/types";
+	import type { RecipeCategory } from "$lib/recipe-types";
 	import { getCategoryColorStyle } from "$lib/utils/category-style";
     let { category }: {
         category: RecipeCategory

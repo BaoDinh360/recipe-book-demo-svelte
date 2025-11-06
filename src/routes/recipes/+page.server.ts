@@ -1,8 +1,6 @@
-import type { RecipeFilterCriteria } from '$lib/recipe-types';
+import type { RecipeCategory, RecipeFilterCriteria } from '$lib/recipe-types';
 import { BusinessError } from '$lib/server/business-errors';
 import { getPaginatedRecipeList } from '$lib/server/recipe-service';
-import type { RecipeCategory } from '$lib/types';
-// import { getPaginatedRecipeList } from '$lib/utils/recipe-service';
 import type { PageServerLoad } from './$types';
 import { error } from '@sveltejs/kit';
 

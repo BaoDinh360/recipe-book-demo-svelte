@@ -116,6 +116,20 @@ export const updateRecipe = async (recipeData: UpdateRecipeData): Promise<Recipe
         throw err;
     }
 };
+// delete recipe by id
+export const deleteRecipe = async (id: string): Promise<void> => {
+    try {
+        await pbClient.collection(COLLECTION_NAME).delete(id);
+    } catch (err) {
+        // pocketbase error exception
+        console.error('Pocketbase Error: ', err);
+        if(err instanceof ClientResponseError) {
+            handlePocketbaseError(err);
+        }
+        // re throw / bubble up other error
+        throw err;
+    }
+};
 
 // mapper func
 const mapPbRecordToRecipeListItem = (pbRecord: RecipePbRecord): RecipeListItem => {

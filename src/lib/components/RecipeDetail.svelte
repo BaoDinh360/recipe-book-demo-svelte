@@ -2,7 +2,6 @@
 	import { goto } from "$app/navigation";
 	import type { RecipeDetail } from "$lib/recipe-types";
 	import { notifySuccess, notifyError } from "$lib/stores/notification-stores";
-	import { deleteRecipe } from "$lib/utils/recipe-service";
 	import CategoryBadge from "./CategoryBadge.svelte";
 	import ConfirmActionModal from "./ConfirmActionModal.svelte";
     import { CalendarIcon, ClipboardIcon, Clock4Icon, DownloadIcon, InfoIcon, ListChecksIcon, TagIcon } from '$lib/icons';
@@ -20,17 +19,28 @@
             return;
         } 
         let notiMessage = '';
+        let recipeId = recipeDetails.id;
+        let recipeCode = recipeDetails.recipeCode;
         try {
-            await deleteRecipe(recipeDetails.id);
-            // back to index /recipes 
-            navigateToRecipes();
-
-            notiMessage = `Delete recipe: ${recipeDetails.recipeCode} success!`;
-            notifySuccess(notiMessage);
-        } catch (error) {
-            console.error('An exception occurs: ', error);
-            notiMessage = `An error occurs when deleting recipe: ${recipeDetails.recipeCode}!`;
-            notifyError(notiMessage);
+            const response = await fetch(`/api/recipes/${recipeId}`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+            });
+            const result = await response.json();
+            if(response.ok && result.success) {
+                // back to index /recipes
+                navigateToRecipes();
+                // show success noti
+                notiMessage = `Delete recipe: ${recipeCode} success!`;
+                notifySuccess(notiMessage);
+            } else {
+                // failed
+                notiMessage = result.message ?? `Failed to delete recipe: ${recipeCode}!`;
+                notifyError(notiMessage);
+            }
+        } catch (err) {
+            console.error('An exception occurs: ', err);
+            notifyError('An unexpected error occurs!');
         }
     };
 

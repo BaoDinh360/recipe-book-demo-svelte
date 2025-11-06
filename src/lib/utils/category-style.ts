@@ -1,4 +1,4 @@
-import type { RecipeCategory } from "$lib/types";
+import type { RecipeCategory } from "$lib/recipe-types";
 
 // mapping category with style class
 const categoryColorMap: Record<RecipeCategory, string> = {

@@ -2,10 +2,10 @@
 	import { goto, invalidate } from "$app/navigation";
 	import type { RecipeListItem } from "$lib/recipe-types";
 	import { notifyError, notifySuccess } from "$lib/stores/notification-stores";
-	import { deleteRecipe } from "$lib/utils/recipe-service";
 	import CategoryBadge from "./CategoryBadge.svelte";
 	import ConfirmActionModal from "./ConfirmActionModal.svelte";
     import { EyeIcon, SquarePenIcon, Trash2Icon } from '$lib/icons';
+	import { navigateToRecipes } from "$lib/utils/navigation";
 
     let { recipe, 
     }: {
@@ -20,17 +20,28 @@
             return;
         }
         let notiMessage = '';
+        let recipeId = recipe.id;
+        let recipeCode = recipe.recipeCode;
         try {
-            await deleteRecipe(recipe.id);
-            // trigger page.ts re run load func
-            invalidate('app:recipes');
-
-            notiMessage = `Delete recipe: ${recipe.recipeCode} success!`;
-            notifySuccess(notiMessage);
-        } catch (error) {
-            console.error('An exception occurs: ', error);
-            notiMessage = `An error occurs when deleting recipe: ${recipe.recipeCode}!`;
-            notifyError(notiMessage);
+            const response = await fetch(`/api/recipes/${recipeId}`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+            });
+            const result = await response.json();
+            if(response.ok && result.success) {
+                // back to index /recipes
+                navigateToRecipes();
+                // show success noti
+                notiMessage = `Delete recipe: ${recipeCode} success!`;
+                notifySuccess(notiMessage);
+            } else {
+                // failed
+                notiMessage = result.message ?? `Failed to delete recipe: ${recipeCode}!`;
+                notifyError(notiMessage);
+            }
+        } catch (err) {
+            console.error('An exception occurs: ', err);
+            notifyError('An unexpected error occurs!');
         }
     };
 

@@ -1,11 +1,4 @@
 
-export type RecipeCategory = 
-    'Breakfast' | 
-    'Lunch' |
-    'Dinner' |
-    'Desserts';
-
-
 export enum FormState {
     ADD = 'ADD',
     EDIT = 'EDIT'

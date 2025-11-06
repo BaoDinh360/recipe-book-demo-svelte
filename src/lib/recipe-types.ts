@@ -1,4 +1,9 @@
-import type { RecipeCategory } from "./types";
+
+export type RecipeCategory = 
+    'Breakfast' | 
+    'Lunch' |
+    'Dinner' |
+    'Desserts';
 
 // pocketbase full recipe record
 export interface RecipePbRecord {

@@ -5,5 +5,5 @@ import { get } from "svelte/store"
 // naviagte to /recipes, keeps query params
 export const navigateToRecipes = async () => {
     const url = get(lastRecipeUrl);
-    return await goto(url ?? '/recipes');
+    return goto(url ?? '/recipes');
 }
