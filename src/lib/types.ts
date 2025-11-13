@@ -15,3 +15,15 @@ export enum PageType {
     CREATE,
     EDIT
 };
+
+export type RecipeFormErrors = {
+    title: string | undefined,
+    category: string | undefined,
+    prepTimeMin: string | undefined
+};
+
+export interface ApiResponse<T> {
+    success: boolean;
+    message?: string;
+    data?: T
+};

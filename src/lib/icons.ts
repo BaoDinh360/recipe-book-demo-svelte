@@ -19,3 +19,6 @@ export { default as ChefHatIcon } from '@lucide/svelte/icons/chef-hat';
 export { default as HouseHeartIcon } from '@lucide/svelte/icons/house-heart';
 export { default as MoveLeftIcon } from '@lucide/svelte/icons/move-left';
 export { default as SquarePlusIcon } from '@lucide/svelte/icons/square-plus';
+export { default as PlusIcon } from '@lucide/svelte/icons/plus';
+export { default as ListOrderedIcon } from '@lucide/svelte/icons/list-ordered';
+export { default as HashIcon } from '@lucide/svelte/icons/hash';

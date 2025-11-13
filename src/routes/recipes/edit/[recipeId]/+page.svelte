@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
-	import RecipeForm from "$lib/components/RecipeForm.svelte";
+	import RecipeForm from "$lib/components/recipe-form/RecipeForm.svelte";
 	import type { UpdateRecipeData } from "$lib/recipe-types";
 	import { notifyError, notifySuccess } from "$lib/stores/notification-stores";
 	import { ClientResponseError } from "pocketbase";
@@ -52,8 +52,9 @@
 
 </script>
 
-<RecipeForm 
+<RecipeForm
     recipeToEdit={data.recipeData}
+    ingredientSelects={[]}
     onSubmit={(recipeData) => onUpdateRecipe(recipeData as UpdateRecipeData)}
     {onCancel}
     />

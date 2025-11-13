@@ -69,6 +69,15 @@ export const getPaginatedRecipeList = async (currentPage: number, itemsPerPage: 
 export const getRecipeById = async (id: string): Promise<RecipeDetail> => {
     try {
         const record = await pbClient.collection(COLLECTION_NAME).getOne<RecipePbRecord>(id);
+
+        // BAODNQ 20251111 - TEST ONLY
+        // get ingredients belongs to recipe
+        const recipeIngredients = await pbClient.collection('recipes_ingredients').getFullList({
+            filter: `recipeId="${id}"`,
+            expand: 'ingredientId'
+        });
+        console.dir(recipeIngredients, { depth: null })
+
         console.log('pocketbase recipe: {id} record', id, record);
         const recipe: RecipeDetail = mapPbRecordToRecipeDetail(record);
         return recipe;
@@ -82,6 +91,31 @@ export const getRecipeById = async (id: string): Promise<RecipeDetail> => {
         throw err;
     }
 };
+// get recipe and all ingredients
+export const getRecipeByIdWithIngredients = async(id: string) => {
+    try {
+        const record = await pbClient.collection(COLLECTION_NAME).getOne<RecipePbRecord>(id);
+        // get ingredients belongs to recipe
+        const recipeIngredients = await pbClient.collection('recipes_ingredients').getFullList({
+            filter: `recipe="${id}`,
+            expand: 'ingredient'
+        });
+        console.log(`recipe: ${id} ingredients list: ${recipeIngredients}`);
+        
+        console.log('pocketbase recipe: {id} record {record}', id, record);
+        const recipe: RecipeDetail = mapPbRecordToRecipeDetail(record);
+        return recipe;
+    } catch (err) {
+        // pocketbase error exception
+        console.error('Pocketbase Error: ', err);
+        if(err instanceof ClientResponseError) {
+            handlePocketbaseError(err);
+        }
+        // re throw / bubble up other error
+        throw err;
+    }
+}
+
 // create new recipe
 export const createRecipe = async (recipeData: CreateRecipeData): Promise<RecipePbRecord> => {
     try {

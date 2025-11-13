@@ -95,7 +95,8 @@
 </header>
 
 <!-- child content -->
-{#if layoutPageType === PageType.INDEX || layoutPageType === PageType.DETAIL}
+{@render children?.()}
+<!-- {#if layoutPageType === PageType.INDEX || layoutPageType === PageType.DETAIL}
     {@render children?.()}
 {:else}
     <div class="w-full mx-auto px-4 rounded-lg shadow-md bg-white border border-gray-200">
@@ -103,4 +104,4 @@
             {@render children?.()}
         </div>
     </div>
-{/if}
+{/if} -->

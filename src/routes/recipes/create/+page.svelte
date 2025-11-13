@@ -1,10 +1,20 @@
 <script lang="ts">
-	import RecipeForm from "$lib/components/RecipeForm.svelte";
+	import RecipeForm from "$lib/components/recipe-form/RecipeForm.svelte";
 	import type { CreateRecipeData } from "$lib/recipe-types";
 	import { notifyError, notifySuccess } from "$lib/stores/notification-stores";
 	import { navigateToRecipes } from "$lib/utils/navigation";
+	import type { PageProps } from "./$types";
 
     // path: /recipes/create/
+
+    let { data }: PageProps = $props();
+
+    $effect(() => {
+        // display error noti if error
+        if(data.errorMsg) {
+            notifyError(data.errorMsg);
+        }
+    })
 
     const onCreateRecipe = async(recipeData: CreateRecipeData): Promise<void> => {
         let notiMessage = '';
@@ -39,7 +49,8 @@
 
 </script>
 
-<RecipeForm 
+<RecipeForm
+    ingredientSelects={data.ingredientSelects}
     onSubmit={onCreateRecipe}
     {onCancel}/>
 

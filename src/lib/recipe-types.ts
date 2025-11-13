@@ -1,3 +1,4 @@
+import type { IngredientFormData } from "./types/ingredient-types";
 
 export type RecipeCategory = 
     'Breakfast' | 
@@ -70,6 +71,8 @@ export interface CreateRecipeData {
     instructions: string[];
     prepTimeMin: number;
     category: RecipeCategory;
+    // ingredient lists
+    ingredients: IngredientFormData[];
 }
 // interface for update existing recipe
 export interface UpdateRecipeData extends CreateRecipeData {

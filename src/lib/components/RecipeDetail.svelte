@@ -4,7 +4,7 @@
 	import { notifySuccess, notifyError } from "$lib/stores/notification-stores";
 	import CategoryBadge from "./CategoryBadge.svelte";
 	import ConfirmActionModal from "./ConfirmActionModal.svelte";
-    import { CalendarIcon, ClipboardIcon, Clock4Icon, DownloadIcon, InfoIcon, ListChecksIcon, TagIcon } from '$lib/icons';
+    import { CalendarIcon, ClipboardIcon, Clock4Icon, DownloadIcon, InfoIcon, ListChecksIcon, ListOrderedIcon, TagIcon } from '$lib/icons';
 	import { navigateToRecipes } from "$lib/utils/navigation";
 
     let { recipeDetails }: {
@@ -52,8 +52,8 @@
 {:else}
     <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
         <!-- main recipe content left col -->
-        <div class="lg:col-span-3">
-            <!-- header -->
+        <div class="lg:col-span-3 space-y-8">
+            <!-- header card section -->
             <div class="bg-white p-6 rounded-lg shadow-md mb-6 border border-gray-200">
                 <!-- title -->
                 <h1 class="text-2xl font-bold text-indigo-700 mb-6">
@@ -64,10 +64,40 @@
                     {recipeDetails.description}
                 </p>
             </div>
-            <!-- instructions -->
+            <!-- ingredient list card section -->
+            <div class="bg-white p-6 rounded-lg shadow-md mb-6 border border-gray-200">
+                <div class="flex items-center gap-2 mb-6 pb-2 border-b border-gray-100">
+                    <ListChecksIcon class="h-5 w-5 stroke-gray-700"/>
+                    <h2 class="text-xl font-bold text-gray-700">
+                        Ingredients
+                    </h2>
+                </div>
+                <!-- list section -->
+                <div class="space-y-4 mx-2">
+                    <div class="grid grid-cols-[3.5fr_0.5fr_1fr] gap-4 border-b border-gray-150 pb-3">
+                        <div class="flex items-center space-x-3">
+                            <input type="checkbox" class="checkbox checkbox-sm" aria-label="Check ingredients" />
+                            <span class="text-base font-semibold">Flour</span>
+                        </div>
+                        <span class="text-center font-bold">2</span>
+                        <span class="text-left">cup</span>
+                    </div>
+                    <!-- <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+                        <div class="flex items-center space-x-3">
+                            <input type="checkbox" class="checkbox checkbox-sm" aria-label="Check ingredients" />
+                            <span class="text-base font-semibold">Flour</span>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <span class="font-bold">2</span>
+                            <span>cup</span>
+                        </div>
+                    </div> -->
+                </div>
+            </div>
+            <!-- instructions card section -->
             <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-                <div class="flex items-center gap-1 lg:gap-2 mb-6 pb-2 border-b border-gray-100">
-                    <ListChecksIcon class="h-5 w-5 stroke-indigo-700"/>
+                <div class="flex items-center gap-2 mb-6 pb-2 border-b border-gray-100">
+                    <ListOrderedIcon class="h-5 w-5 stroke-indigo-700"/>
                     <h2 class="text-xl font-bold text-indigo-700">
                         Instructions
                     </h2>
@@ -84,7 +114,7 @@
         <!-- metadata (sticky on large screen) right col -->
         <div class="lg:col-span-2">
             <div class="lg:sticky lg:top-10 bg-white p-6 rounded-lg shadow-md border-t-4 border-indigo-600">
-                <div class="flex items-center gap-1 lg:gap-2 mb-4">
+                <div class="flex items-center gap-2 mb-6">
                     <InfoIcon class="h-5 w-5 stroke-indigo-700" />
                     <h2 class="text-xl font-bold text-indigo-700">Details</h2>
                 </div>
