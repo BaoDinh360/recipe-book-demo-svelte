@@ -1,4 +1,3 @@
-import type { IngredientFormData } from "./types/ingredient-types";
 
 export type RecipeCategory = 
     'Breakfast' | 
@@ -21,7 +20,6 @@ export interface RecipePbRecord {
     created: string;
     updated: string;
 }
-
 // pocketbase insert/update record
 export interface UpsertRecipePbRecord {
     title: string;
@@ -58,12 +56,28 @@ export interface RecipeDetail {
     title: string;
     description: string;
     instructions: string[];
+    // ingredients list
+    ingredients: RecipeIngredients[];
     prepTimeMin: number;
     category: RecipeCategory;
     createdAt: Date;
     lastUpdatedAt: Date;
 }
-
+export interface RecipeIngredients {
+    id?: string;
+    recipeId: string;
+    ingredientId: string;
+    name: string;
+    qty: number;
+    unit: string;
+};
+export interface RecipeIngredientUpsertData {
+    id?: string | undefined;
+    ingredientId: string;
+    name?: string; // display only
+    qty: number;
+    unit: string;
+}
 // interface for create new recipe
 export interface CreateRecipeData {
     title: string;
@@ -72,7 +86,7 @@ export interface CreateRecipeData {
     prepTimeMin: number;
     category: RecipeCategory;
     // ingredient lists
-    ingredients: IngredientFormData[];
+    ingredients: RecipeIngredientUpsertData[];
 }
 // interface for update existing recipe
 export interface UpdateRecipeData extends CreateRecipeData {

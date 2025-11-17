@@ -13,7 +13,8 @@ export enum PageType {
     INDEX,
     DETAIL,
     CREATE,
-    EDIT
+    EDIT,
+    DEFAULT,
 };
 
 export type RecipeFormErrors = {

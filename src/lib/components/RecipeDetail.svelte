@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
-	import type { RecipeDetail } from "$lib/recipe-types";
+	import type { RecipeDetail, RecipeIngredients } from "$lib/recipe-types";
 	import { notifySuccess, notifyError } from "$lib/stores/notification-stores";
 	import CategoryBadge from "./CategoryBadge.svelte";
 	import ConfirmActionModal from "./ConfirmActionModal.svelte";
@@ -74,24 +74,13 @@
                 </div>
                 <!-- list section -->
                 <div class="space-y-4 mx-2">
-                    <div class="grid grid-cols-[3.5fr_0.5fr_1fr] gap-4 border-b border-gray-150 pb-3">
-                        <div class="flex items-center space-x-3">
-                            <input type="checkbox" class="checkbox checkbox-sm" aria-label="Check ingredients" />
-                            <span class="text-base font-semibold">Flour</span>
-                        </div>
-                        <span class="text-center font-bold">2</span>
-                        <span class="text-left">cup</span>
-                    </div>
-                    <!-- <div class="flex items-center justify-between border-b border-gray-100 pb-3">
-                        <div class="flex items-center space-x-3">
-                            <input type="checkbox" class="checkbox checkbox-sm" aria-label="Check ingredients" />
-                            <span class="text-base font-semibold">Flour</span>
-                        </div>
-                        <div class="flex items-center space-x-4">
-                            <span class="font-bold">2</span>
-                            <span>cup</span>
-                        </div>
-                    </div> -->
+                    {#if (!recipeDetails.ingredients || recipeDetails.ingredients.length <= 0)}
+                        <p class="text-sm text-gray-400 pl-4 italic">No ingredients.</p>
+                    {:else}
+                        {#each recipeDetails.ingredients as item }
+                            {@render displayIngredientRow(item)}
+                        {/each}
+                    {/if}
                 </div>
             </div>
             <!-- instructions card section -->
@@ -200,6 +189,16 @@
         onCancel={() => {}} />
 {/if}
 
+{#snippet displayIngredientRow(item: RecipeIngredients)}
+    <div class="grid grid-cols-[3.5fr_0.5fr_1fr] gap-4 border-b border-gray-150 pb-3">
+        <div class="flex items-center space-x-3">
+            <input type="checkbox" class="checkbox checkbox-sm" aria-label="Check ingredients" />
+            <span class="text-base font-semibold">{item.name}</span>
+        </div>
+        <span class="text-center font-bold">{item.qty}</span>
+        <span class="text-left">{item.unit}</span>
+    </div>
+{/snippet}
 
 <style>
 

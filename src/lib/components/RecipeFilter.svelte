@@ -18,7 +18,7 @@
         text: undefined,
         category: undefined,
         prepTimeMin: undefined,
-        sortBy: 'created',
+        sortBy: '-created',
     });
 
     $effect(() => {
@@ -27,7 +27,7 @@
             text: recipeFilters.text,
             category: recipeFilters.category,
             prepTimeMin: recipeFilters.prepTimeMin,
-            sortBy: recipeFilters.sortBy || 'created'
+            sortBy: recipeFilters.sortBy || '-created'
         };
     })
 

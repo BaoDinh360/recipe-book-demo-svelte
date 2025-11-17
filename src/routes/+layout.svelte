@@ -3,6 +3,7 @@
 	import favicon from '$lib/assets/favicon.svg';
 	import NotificationArea from '$lib/components/NotificationArea.svelte';
 	import { BookOpenTextIcon, ChefHatIcon, HouseHeartIcon } from '$lib/icons';
+	import TopBarHeader from '$lib/components/TopBarHeader.svelte';
 
 	let { children } = $props();
 </script>
@@ -42,10 +43,12 @@
 			</li>
 		</ul>
 	</div>
-	<!-- children content -->
-	<div class="flex-1 p-4 md:p-10 overflow-y-auto">
-		{@render children?.()}
+	<!-- top header bar -->
+	<div class="flex-1 overflow-y-auto bg-gray-100">
+		<TopBarHeader />
+		<!-- children content -->
+		<div class="p-4 md:px-8 md:pb-10 md:pt-8">
+			{@render children?.()}
+		</div>
 	</div>
 </div>
-
-<!-- {@render children?.()} -->

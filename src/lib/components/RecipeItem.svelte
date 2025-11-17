@@ -30,7 +30,9 @@
             const result = await response.json();
             if(response.ok && result.success) {
                 // back to index /recipes
-                navigateToRecipes();
+                //navigateToRecipes();
+                // invalidate page.server.ts tag to trigger reupdate
+                await invalidate('app:recipes');
                 // show success noti
                 notiMessage = `Delete recipe: ${recipeCode} success!`;
                 notifySuccess(notiMessage);

@@ -19,32 +19,24 @@ export interface IngredientSelect {
     unit: string;
 };
 
-export interface IngredientFormData {
-    ingredientId: string;
-    name: string; // for display
-    qty: number;
-    unit: string;
-};
-
-
 // recipe_ingredients
 
-export interface RecipeIngredientsPbRecord {
-    id: string;
-    recipeId: string;
-    ingredientId: string;
-    quantity: number;
-    unit: string;
-    // pocketbase generated props
-    collectionId: string;
-    collectionName: string;
-    created: string;
-    updated: string;
-}
+// export interface RecipeIngredientsPbRecord {
+//     id: string;
+//     recipeId: string;
+//     ingredientId: string;
+//     quantity: number;
+//     unit: string;
+//     // pocketbase generated props
+//     collectionId: string;
+//     collectionName: string;
+//     created: string;
+//     updated: string;
+// }
 
-export interface CreateRecipeIngredientsPbRecord {
-    recipeId: string;
-    ingredientId: string;
-    quantity: number;
-    unit: string;
-}
+// export interface CreateRecipeIngredientsPbRecord {
+//     recipeId: string;
+//     ingredientId: string;
+//     quantity: number;
+//     unit: string;
+// }

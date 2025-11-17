@@ -6,7 +6,7 @@
 	import RecipeGeneralInfoSection from "./RecipeGeneralSection.svelte";
 	import IngredientSection from "./IngredientSection.svelte";
 	import RecipeStatsSection from "./RecipeStatsSection.svelte";
-	import type { IngredientFormData, IngredientSelect } from "$lib/types/ingredient-types";
+	import type { IngredientSelect } from "$lib/types/ingredient-types";
 	import { setContext } from "svelte";
 
     let { recipeToEdit, ingredientSelects, onSubmit, onCancel }: {
@@ -29,40 +29,18 @@
         category: '',
         prepTimeMin: 0
     };
-    const defaultIngredientList:IngredientFormData[] = [];
-
-    // const defaultFormData = {
-    //     id: undefined,
-    //     // title: '',
-    //     // description: '',
-    //     // instructions: '',
-    //     prepTimeMin: 0,
-    //     category: ''
-    // };
+    const defaultIngredientList:{
+        rowId: string;
+        ingredientId: string;
+        name: string; // for display
+        qty: number;
+        unit: string;
+    }[] = [];
     
     // if recipeToEdit obj is passed in, set formData input local state to recipeToEdit value
     // esle use the defaultFormData value
     // recipeToEdit: edit form mode, else add form mode
     // Add form mode won't have id, recipeCode
-    
-    // let formData: {
-    //     id: string | undefined,
-    //     // title: string,
-    //     // description: string,
-    //     // instructions: string,
-    //     prepTimeMin: number,
-    //     category: RecipeCategory | string, }
-    // = $state(recipeToEdit ? 
-    //     {
-    //         // ...recipeToEdit, 
-    //         // instructions: recipeToEdit.instructions.length <= 0 ? '' 
-    //         //     : recipeToEdit.instructions.join('\n')
-    //         id: recipeToEdit.id,
-    //         prepTimeMin: recipeToEdit.prepTimeMin,
-    //         category: recipeToEdit.category
-    //     }: 
-    //     {...defaultFormData}
-    // );
 
     // form state for general info section
     let generalFormData: {
@@ -92,7 +70,24 @@
     );
 
     // form state for recipe ingredient list
-    let ingredientListData:IngredientFormData[] = $state([]);
+    let ingredientListData:{
+        // client rowId to keep track
+        rowId: string;
+        id?: string;
+        ingredientId: string;
+        name: string; // for display
+        qty: number;
+        unit: string;
+    }[] = $state(recipeToEdit ? 
+    recipeToEdit.ingredients.map(ingr => ({
+        rowId: crypto.randomUUID(),
+        id: ingr.id,
+        ingredientId: ingr.ingredientId,
+        name: ingr.name!,
+        qty: ingr.qty,
+        unit: ingr.unit
+    })): defaultIngredientList);
+    
 
     // update formState mode based on recipeToEdit props
     let formState: FormState = $derived.by(() => {
@@ -166,7 +161,10 @@
             prepTimeMin: statsFormData.prepTimeMin,
             category: statsFormData.category as RecipeCategory,
             // ingredients list form data
-            ingredients: ingredientListData,
+            ingredients: ingredientListData.map(ingr => {
+                const { rowId, ...included } = ingr;
+                return included;
+            }),
         }
         if(formState === FormState.EDIT && recipeToEdit) {
             // edit recipe
@@ -175,17 +173,72 @@
                 id: recipeToEdit.id,
                 recipeCode: recipeToEdit.recipeCode,
                 // BAODNQ 20251111 - temp disable
-                ingredients: []
+                //ingredients: []
             };
             onSubmit(recipeData);
         }
         else {
             // add recipe
             const recipeData: CreateRecipeData = {
-                ...recipeInputData
+                ...recipeInputData,
+                // ingredients: recipeInputData.ingredients.map(ingr => ({
+                //     ingredientId: ingr.ingredientId,
+                //     qty: ingr.qty,
+                //     unit: ingr.unit
+                // }))
             };
             onSubmit(recipeData);
         }
+    }
+
+    // state for keep track of selected ingredient
+    let selectedIngredientRowId: string | undefined = $state(undefined);
+    let selectedIngredientRow  = $derived.by(() => {
+        if(selectedIngredientRowId) {
+            return ingredientListData.find(ingr => ingr.rowId === selectedIngredientRowId);
+        }
+        return undefined;
+    });
+    const addNewIngredient = (ingredientData: {
+        ingredientId: string;
+        name: string;
+        qty: number;
+        unit: string;
+    }) => {
+        console.log('ingredientListData', $state.snapshot(ingredientListData));
+        const newRow = {
+            rowId: crypto.randomUUID(),
+            ...ingredientData
+        };
+        console.log('ingredient data: ', ingredientData);
+        console.log('new row: ', newRow);
+        ingredientListData = [...ingredientListData, newRow];
+    }
+    const updateIngredient = (rowId: string, ingredientData: {
+        ingredientId: string;
+        name: string;
+        qty: number;
+        unit: string;
+    }) => {
+        console.log('ingredientListData', $state.snapshot(ingredientListData));
+        ingredientListData = ingredientListData.map(item => {
+            if(item.rowId === rowId) {
+                return {...item, ...ingredientData};
+            }
+            return item;
+        });
+        selectedIngredientRowId = undefined;
+    }
+    const removeIngredient =(rowId: string) => {
+        ingredientListData = ingredientListData.filter(item => item.rowId !== rowId);
+    }
+    const onSelectedIngredient = (rowId: string) => {
+        selectedIngredientRowId = rowId;
+        console.log('selectedIngredientRowId', $state.snapshot(selectedIngredientRowId));
+        console.log('selected ingred row: ', $state.snapshot(selectedIngredientRow));
+    }
+    const onCancelEditIngredient = () => {
+        selectedIngredientRowId = undefined;
     }
 
     const onCancelForm = () => {
@@ -268,7 +321,14 @@
                     errContent={showInputError}/>
                 <!-- card section ingredients list -->
                 <IngredientSection 
-                    {ingredientListData}/>
+                    {ingredientListData}
+                    selectedRowId={selectedIngredientRowId}
+                    selectedRow={selectedIngredientRow}
+                    onSelectEditRow={onSelectedIngredient}
+                    onCancelEdit={onCancelEditIngredient}
+                    onAddNew={addNewIngredient}
+                    onUpdateExisted={updateIngredient}
+                    onRemove={removeIngredient}/>
             </div>
             <!-- right col -->
             <div class="md:col-span-2 space-y-4">

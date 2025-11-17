@@ -8,4 +8,4 @@ export const pocketbaseClient: PocketBase = new PocketBase(pocketbaseHost);
 // collection names
 export const RECIPES = 'recipes';
 export const INGREDIENTS = 'ingredients';
-export const RECIPES_INGRED = 'recipes_ingredients';
+export const RECIPES_INGREDIENTS = 'recipes_ingredients';

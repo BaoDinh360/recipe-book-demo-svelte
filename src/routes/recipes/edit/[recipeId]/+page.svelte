@@ -54,7 +54,7 @@
 
 <RecipeForm
     recipeToEdit={data.recipeData}
-    ingredientSelects={[]}
+    ingredientSelects={data.ingredientSelects}
     onSubmit={(recipeData) => onUpdateRecipe(recipeData as UpdateRecipeData)}
     {onCancel}
     />

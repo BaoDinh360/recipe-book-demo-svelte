@@ -27,7 +27,7 @@ export const load: PageServerLoad = async ({ url, depends }) => {
             category: url.searchParams.get('category') as RecipeCategory || undefined,
             prepTimeMin: url.searchParams.get('prepTimeMin') !== null ? Number(url.searchParams.get('prepTimeMin'))
                 : undefined,
-            sortBy: url.searchParams.get('sort') || undefined
+            sortBy: url.searchParams.get('sort') || '-created'
         }
         try {
              // depends tag used for invalidate --> trigger re fetch data

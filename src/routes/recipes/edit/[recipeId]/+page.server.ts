@@ -1,15 +1,22 @@
 import type { PageServerLoad } from "./$types";
-import { getRecipeById } from '$lib/server/recipe-service';
+import { getRecipeById, getRecipeByIdWithIngredients } from '$lib/server/recipe-service';
 import { BusinessError } from "$lib/server/business-errors";
 import { error } from "@sveltejs/kit";
+import { getAllIngredients } from "$lib/server/ingredient-service";
 
 export const load: PageServerLoad = async ({ params }) => {
     try {
-        const recipe = await getRecipeById(params.recipeId);
+        //const recipe = await getRecipeById(params.recipeId);
+        const recipe = await getRecipeByIdWithIngredients(params.recipeId);
         // exclude unecessary props
         const { createdAt, lastUpdatedAt, ...included } = recipe;
+
+        // get all ingredients for select
+        const ingredientSelects = await getAllIngredients();
+
         return {
-            recipeData: included
+            recipeData: included,
+            ingredientSelects,
         };
     } catch (err) {
         let errorMsg: string | undefined;
@@ -25,6 +32,7 @@ export const load: PageServerLoad = async ({ params }) => {
         }
         return {
             recipeData: undefined,
+            ingredientSelects: [],
             errorMsg,
         };
     }

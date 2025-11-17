@@ -1,12 +1,13 @@
 import type { RecipeDetail } from '$lib/recipe-types';
 import { BusinessError } from '$lib/server/business-errors';
-import { getRecipeById } from '$lib/server/recipe-service';
+import { getRecipeById, getRecipeByIdWithIngredients } from '$lib/server/recipe-service';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ params }) => {
     try {
-        const recipe = await getRecipeById(params.recipeId);
+        //const recipe = await getRecipeById(params.recipeId);
+        const recipe = await getRecipeByIdWithIngredients(params.recipeId);
         return {
             recipeDetailData: recipe
         };

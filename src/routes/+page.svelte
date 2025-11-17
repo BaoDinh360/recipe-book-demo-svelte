@@ -60,17 +60,18 @@
 
 </script>
 
-<main class="container mx-auto my-12 p-6 max-w-full">
+<h2>Home page</h2>
+
+<!-- <main class="container mx-auto my-12 p-6 max-w-full">
     <div class="grid grid-cols-1 md:grid-cols-9 gap-8">
         <div class="md:col-span-5">
             <h2 class="text-2xl font-bold text-indigo-700 mb-2 pb-2 text-center">Recipe List</h2>
-            <!-- <RecipeFilter onFilterChange={onFilterRecipe}/> -->
         </div>
         <div class="md:col-span-4">
             
         </div>
     </div>
-</main>
+</main> -->
 
 <style>
 

@@ -1,7 +1,6 @@
 import type { CreateRecipeData } from '$lib/recipe-types';
 import { BusinessError } from '$lib/server/business-errors';
-import { createRecipeIngredients } from '$lib/server/recipe-ingred-service.js';
-import { createRecipe } from '$lib/server/recipe-service.js';
+import { createRecipeWithIngredients } from '$lib/server/recipe-service.js';
 import { json, error } from '@sveltejs/kit'
 // api endpoint: /api/recipes/
 
@@ -11,20 +10,9 @@ export const POST = async({ request, url }) => {
     try {
         const recipeData: CreateRecipeData = await request.json();
         console.log('Request payload: ', JSON.stringify(recipeData));
-        const created = await createRecipe(recipeData);
-
-        // add to recipe_ingredients if create recipe success
-        let insertedList = [];
-        if(created && created.id) {
-            for(const item of recipeData.ingredients) {
-                const result = await createRecipeIngredients(item, created.id);
-                // if insert success, push to list
-                insertedList.push(result);
-            }
-        }
-
-        console.log('recipes ingredients inserted: ', insertedList);
-
+        //const created = await createRecipe(recipeData);
+        const created = await createRecipeWithIngredients(recipeData);
+        
         return json({
             success: true,
             code: 201,
