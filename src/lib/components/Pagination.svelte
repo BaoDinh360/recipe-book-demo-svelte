@@ -60,7 +60,7 @@
 
 </script>
 
-<div class="flex flex-col md:flex-row items-center justify-between mb-6  p-3 rounded-lg
+<div class="flex flex-col md:flex-row items-center justify-between p-3 rounded-lg
     bg-white border border-gray-100 shadow-sm">
     <!-- items count, items per page -->
     <div class="flex items-center gap-8 mb-3 sm:mb-0">

@@ -72,13 +72,6 @@
     };
     // use for edit existing ingredient
     const onPopuplateFormIngredient = (rowId: string) => {
-        // find by index, then populate the input form
-        // const ingredientRowSelected = ingredientListData[index];
-        // console.log('ingredient clicked: ', $state.snapshot(ingredientRowSelected));
-        // formIngredient = {...ingredientRowSelected};
-        // formMode = 'EDIT';
-        // currentEditIngredIndex = index;
-        console.log('rowId edit clicked: ', rowId);
         onSelectEditRow(rowId);
     }
 
@@ -87,23 +80,10 @@
         resetInput();
     };
     const onDeleteIngredientItem = (rowId: string) => {
-        // const index = ingredientListData.findIndex(i => i.ingredientId === ingrId);
-        // if(index !== -1) {
-        //     ingredientListData.splice(index, 1);
-        // }
-        // console.log('ingredient list total count: ', $state.snapshot(ingredientListData.length));
         onRemove(rowId);
         resetInput();
     };
     const onUpdateIngredientItem = (rowId: string) => {
-        // update only the selected, return a new array
-        // ingredientListData = ingredientListData.map((item, index) => {
-        //     if(index === currentEditIngredIndex) {
-        //         return {...item, ...formIngredient};
-        //     }
-        //     return item;
-        // });
-        // console.log('ingredient list : ', $state.snapshot(ingredientListData));
         onUpdateExisted(rowId, {...formIngredient});
         resetInput();
     };

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { categoryOptions } from "$lib/constants";
 	import type { CreateRecipeData, RecipeCategory, RecipeFormSubmissionData, UpdateRecipeData } from "$lib/recipe-types";
 	import { FormState, type RecipeFormErrors } from "$lib/types";
     import { z } from "zod";
@@ -8,6 +7,7 @@
 	import RecipeStatsSection from "./RecipeStatsSection.svelte";
 	import type { IngredientSelect } from "$lib/types/ingredient-types";
 	import { setContext } from "svelte";
+	import ConfirmActionModal from "../shared/ConfirmActionModal.svelte";
 
     let { recipeToEdit, ingredientSelects, onSubmit, onCancel }: {
         recipeToEdit?: UpdateRecipeData | undefined,
@@ -18,6 +18,15 @@
 
     // context api to pass data (avoid props drilling)
     setContext('ingredientSelects', ingredientSelects);
+
+    // cancel modal ref
+    let cancelModalRef: ConfirmActionModal | undefined = $state();
+    const confirmCancelForm = () => {
+        // reset form input
+        resetFormInput();
+        // callback props
+        onCancel();
+    }
 
     // split form state into multiple state obj section
     const defaultGeneral = {
@@ -137,9 +146,6 @@
 
     const submitForm = (e: Event) => {
         e.preventDefault();
-
-        // BAODNQ 20251110 - TEST ONLY
-
         console.log('general info data: ', $state.snapshot(generalFormData));
         console.log('stats data: ', $state.snapshot(statsFormData));
         console.log('ingredient list data: ', $state.snapshot(ingredientListData));
@@ -172,8 +178,6 @@
                 ...recipeInputData,
                 id: recipeToEdit.id,
                 recipeCode: recipeToEdit.recipeCode,
-                // BAODNQ 20251111 - temp disable
-                //ingredients: []
             };
             onSubmit(recipeData);
         }
@@ -181,11 +185,6 @@
             // add recipe
             const recipeData: CreateRecipeData = {
                 ...recipeInputData,
-                // ingredients: recipeInputData.ingredients.map(ingr => ({
-                //     ingredientId: ingr.ingredientId,
-                //     qty: ingr.qty,
-                //     unit: ingr.unit
-                // }))
             };
             onSubmit(recipeData);
         }
@@ -241,18 +240,11 @@
         selectedIngredientRowId = undefined;
     }
 
-    const onCancelForm = () => {
-        // reset form input
-        resetFormInput();
-        // callback props
-        onCancel();
-    }
-
     const resetFormInput = () => {
         // reset input
-        //formData = {...defaultFormData};
         generalFormData = {...defaultGeneral};
-        statsFormData = {...statsFormData};
+        statsFormData = {...defaultStats};
+        ingredientListData = defaultIngredientList;
     }
     const resetFormErrors = () => {
         formErrors = {
@@ -388,8 +380,8 @@
         </div>
         <!-- button -->
         <div class="flex justify-end gap-4 pt-6">
-            <button type="button" class="btn btn-ghost w-36 border border-gray-200"
-                onclick={onCancelForm}>
+            <button type="button" class="btn w-36 bg-gray-200 hover:bg-gray-300"
+                onclick={() => cancelModalRef!.showModal()}>
                 Cancel
             </button>
             <button type="submit" class="btn btn-primary w-36 text-white font-semibold">
@@ -401,6 +393,21 @@
         </div>
     </form>
 </div>
+
+<!-- cancel form modal -->
+    {#snippet cancelContent()}
+        <p class="py-4 px-2 text-gray-600">
+            Cancel changes from this recipe?
+        </p>
+    {/snippet}
+    <ConfirmActionModal 
+        bind:this={cancelModalRef}
+        title='Cancel Changes'
+        modalContent={cancelContent}
+        actionLabel='Cancel changes'
+        modalStyle='NEUTRAL'
+        onConfirm={confirmCancelForm}
+        onCancel={() => {}} />
 
 {#snippet showInputError(message: string | undefined)}
     {#if message}

@@ -3,9 +3,8 @@
 	import type { RecipeListItem } from "$lib/recipe-types";
 	import { notifyError, notifySuccess } from "$lib/stores/notification-stores";
 	import CategoryBadge from "./CategoryBadge.svelte";
-	import ConfirmActionModal from "./ConfirmActionModal.svelte";
+	import ConfirmActionModal from "./shared/ConfirmActionModal.svelte";
     import { EyeIcon, SquarePenIcon, Trash2Icon } from '$lib/icons';
-	import { navigateToRecipes } from "$lib/utils/navigation";
 
     let { recipe, 
     }: {
@@ -105,10 +104,18 @@
     </div>
 
     <!-- delete modal -->
+    {#snippet deleteRecipeContent()}
+        <p class="py-4 px-2 text-gray-600">
+            Are you sure you want to permanently delete 
+            <span class="font-semibold text-red-600">
+                {recipe.recipeCode}: {recipe.title}
+            </span>?
+        </p>
+    {/snippet}
     <ConfirmActionModal 
         bind:this={deleteModalRef}
-        title='Confirm Recipe Deletion'
-        message={`Are you sure you want to permanently delete ${recipe.recipeCode}: ${recipe.title}?`}
+        title='Delete Recipe'
+        modalContent={deleteRecipeContent}
         actionLabel='Delete'
         modalStyle='ERROR'
         onConfirm={confirmDeleteRecipe}

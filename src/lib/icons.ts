@@ -22,3 +22,5 @@ export { default as SquarePlusIcon } from '@lucide/svelte/icons/square-plus';
 export { default as PlusIcon } from '@lucide/svelte/icons/plus';
 export { default as ListOrderedIcon } from '@lucide/svelte/icons/list-ordered';
 export { default as HashIcon } from '@lucide/svelte/icons/hash';
+export { default as PanelLeftCloseIcon } from '@lucide/svelte/icons/panel-left-close';
+export { default as PanelLeftOpenIcon } from '@lucide/svelte/icons/panel-left-open';

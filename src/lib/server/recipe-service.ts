@@ -1,7 +1,6 @@
 import { isUpdateRecipeDataType, type CreateRecipeData, type RecipeDetail, type RecipeFilterCriteria, type RecipeFormSubmissionData, type RecipeListItem, type RecipeListPagination, type RecipePbRecord, type UpdateRecipeData, type UpsertRecipePbRecord } from "$lib/recipe-types";
 import { pocketbaseClient, RECIPES, RECIPES_INGREDIENTS } from "$lib/server/pocketbase-client";
 import { ClientResponseError } from "pocketbase";
-import { BusinessError } from "./business-errors";
 import { handlePocketbaseError } from "./error-handler";
 
 const pbClient = pocketbaseClient;

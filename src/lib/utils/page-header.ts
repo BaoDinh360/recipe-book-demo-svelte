@@ -26,28 +26,3 @@ export const isShowBackButton = (pageRoute: string | null) => {
     // fallback, hide
     return false;
 }
-// // recipes route
-// export const recipeRoutePageTypeMap: Record<string, PageType> = {
-//     // recipe route, page type
-//     '/recipes': PageType.INDEX,
-//     '/recipes/[recipeId]': PageType.DETAIL,
-//     '/recipes/create': PageType.CREATE,
-//     '/recipes/edit/[recipeId]': PageType.EDIT
-// };
-// export const pageTypeRecipeTitleMap: Record<PageType, string> = {
-//     // recipe route, title
-//     [PageType.INDEX]: 'Recipes List',
-//     [PageType.DETAIL]: 'Recipe Details',
-//     [PageType.CREATE]: 'Add Recipe',
-//     [PageType.EDIT]: 'Edit Recipe',
-//     [PageType.DEFAULT]: '',
-// };
-// export const getRecipePageTypeByRoute = (pageRoute: string | null) => {
-//     if(pageRoute) {
-//         return recipeRoutePageTypeMap[pageRoute] || PageType.DEFAULT;
-//     }
-//     return PageType.DEFAULT;
-// }
-// export const getRecipesPageTitleByPageType = (pageType: PageType) => {
-//     return pageTypeRecipeTitleMap[pageType] || '';
-// };

@@ -79,7 +79,7 @@
 
 </script>
 
-<div class="bg-white p-4 sm:p-4 rounded-lg shadow-md border border-gray-100 mb-6">
+<div class="bg-white p-4 rounded-lg shadow-md border border-gray-100">
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 items-end">
         <div class="col-span-1 md:col-span-2">
             <label class="label" for="search">
@@ -128,7 +128,7 @@
         </div>
         <!-- button -->
         <div class="md:col-span-1 flex flex-col justify-end gap-2 h-full">
-            <button type="button" class="btn btn-sm btn-info w-full"
+            <button type="button" class="btn btn-sm text-white w-full bg-sky-500 hover:bg-sky-600"
                 onclick={onFilterRecipe}>
                 Apply
             </button>

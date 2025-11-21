@@ -1,17 +1,19 @@
 <script lang="ts">
+	import type { Snippet } from "svelte";
+
   
     let {
         title,
-        message,
         actionLabel,
         modalStyle,
+        modalContent,
         onCancel,
         onConfirm
     }: {
         title: string;
-        message: string;
         actionLabel: string;
         modalStyle: 'INFO' | 'ERROR' | 'NEUTRAL';
+        modalContent: Snippet;
         onCancel: () => void;
         onConfirm: () => void;
     } = $props();
@@ -68,9 +70,10 @@
             <h3 class="font-bold text-2xl mb-4 {titleStyle}">
                 {title}
             </h3>
-            <p class="py-2 text-gray-600">
+            <!-- <p class="py-2 text-gray-600">
                 {message}
-            </p>
+            </p> -->
+            {@render modalContent()}
         </div>
         <div class="modal-action p-2 pt-4">
             <div class="w-full flex flex-row justify-end gap-2.5">
