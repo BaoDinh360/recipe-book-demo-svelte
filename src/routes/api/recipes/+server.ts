@@ -1,38 +1,45 @@
 import type { CreateRecipeData } from '$lib/recipe-types';
 import { BusinessError } from '$lib/server/business-errors';
+import { handlePocketbaseError } from '$lib/server/error-handler';
 import { createRecipeWithIngredients } from '$lib/server/recipe-service.js';
+import type { ApiResponse } from '$lib/types';
 import { json, error } from '@sveltejs/kit'
-// api endpoint: /api/recipes/
+import { ClientResponseError } from 'pocketbase';
 
-// POST
-export const POST = async({ request, url }) => {
-    console.log(`Api endpoint: ${request.method} - ${url.pathname}`);
+// POST /api/recipes/
+export const POST = async({ request, url, locals }) => {
+    const logger = locals.logger;
     try {
         const recipeData: CreateRecipeData = await request.json();
-        console.log('Request payload: ', JSON.stringify(recipeData));
-        //const created = await createRecipe(recipeData);
-        const created = await createRecipeWithIngredients(recipeData);
-        
-        return json({
+        logger.info('Creating new recipe', 
+            { title: recipeData.title, category: recipeData.category, 
+                totalIngredients: recipeData.ingredients.length });
+        const created = await createRecipeWithIngredients(recipeData, logger);
+        logger.info('Recipe created', { recipeId: created.id, recipeCode: created.recipeCode });
+        const successRes: ApiResponse<{id: string, recipeCode: string}> = {
             success: true,
-            code: 201,
-            data: created,
-        }, { status: 201 });
+            data: created
+        };
+        return json(successRes, { status: 201 });
     } catch (err) {
         let status, message;
         if(err instanceof BusinessError) {
             status = err.statusCode;
             message = err.message;
-        } else {
+        } else if (err instanceof ClientResponseError) {
+            handlePocketbaseError(err, logger);
+        }
+        else {
             // other error
-            console.error('Api endpoint unhandled exception error: ', err);
+            logger.error('Unhandled server error', {err});
             status = 500;
             message = 'An unexpected server error occurred!';
         }
-        return json({
+        const errRes: ApiResponse<null> = {
             success: false,
-            code: status,
-            message: message,
-        }, { status: status });
+            message,
+            data: null
+        };
+        return json(errRes, { status: status });
     }
 }

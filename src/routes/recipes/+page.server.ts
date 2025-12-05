@@ -1,8 +1,10 @@
 import type { RecipeCategory, RecipeFilterCriteria } from '$lib/recipe-types';
 import { BusinessError } from '$lib/server/business-errors';
 import { getPaginatedRecipeList } from '$lib/server/recipe-service';
+import { ClientResponseError } from 'pocketbase';
 import type { PageServerLoad } from './$types';
 import { error } from '@sveltejs/kit';
+import { handlePocketbaseError } from '$lib/server/error-handler';
 
 const RECIPES_TAG = 'app:recipes';
 const DEFAULT_START_PAGE = 1;
@@ -17,7 +19,8 @@ const DEFAULT_PER_PAGE = 3; // 3, 6, 9
 // sort: sort=
 
 // runs on server only
-export const load: PageServerLoad = async ({ url, depends }) => {
+export const load: PageServerLoad = async ({ url, depends, locals }) => {
+    const logger = locals.logger;
     // pagination
         const currentPage = Number(url.searchParams.get('page') || DEFAULT_START_PAGE);
         const itemsPerPage = Number(url.searchParams.get('perPage') || DEFAULT_PER_PAGE);
@@ -30,12 +33,17 @@ export const load: PageServerLoad = async ({ url, depends }) => {
             sortBy: url.searchParams.get('sort') || '-created'
         }
         try {
+            //throw new Error('Test');
+            logger.info('Fetching recipes data',
+                { pagination: { currentPage, itemsPerPage }, filters: recipeFilters });
              // depends tag used for invalidate --> trigger re fetch data
             depends(RECIPES_TAG);
     
-            const paginatedResult = await getPaginatedRecipeList(currentPage, itemsPerPage, recipeFilters);
+            const paginatedResult = await getPaginatedRecipeList(
+                currentPage, itemsPerPage, recipeFilters, logger);
             const { totalPages, totalItems, items } = paginatedResult;
-            console.log('paginated recipe: ', { currentPage, itemsPerPage, totalPages, totalItems, itemsCount: items.length });
+            logger.info('Recipes pagination data result',
+                { pagination: { currentPage, itemsPerPage, totalPages, totalItems } });
 
             return {
                 recipeListData: items,
@@ -52,19 +60,21 @@ export const load: PageServerLoad = async ({ url, depends }) => {
             if(err instanceof BusinessError) {
                 errorMsg = err.message;
                 // return error msg back to page
+                return {
+                    recipeListData: [],
+                    currentPage,
+                    itemsPerPage,
+                    totalPages: 0,
+                    totalItems: 0,
+                    errorMsg,
+                };  
+            } else if (err instanceof ClientResponseError) {
+                handlePocketbaseError(err, logger);
             } else {
                 // other error
-                // display error page for 500
-                console.error('Unhandled exception error: ', err);
-                throw error(500, 'An unexpected server error occurred!');
+                logger.error('Unhandled server error', {err});
             }
-            return {
-                recipeListData: [],
-                currentPage,
-                itemsPerPage,
-                totalPages: 0,
-                totalItems: 0,
-                errorMsg,
-            };        
+            // display error page for 500
+            throw error(500, 'An unexpected server error occurred!');
         }
 }
