@@ -239,6 +239,19 @@ export const updateRecipe = async (recipeData: UpdateRecipeData, logger: Logger)
 // delete recipe by id
 export const deleteRecipe = async (id: string, logger: Logger): Promise<void> => {
     try {
+        // find + delete recipe_ingredients relation records
+        const rcp_ingredients = await pbClient.collection(RECIPES_INGREDIENTS).getFullList({
+            filter: `recipe="${id}"`
+        });
+        logger.debug(`Recipe: ${id} ingredients records`, { total: rcp_ingredients.length });
+        // delete relation records if found
+        if (rcp_ingredients !== null && rcp_ingredients.length > 0) {
+            await Promise.all(
+                rcp_ingredients.map((ri) => pbClient.collection(RECIPES_INGREDIENTS).delete(ri.id))
+            );
+            logger.debug(` DB delete recipe: ${id} ingredients records deleted`);
+        }
+        // delete parent record
         await pbClient.collection(RECIPES).delete(id);
         logger.debug('DB delete recipe', { recipeId: id });
     } catch (err) {
