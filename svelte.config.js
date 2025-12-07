@@ -1,6 +1,6 @@
 //import adapter from '@sveltejs/adapter-auto';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
-import adapter from '@sveltejs/adapter-static';
+import adapter from '@sveltejs/adapter-node';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -14,17 +14,7 @@ const config = {
 		// See https://svelte.dev/docs/kit/adapters for more information about adapters.
 		// adapter: adapter()
 
-		adapter: adapter({
-			pages: 'build',
-			assets: 'build',
-			fallback: '404.html',
-			precompress: false,
-			strict: true
-		}),
-		paths: {
-			// base: process.argv.includes('dev') ? '' : process.env.BASE_PATH,
-			base: process.argv.includes('dev') ? '' : '/recipe-book-demo-svelte',
-		}
+		adapter: adapter()
 	}
 };
 
