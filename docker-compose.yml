@@ -12,3 +12,5 @@ services:
     restart: unless-stopped
     env_file:
       - .env.production
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
