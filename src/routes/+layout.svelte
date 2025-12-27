@@ -16,7 +16,7 @@
 <!-- Show notification -->
 <NotificationArea />
 
-<div class="flex min-h-screen">
+<div class="bg-base-100 font-body text-deep-charcoal min-h-screen flex flex-col overflow-x-hidden">
 	<!-- sidebar layout -->
 	<!-- <Sidebar />
 	<div class="flex-1 overflow-y-auto bg-gray-50">

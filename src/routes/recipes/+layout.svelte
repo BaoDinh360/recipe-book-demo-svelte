@@ -18,7 +18,7 @@
             </button>
         {/if}
     </div> -->
-    <HeaderBar />
+    <!-- <HeaderBar /> -->
     <!-- child content -->
     {@render children?.()}
 </div>

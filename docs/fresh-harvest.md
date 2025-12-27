@@ -50,7 +50,7 @@ module.exports = {
           "neutral": "#212121",          // Deep Charcoal
           "neutral-content": "#ffffff",
           "base-100": "#FFFFFF",         // Background
-          "base-200": "#F7F7F7",         // Surface/Cards
+          "base-200": "#F7F7F7",         // Surface/Cards / light cream
           "base-300": "#DCDCDC",         // Borders/Dividers
           "base-content": "#212121",     // Main Text color
           "info": "#1E88E5",
