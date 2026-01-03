@@ -8,7 +8,7 @@
 
 </script>
 
-<div class="">
+<div class="min-h-screen">
     <HeaderBar />
     <!-- child content -->
     {@render children?.()}

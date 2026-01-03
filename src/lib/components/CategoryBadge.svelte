@@ -7,6 +7,6 @@
     let categoryStyleClass = $derived(getCategoryColorStyle(category));
 </script>
 
-<span class="p-4 badge badge-lg font-semibold {categoryStyleClass}">
+<span class="p-4 badge badge-lg font-semibold text-base {categoryStyleClass}">
     {category}
 </span>

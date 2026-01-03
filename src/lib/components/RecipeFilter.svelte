@@ -138,17 +138,17 @@
 </div> -->
 
 <!-- <div class="p-6"></div> -->
-<div class="flex flex-col lg:flex-row lg:items-end gap-4 mb-8 pb-4">
-    <div class="w-2/5">
-        <label class="w-full input input-bordered input flex items-center gap-2 relative group
-            border-base-300 rounded-lg bg-base-200 text-neutral placeholder-neutral/50 focus-within:ring-2 focus-within:ring-primary focus-within:border-primary transition-all">
+<div class="flex flex-col lg:flex-row lg:items-end gap-4">
+    <div class="w-2/5 pb-4">
+        <label class="w-full input input-bordered flex items-center gap-2 relative group
+            border-base-300 rounded-lg bg-base-200 text-neutral placeholder-neutral/50 focus-within:outline-none focus-within:ring-2 focus-within:ring-primary focus-within:border-primary transition-all">
             <SearchIcon class="h-5 w-5 text-neutral/50 group-focus-within:text-primary" />
             <input type="text" class="grow" placeholder="Search your recipes..." id="search" 
                 bind:value={filterInput.text}/>
         </label>
     </div>
     
-    <div class="w-2/5 flex gap-2 overflow-x-auto scrollbar-hide items-center">
+    <div class="w-2/5 flex gap-2 overflow-x-auto scrollbar-hide items-center pb-4">
         <!-- category -->
         <div class="form-control px-2 w-full">
             <label class="label" for="filterCateg">
@@ -156,11 +156,11 @@
                     Category
                 </span>
             </label>
-            <select class="w-full bg-base-200 border border-base-300 rounded-lg py-3 px-4 text-neutral focus-within:ring-1 focus-within:ring-primary focus-within:border-primary"
+            <select class="select select-bordered w-full bg-base-200 border border-base-300 rounded-lg text-base text-neutral focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
                 id="filterCateg"
                 bind:value={filterInput.category}
                 >
-                <option value={undefined}>---All---</option>
+                <option value={undefined}>All</option>
                 {#each categoryOptions as option }
                     <option value={option.value}>{option.label}</option>
                 {/each}
@@ -173,8 +173,8 @@
                     Prep Time (min)
                 </span>
             </label>
-            <input type="number" class="w-full input input-bordered input flex items-center gap-2 relative group
-                border-base-300 rounded-lg bg-base-200 text-neutral placeholder-neutral/50 focus-within:ring-1 focus-within:ring-primary focus-within:border-primary transition-all"
+            <input type="number" class="input input-bordered w-full py-3 px-4 flex items-center gap-2 relative group
+                border border-base-300 rounded-lg bg-base-200 text-neutral placeholder-neutral/50 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all"
                 id="filterPrep"
                 placeholder="e.g., 26"
                 bind:value={filterInput.prepTimeMin}
@@ -187,7 +187,7 @@
                     Sort by
                 </span>
             </label>
-            <select class="w-full bg-base-200 border border-base-300 rounded-lg py-3 px-4 text-neutral focus-within:ring-1 focus-within:ring-primary focus-within:border-primary" 
+            <select class="select select-bordered w-full bg-base-200 border border-base-300 rounded-lg text-base text-neutral focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary" 
                 id="sort"
                 bind:value={filterInput.sortBy}>
                 {#each sortingOptions as option }
@@ -197,12 +197,12 @@
         </div>
     </div>
 
-    <div class="w-1/5 flex gap-2 items-center justify-end">
-        <button class="px-6 py-4 rounded-lg bg-primary text-sm text-neutral-content font-semibold shadow-md shadow-primary/20 hover:brightness-95 transition-all"
+    <div class="w-1/5 flex gap-2 items-center justify-end pb-4">
+        <button class="px-6 py-3 rounded-lg bg-primary text-base text-neutral-content font-semibold shadow-md shadow-primary/20 hover:brightness-95 transition-all"
             onclick={onFilterRecipe} type="button">
             Apply Filters
         </button>
-        <button class="px-6 py-4 rounded-lg bg-white border border-base-300 text-neutral font-medium hover:bg-base-300/10 transition-colors"
+        <button class="px-6 py-3 rounded-lg bg-white border border-base-300 text-neutral font-medium hover:bg-base-300/10 transition-colors"
             onclick={onResetFilter} type="button" aria-label="reset filter">
             <FunnelXIcon class="size-5" />
         </button>

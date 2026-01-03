@@ -8,7 +8,7 @@ import { handlePocketbaseError } from '$lib/server/error-handler';
 
 const RECIPES_TAG = 'app:recipes';
 const DEFAULT_START_PAGE = 1;
-const DEFAULT_PER_PAGE = 3; // 3, 6, 9
+const DEFAULT_PER_PAGE = 4; // 3, 6, 9
 
 // url with query params: /recipes?page=...&perPage=...
 // for each filter params, put it as separate query params, e.g: &category=...

@@ -51,7 +51,7 @@ module.exports = {
           "neutral-content": "#ffffff",
           "base-100": "#FFFFFF",         // Background
           "base-200": "#F7F7F7",         // Surface/Cards / light cream
-          "base-300": "#DCDCDC",         // Borders/Dividers
+          "base-300": "#DCDCDC",         // Borders/Dividers / soft-stone
           "base-content": "#212121",     // Main Text color
           "info": "#1E88E5",
           "success": "#45A049",

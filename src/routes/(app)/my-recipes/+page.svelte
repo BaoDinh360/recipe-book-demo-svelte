@@ -55,5 +55,16 @@
         </button>
     </div>
 
-    <RecipeFilter {recipeFilters}/>
+    <div class="w-full mx-auto flex flex-col gap-6">
+        <RecipeFilter {recipeFilters}/>
+
+        <RecipeList recipeList={data.recipeListData}/>
+
+        <Pagination 
+            currentPage={data.currentPage}
+            itemsPerPage={data.itemsPerPage}
+            totalPages={data.totalPages}
+            totalItems={data.totalItems}/>
+    </div>
+    
 </main>
