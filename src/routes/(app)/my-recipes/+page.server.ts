@@ -5,10 +5,11 @@ import { ClientResponseError } from 'pocketbase';
 import type { PageServerLoad } from './$types';
 import { error } from '@sveltejs/kit';
 import { handlePocketbaseError } from '$lib/server/error-handler';
+import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_START_PAGE } from '$lib/constants';
 
 const RECIPES_TAG = 'app:recipes';
-const DEFAULT_START_PAGE = 1;
-const DEFAULT_PER_PAGE = 4; // 3, 6, 9
+// const DEFAULT_START_PAGE = 1;
+// const DEFAULT_PER_PAGE = 4;
 
 // url with query params: /recipes?page=...&perPage=...
 // for each filter params, put it as separate query params, e.g: &category=...
@@ -23,7 +24,7 @@ export const load: PageServerLoad = async ({ url, depends, locals }) => {
     const logger = locals.logger;
     // pagination
         const currentPage = Number(url.searchParams.get('page') || DEFAULT_START_PAGE);
-        const itemsPerPage = Number(url.searchParams.get('perPage') || DEFAULT_PER_PAGE);
+        const itemsPerPage = Number(url.searchParams.get('perPage') || DEFAULT_ITEMS_PER_PAGE);
         // filter
         const recipeFilters: RecipeFilterCriteria = {
             text: url.searchParams.get('text') || undefined,

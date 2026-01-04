@@ -12,6 +12,10 @@ export const sortingOptions: SelectOption[] = [
     {label: 'Latest', value: '-created'}
 ];
 
+// pagination
+export const DEFAULT_START_PAGE = 1;
+export const DEFAULT_ITEMS_PER_PAGE = 4;
+
 const ITEMS_PER_PAGE_ARR = [4, 8, 12];
 export const itemsPerPageOptions: SelectOption[] = ITEMS_PER_PAGE_ARR.map((item) => ({
     label: item.toString(),

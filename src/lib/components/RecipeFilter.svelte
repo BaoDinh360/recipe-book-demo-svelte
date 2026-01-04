@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
 	import { page } from "$app/state";
-	import { categoryOptions, sortingOptions } from "$lib/constants";
+	import { categoryOptions, DEFAULT_ITEMS_PER_PAGE, DEFAULT_START_PAGE, sortingOptions } from "$lib/constants";
 	import type { RecipeCategory, RecipeFilterCriteria } from "$lib/recipe-types";
 	import { FunnelXIcon, SearchIcon } from '$lib/icons';
 
@@ -63,8 +63,8 @@
     }
 
     const resetPagination = (searchParams: URLSearchParams) => {
-        searchParams.set('page', String(1));
-        searchParams.set('perPage', String(3));
+        searchParams.set('page', String(DEFAULT_START_PAGE));
+        searchParams.set('perPage', String(DEFAULT_ITEMS_PER_PAGE));
     }
 
     const onResetFilter = () => {

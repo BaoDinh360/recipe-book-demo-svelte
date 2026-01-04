@@ -165,13 +165,13 @@
         Showing <span class="font-bold text-neutral">{startIndex} - {endIndex}</span> 
         of 
         <span class="font-bold text-neutral">{totalItems}</span> 
-        recipes
+        items
     </div>
     <nav class="flex items-center gap-2 order-1 md:order-2">
         <button class="size-10 flex items-center justify-center rounded-lg border border-base-300
             bg-white hover:bg-base-300/30 text-neutral transition-colors 
             disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={currentPage == 1}
+            disabled={currentPage === 1 || totalPages === 0}
             onclick={previousPage}>
             <ChevronLeftIcon class="h-4 w-4"/>
         </button>
@@ -194,7 +194,7 @@
         <button class="size-10 flex items-center justify-center rounded-lg border border-base-300
             bg-white hover:bg-base-300/30 text-neutral transition-colors 
             disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={currentPage === totalPages}
+            disabled={currentPage === totalPages || totalPages === 0}
             onclick={nextPage}>
             <ChevronRightIcon class="size-4" />
         </button>

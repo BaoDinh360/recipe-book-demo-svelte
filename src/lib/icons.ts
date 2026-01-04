@@ -26,3 +26,4 @@ export { default as PanelLeftCloseIcon } from '@lucide/svelte/icons/panel-left-c
 export { default as PanelLeftOpenIcon } from '@lucide/svelte/icons/panel-left-open';
 export { default as UtensilsCrossedIcon } from '@lucide/svelte/icons/utensils-crossed';
 export { default as FunnelXIcon } from '@lucide/svelte/icons/funnel-x';
+export { default as SearchXIcon } from '@lucide/svelte/icons/search-x';

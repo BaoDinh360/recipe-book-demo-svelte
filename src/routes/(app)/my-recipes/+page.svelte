@@ -8,6 +8,7 @@
 	import { lastRecipeUrl } from "$lib/stores/navigation-state";
 	import { notifyError } from "$lib/stores/notification-stores";
 	import type { PageProps } from "./$types";
+	import { goto } from "$app/navigation";
 	
     // /recipes/index
 
@@ -49,7 +50,8 @@
         <button
             class="flex items-center gap-2 bg-accent hover:brightness-95 text-neutral px-6 py-3 
                 rounded-lg font-bold shadow-lg shadow-accent/20 transition-all hover:-translate-y-0.5 
-                active:translate-y-0">
+                active:translate-y-0"
+            onclick={() => goto('/recipes/create')}>
             <SquarePlusIcon class="size-5" />
             <span>Create New Recipe</span>
         </button>
