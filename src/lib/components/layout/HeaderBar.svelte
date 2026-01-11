@@ -1,14 +1,11 @@
 <script lang="ts">
 	import { page } from "$app/state";
+	import { NAV_MENU_ITEMS } from "$lib/constants";
 	import { UtensilsCrossedIcon } from "$lib/icons";
 
     let currentPath = $derived(page.url.pathname);
     
-    const navItems = [
-        { name: 'Browse Recipes', url: '#' },
-        { name: 'My Recipes', url: '/recipes' },
-        { name: 'Meal Planner', url: '#' }
-    ]
+    const navItems = NAV_MENU_ITEMS;
 
 </script>
 

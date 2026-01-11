@@ -21,3 +21,11 @@ export const itemsPerPageOptions: SelectOption[] = ITEMS_PER_PAGE_ARR.map((item)
     label: item.toString(),
     value: item
 }));
+
+// menu navbar items
+export const NAV_MENU_ITEMS = [
+    { name: 'Browse Recipes', url: '#' },
+    { name: 'My Recipes', url: '/my-recipes' },
+    { name: 'Meal Planner', url: '#' },
+    { name: 'Create recipe', url: '/recipes/create' }
+]

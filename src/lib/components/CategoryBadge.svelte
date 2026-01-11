@@ -1,12 +1,18 @@
 <script lang="ts">
+    import { twMerge } from 'tailwind-merge';
+	import { clsx } from 'clsx';
 	import type { RecipeCategory } from "$lib/recipe-types";
 	import { getCategoryColorStyle } from "$lib/utils/category-style";
-    let { category }: {
-        category: RecipeCategory
+    let { class: className = '', category, ...rest }: {
+        category: RecipeCategory,
+        class?: string,
     } = $props();
     let categoryStyleClass = $derived(getCategoryColorStyle(category));
+
+    const baseStyleClass = $derived(`p-4 badge badge-lg font-semibold text-base ${categoryStyleClass}`)
+    const finalClass = $derived(twMerge(clsx(baseStyleClass, className)));
 </script>
 
-<span class="p-4 badge badge-lg font-semibold text-base {categoryStyleClass}">
+<span class={finalClass} {...rest}>
     {category}
 </span>

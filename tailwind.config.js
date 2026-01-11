@@ -7,7 +7,9 @@ export default {
     extend: {
       fontFamily: {
         heading: ["Poppins", "sans-serif"],
-        body: ["Roboto", "sans-serif"]
+        body: ["Roboto", "sans-serif"],
+        'display': ["Poppins", "sans-serif"],
+        'body': ["Roboto", "sans-serif"]
       }
     },
   },
