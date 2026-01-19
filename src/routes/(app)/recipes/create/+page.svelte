@@ -2,7 +2,7 @@
 	import RecipeForm from "$lib/components/recipe-form/RecipeForm.svelte";
 	import type { CreateRecipeData } from "$lib/recipe-types";
 	import { notifyError, notifySuccess } from "$lib/stores/notification-stores";
-	import { navigateToRecipes } from "$lib/utils/navigation";
+	import { navigateToMyRecipes, navigateToRecipes } from "$lib/utils/navigation";
 	import type { PageProps } from "./$types";
 
     // path: /recipes/create/
@@ -28,7 +28,7 @@
             // success
             if(response.ok && result.success) {
                 // back to index /recipes
-                await navigateToRecipes();
+                await navigateToMyRecipes();
                 // show success noti
                 notiMessage = `Create new recipe: ${result.data.recipeCode} success!`;
                 notifySuccess(notiMessage);
@@ -44,15 +44,18 @@
     }
     const onCancel = async () => {
         // redirect to index /recipes 
-        await navigateToRecipes();
+        await navigateToMyRecipes();
     }
 
 </script>
 
-<RecipeForm
-    ingredientSelects={data.ingredientSelects}
-    onSubmit={onCreateRecipe}
-    {onCancel}/>
+<main class="flex h-full grow flex-col px-4 md:px-10 lg:px-40 py-5">
+    <RecipeForm
+        ingredientSelects={data.ingredientSelects}
+        onSubmit={onCreateRecipe}
+        {onCancel}/>
+</main>
+
 
 <style>
 

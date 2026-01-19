@@ -52,12 +52,14 @@
 
 </script>
 
-<RecipeForm
-    recipeToEdit={data.recipeData}
-    ingredientSelects={data.ingredientSelects}
-    onSubmit={(recipeData) => onUpdateRecipe(recipeData as UpdateRecipeData)}
-    {onCancel}
+<main class="flex h-full grow flex-col px-4 md:px-10 lg:px-40 py-5">
+    <RecipeForm
+        recipeToEdit={data.recipeData}
+        ingredientSelects={data.ingredientSelects}
+        onSubmit={(recipeData) => onUpdateRecipe(recipeData as UpdateRecipeData)}
+        {onCancel}
     />
+</main>
 
 <style>
 

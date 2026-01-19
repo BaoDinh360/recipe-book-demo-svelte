@@ -8,6 +8,8 @@
 	import type { IngredientSelect } from "$lib/types/ingredient-types";
 	import { setContext } from "svelte";
 	import ConfirmActionModal from "../shared/ConfirmActionModal.svelte";
+	import { ImageUpIcon, SaveIcon, SquarePenIcon } from "$lib/icons";
+	import RecipeInstructionsSection from "./RecipeInstructionsSection.svelte";
 
     let { recipeToEdit, ingredientSelects, onSubmit, onCancel }: {
         recipeToEdit?: UpdateRecipeData | undefined,
@@ -55,13 +57,13 @@
     let generalFormData: {
         title: string,
         description: string,
-        instructions: string
+        // instructions: string
     } = $state(recipeToEdit ? 
         {
             title: recipeToEdit.title,
             description: recipeToEdit.description,
-            instructions: recipeToEdit.instructions.length <= 0 ? '' 
-                : recipeToEdit.instructions.join('\n')
+            // instructions: recipeToEdit.instructions.length <= 0 ? '' 
+            //     : recipeToEdit.instructions.join('\n')
         }: 
         {...defaultGeneral}
     );
@@ -97,6 +99,14 @@
         unit: ingr.unit
     })): defaultIngredientList);
     
+    // form state for list of instruction steps
+    let instructionListData: {
+        rowId: string, instructionText: string 
+    }[] = $state(recipeToEdit ?
+    recipeToEdit.instructions.map(ins => ({
+        rowId: crypto.randomUUID(),
+        instructionText: ins
+    })) : []);
 
     // update formState mode based on recipeToEdit props
     let formState: FormState = $derived.by(() => {
@@ -149,6 +159,7 @@
         console.log('general info data: ', $state.snapshot(generalFormData));
         console.log('stats data: ', $state.snapshot(statsFormData));
         console.log('ingredient list data: ', $state.snapshot(ingredientListData));
+        console.log('instructions list data: ', $state.snapshot(instructionListData));
         //return;
 
         // validate form inputs
@@ -159,11 +170,12 @@
         const recipeInputData = {
             title: generalFormData.title,
             description: generalFormData.description,
-            instructions: generalFormData.instructions === '' ? [] :
-                generalFormData.instructions
-                .split('\n') // split into string[]
-                .map(s => s.trim()) // foreach items, trim
-                .filter(Boolean), // filter in only valid string, no empty string
+            instructions: instructionListData.map(i => i.instructionText.trim()),
+            // instructions: generalFormData.instructions === '' ? [] :
+            //     generalFormData.instructions
+            //     .split('\n') // split into string[]
+            //     .map(s => s.trim()) // foreach items, trim
+            //     .filter(Boolean), // filter in only valid string, no empty string
             prepTimeMin: statsFormData.prepTimeMin,
             category: statsFormData.category as RecipeCategory,
             // ingredients list form data
@@ -254,6 +266,16 @@
         };
     }
 
+    // function for instruction list data
+    const addNewInstruction = () => {
+        instructionListData.push({
+            rowId: crypto.randomUUID(),
+            instructionText: ''
+        });
+    }
+    const removeInstruction = (rowId: string) => {
+        instructionListData = instructionListData.filter(i => i.rowId !== rowId);
+    }
 </script>
 
 <div class="container mx-auto max-w-full">
@@ -263,49 +285,6 @@
         <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
             <!-- left col -->
             <div class="md:col-span-3 space-y-4">
-                <!-- card section recipe info -->
-                <!-- <div class="w-full mx-auto p-6 rounded-lg shadow-md 
-                    bg-white border border-gray-200 space-y-4">
-                    <h3 class="text-lg font-bold text-gray-800 border-b pb-3 mb-4">
-                        Recipe Info 
-                        {#if formState === FormState.EDIT && recipeToEdit}
-                            <span class="font-bold pl-4 text-indigo-700 text-base">
-                                {recipeToEdit.recipeCode}
-                            </span>
-                        {/if}
-                    </h3>
-                    <div class="form-control w-full">
-                        <label class="label" for="title">
-                            <span class="label-text text-base text-gray-600 font-semibold input-required">
-                                Title
-                            </span>
-                        </label>
-                        <input class="input input-bordered w-full" class:input-error={formErrors.title} 
-                            type="text" id="title" bind:value={formData.title}
-                            onchange={() => formErrors.title = undefined}/>
-                        {@render showInputError(formErrors.title)}
-                    </div>
-                    <div class="form-control w-full">
-                        <label class="label" for="desc">
-                            <span class="label-text text-base text-gray-600 font-semibold">
-                                Description
-                            </span>
-                        </label>
-                        <textarea class="textarea textarea-bordered w-full" 
-                            id="desc" placeholder="Add a description" bind:value={formData.description}>
-                        </textarea>
-                    </div>
-                    <div class="form-control w-full">
-                        <label class="label" for="instruction">
-                            <span class="label-text text-base text-gray-600 font-semibold">
-                                Instructions, 1 per line
-                            </span>    
-                        </label>
-                        <textarea class="textarea textarea-bordered w-full" rows="5"
-                            id="instruction" placeholder="Add instructions, 1 per line"
-                            bind:value={formData.instructions}></textarea>
-                    </div>
-                </div> -->
                 <RecipeGeneralInfoSection 
                     bind:formData={generalFormData}
                     recipeCode={recipeToEdit ? recipeToEdit.recipeCode : undefined}
@@ -394,6 +373,92 @@
     </form>
 </div>
 
+<div class="mt-6"></div>
+<!-- BAODNQ 20260111 - FIX UI -->
+<form onsubmit={(e) => submitForm(e)}>
+    <div class="flex flex-col max-w-[960px] flex-1 gap-6 pb-20">
+        <div class="flex flex-wrap justify-between gap-3 px-4">
+            <div class="flex flex-col gap-2">
+                <h1 class="text-base-content text-3xl md:text-4xl font-display 
+                    font-semibold leading-tight tracking-tight">
+                    {formState === FormState.EDIT ?
+                        'Edit Recipe' :
+                        'Create New Recipe'
+                    }
+                </h1>
+                {#if formState === FormState.EDIT}
+                    <p class="text-primary text-xl font-bold font-display">
+                        {recipeToEdit?.recipeCode}
+                    </p>
+                {:else}
+                    <p class="text-base-content/80 text-base font-normal font-body">
+                        Share your culinary masterpiece with the world.
+                    </p>
+                {/if}
+            </div>
+            <div class="flex gap-4 self-start">
+                {@render formButtonGroup()}
+            </div>
+        </div>
+        <!-- upload image (future feat) -->
+        <div class="px-4">
+            <div class="group relative w-full bg-center bg-no-repeat bg-cover flex flex-col items-center 
+                justify-center overflow-hidden bg-base-200 rounded-xl min-h-[280px] border-2 border-dashed 
+                border-base-300 hover:border-primary transition-colors cursor-pointer"
+                data-alt="Placeholder recipe image">
+                <div class="flex flex-col items-center gap-3 p-6 bg-base-100/60 rounded-2xl backdrop-blur-sm 
+                    shadow-sm transition-transform group-hover:scale-105">
+                    <ImageUpIcon class="size-8 text-primary" />
+                    <div class="text-center">
+                        <p class="text-neutral font-bold text-base">Upload Cover Photo</p>
+                        <p class="text-neutral/80 text-sm">Drag & drop or click to browse</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6 px-4">
+            <!-- left col -->
+            <div class="md:col-span-8 flex flex-col gap-6">
+                <RecipeGeneralInfoSection 
+                    bind:formData={generalFormData}
+                    recipeCode={recipeToEdit ? recipeToEdit.recipeCode : undefined}
+                    bind:formErrors={formErrors}
+                    errContent={showInputError}/>
+            </div>
+            <!-- right col -->
+            <div class="md:col-span-4 flex flex-col gap-6">
+                <RecipeStatsSection 
+                    bind:formData={statsFormData}
+                    bind:formErrors={formErrors}
+                    errContent={showInputError}/>
+            </div>
+        </div>
+        <div class="border-t border-base-300 my-2"></div>
+        <!-- TODO: ingredients section (FIX LATER) -->
+        <IngredientSection 
+            {ingredientListData}
+            selectedRowId={selectedIngredientRowId}
+            selectedRow={selectedIngredientRow}
+            onSelectEditRow={onSelectedIngredient}
+            onCancelEdit={onCancelEditIngredient}
+            onAddNew={addNewIngredient}
+            onUpdateExisted={updateIngredient}
+            onRemove={removeIngredient}/>
+        
+        <div class="border-t border-base-300 my-2"></div>
+        <RecipeInstructionsSection 
+            {instructionListData}
+            onAddInstruction={addNewInstruction}
+            onRemoveInstruction={removeInstruction}/>
+        
+        <div class="sticky bottom-0 left-0 right-0 p-4 bg-base-100 border-t border-base-300 
+            md:static md:bg-transparent md:border-0 md:p-4 mt-8">
+            <div class="flex gap-3 justify-end">
+                {@render formButtonGroup()}
+            </div>
+        </div>
+    </div>
+</form>
 <!-- cancel form modal -->
     {#snippet cancelContent()}
         <p class="py-4 px-2 text-gray-600">
@@ -413,6 +478,26 @@
     {#if message}
         <p class="input-error-msg">{message}</p>
     {/if}
+{/snippet}
+
+{#snippet formButtonGroup()}
+    <button type="button" class="btn w-36 gap-2 rounded-2xl text-base-content bg-base-100 hover:bg-base-200
+        border border-base-300 hover:scale-105 text-sm transition-all shadow-sm"
+        onclick={() => cancelModalRef!.showModal()}>
+        Cancel
+    </button>
+    <button type="submit" class="btn btn-primary w-40 gap-2 text-primary-content rounded-2xl font-semibold
+        transition-all hover:scale-105 shadow-sm font-display text-sm">
+        {#if formState === FormState.EDIT}
+            <SquarePenIcon class="size-4 text-primary-content" strokeWidth="3" />
+        {:else}
+            <SaveIcon class="size-4 text-primary-content" strokeWidth="3" />
+        {/if}
+        {formState === FormState.EDIT ? 
+            'Save changes' : 
+            'Add recipe'
+        }
+    </button>
 {/snippet}
 
 <style>

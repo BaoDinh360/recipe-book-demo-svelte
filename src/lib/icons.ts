@@ -27,3 +27,5 @@ export { default as PanelLeftOpenIcon } from '@lucide/svelte/icons/panel-left-op
 export { default as UtensilsCrossedIcon } from '@lucide/svelte/icons/utensils-crossed';
 export { default as FunnelXIcon } from '@lucide/svelte/icons/funnel-x';
 export { default as SearchXIcon } from '@lucide/svelte/icons/search-x';
+export { default as SaveIcon } from '@lucide/svelte/icons/save';
+export { default as ImageUpIcon } from '@lucide/svelte/icons/image-up';
