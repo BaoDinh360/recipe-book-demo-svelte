@@ -197,6 +197,12 @@
                     onclick={() => goto(`/recipes/${recipe.id}`)}>
                     <EyeIcon class="size-5" />
                 </button>
+                <!-- <button class="flex items-center justify-center px-3 py-2 rounded-lg bg-base-100
+                    border border-error/60 hover:bg-error/90 hover:border-error hover:text-neutral-content text-error transition-colors"
+                    title="Delete Recipe"
+                    onclick={() => deleteModalRef!.showModal()}>
+                    <Trash2Icon class="size-5" />
+                </button> -->
                 <button class="flex items-center justify-center px-3 py-2 rounded-lg bg-base-100
                     border border-error/60 hover:bg-error/90 hover:border-error hover:text-neutral-content text-error transition-colors"
                     title="Delete Recipe"

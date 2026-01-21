@@ -49,7 +49,7 @@
 
 </script>
 
-<main class="flex h-full grow flex-col px-4 md:px-10 lg:px-40 py-5">
+<main class="flex h-full grow flex-col px-4 md:px-10 lg:px-40 py-5 pt-8">
     <RecipeForm
         ingredientSelects={data.ingredientSelects}
         onSubmit={onCreateRecipe}

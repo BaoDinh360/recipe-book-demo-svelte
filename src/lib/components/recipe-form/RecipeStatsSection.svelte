@@ -62,7 +62,7 @@
             Category
         </span>    
     </label>
-    <select class="select select-bordered w-full bg-base-200 border border-base-300 rounded-lg 
+    <select class="select select-bordered w-full bg-base-200 border border-base-300 rounded-2xl 
         text-base text-neutral font-normal focus:outline-none focus:ring-2 focus:ring-primary 
         focus:border-primary cursor-pointer transition-shadow" 
         class:input-error={formErrors.category}

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { CreateRecipeData, RecipeCategory, RecipeFormSubmissionData, UpdateRecipeData } from "$lib/recipe-types";
+	import type { CreateRecipeData, RecipeCategory, RecipeFormSubmissionData, RecipeIngredientFormVM, UpdateRecipeData } from "$lib/recipe-types";
 	import { FormState, type RecipeFormErrors } from "$lib/types";
     import { z } from "zod";
 	import RecipeGeneralInfoSection from "./RecipeGeneralSection.svelte";
@@ -40,13 +40,7 @@
         category: '',
         prepTimeMin: 0
     };
-    const defaultIngredientList:{
-        rowId: string;
-        ingredientId: string;
-        name: string; // for display
-        qty: number;
-        unit: string;
-    }[] = [];
+    const defaultIngredientList:RecipeIngredientFormVM[] = [];
     
     // if recipeToEdit obj is passed in, set formData input local state to recipeToEdit value
     // esle use the defaultFormData value
@@ -81,15 +75,7 @@
     );
 
     // form state for recipe ingredient list
-    let ingredientListData:{
-        // client rowId to keep track
-        rowId: string;
-        id?: string;
-        ingredientId: string;
-        name: string; // for display
-        qty: number;
-        unit: string;
-    }[] = $state(recipeToEdit ? 
+    let ingredientListData:RecipeIngredientFormVM[] = $state(recipeToEdit ? 
     recipeToEdit.ingredients.map(ingr => ({
         rowId: crypto.randomUUID(),
         id: ingr.id,
@@ -202,55 +188,75 @@
         }
     }
 
-    // state for keep track of selected ingredient
-    let selectedIngredientRowId: string | undefined = $state(undefined);
-    let selectedIngredientRow  = $derived.by(() => {
-        if(selectedIngredientRowId) {
-            return ingredientListData.find(ingr => ingr.rowId === selectedIngredientRowId);
-        }
-        return undefined;
-    });
-    const addNewIngredient = (ingredientData: {
-        ingredientId: string;
-        name: string;
-        qty: number;
-        unit: string;
-    }) => {
-        console.log('ingredientListData', $state.snapshot(ingredientListData));
-        const newRow = {
+    // ingredient func section
+    const addRecipeIngredient = () => {
+        ingredientListData.push({
             rowId: crypto.randomUUID(),
-            ...ingredientData
-        };
-        console.log('ingredient data: ', ingredientData);
-        console.log('new row: ', newRow);
-        ingredientListData = [...ingredientListData, newRow];
-    }
-    const updateIngredient = (rowId: string, ingredientData: {
-        ingredientId: string;
-        name: string;
-        qty: number;
-        unit: string;
-    }) => {
-        console.log('ingredientListData', $state.snapshot(ingredientListData));
-        ingredientListData = ingredientListData.map(item => {
-            if(item.rowId === rowId) {
-                return {...item, ...ingredientData};
-            }
-            return item;
+            ingredientId: '',
+            name: '',
+            qty: 0,
+            unit: ''
         });
-        selectedIngredientRowId = undefined;
     }
-    const removeIngredient =(rowId: string) => {
-        ingredientListData = ingredientListData.filter(item => item.rowId !== rowId);
+    const updateRecipeIngredient = (rowId: string, updated: Partial<RecipeIngredientFormVM>) => {
+        const currIndex = ingredientListData.findIndex(ingr => ingr.rowId === rowId);
+        if (currIndex !== -1) {
+            ingredientListData[currIndex] = {...ingredientListData[currIndex], ...updated};
+        }
     }
-    const onSelectedIngredient = (rowId: string) => {
-        selectedIngredientRowId = rowId;
-        console.log('selectedIngredientRowId', $state.snapshot(selectedIngredientRowId));
-        console.log('selected ingred row: ', $state.snapshot(selectedIngredientRow));
+    const deleteRecipeIngredient = (rowId: string) => {
+        ingredientListData = ingredientListData.filter(i => i.rowId !== rowId);
     }
-    const onCancelEditIngredient = () => {
-        selectedIngredientRowId = undefined;
-    }
+
+    // state for keep track of selected ingredient
+    // let selectedIngredientRowId: string | undefined = $state(undefined);
+    // let selectedIngredientRow  = $derived.by(() => {
+    //     if(selectedIngredientRowId) {
+    //         return ingredientListData.find(ingr => ingr.rowId === selectedIngredientRowId);
+    //     }
+    //     return undefined;
+    // });
+    // const addNewIngredient = (ingredientData: {
+    //     ingredientId: string;
+    //     name: string;
+    //     qty: number;
+    //     unit: string;
+    // }) => {
+    //     console.log('ingredientListData', $state.snapshot(ingredientListData));
+    //     const newRow = {
+    //         rowId: crypto.randomUUID(),
+    //         ...ingredientData
+    //     };
+    //     console.log('ingredient data: ', ingredientData);
+    //     console.log('new row: ', newRow);
+    //     ingredientListData = [...ingredientListData, newRow];
+    // }
+    // const updateIngredient = (rowId: string, ingredientData: {
+    //     ingredientId: string;
+    //     name: string;
+    //     qty: number;
+    //     unit: string;
+    // }) => {
+    //     console.log('ingredientListData', $state.snapshot(ingredientListData));
+    //     ingredientListData = ingredientListData.map(item => {
+    //         if(item.rowId === rowId) {
+    //             return {...item, ...ingredientData};
+    //         }
+    //         return item;
+    //     });
+    //     selectedIngredientRowId = undefined;
+    // }
+    // const removeIngredient =(rowId: string) => {
+    //     ingredientListData = ingredientListData.filter(item => item.rowId !== rowId);
+    // }
+    // const onSelectedIngredient = (rowId: string) => {
+    //     selectedIngredientRowId = rowId;
+    //     console.log('selectedIngredientRowId', $state.snapshot(selectedIngredientRowId));
+    //     console.log('selected ingred row: ', $state.snapshot(selectedIngredientRow));
+    // }
+    // const onCancelEditIngredient = () => {
+    //     selectedIngredientRowId = undefined;
+    // }
 
     const resetFormInput = () => {
         // reset input
@@ -273,37 +279,30 @@
             instructionText: ''
         });
     }
+    const updateInstruction = (rowId: string,instruction: string) => {
+        const current = instructionListData.find(i => i.rowId === rowId);
+        if (current) {
+            current.instructionText = instruction;
+        }
+    }
     const removeInstruction = (rowId: string) => {
         instructionListData = instructionListData.filter(i => i.rowId !== rowId);
     }
 </script>
 
-<div class="container mx-auto max-w-full">
+<!-- <div class="container mx-auto max-w-full">
     <form class="space-y-4"
         onsubmit={(e) => submitForm(e)}>
-        <!-- grid layout -->
         <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
-            <!-- left col -->
             <div class="md:col-span-3 space-y-4">
                 <RecipeGeneralInfoSection 
                     bind:formData={generalFormData}
                     recipeCode={recipeToEdit ? recipeToEdit.recipeCode : undefined}
                     bind:formErrors={formErrors}
                     errContent={showInputError}/>
-                <!-- card section ingredients list -->
-                <IngredientSection 
-                    {ingredientListData}
-                    selectedRowId={selectedIngredientRowId}
-                    selectedRow={selectedIngredientRow}
-                    onSelectEditRow={onSelectedIngredient}
-                    onCancelEdit={onCancelEditIngredient}
-                    onAddNew={addNewIngredient}
-                    onUpdateExisted={updateIngredient}
-                    onRemove={removeIngredient}/>
+                
             </div>
-            <!-- right col -->
             <div class="md:col-span-2 space-y-4">
-                <!-- card section img thumbnail -->
                 <div class="w-full mx-auto p-6 rounded-lg shadow-md 
                     bg-white border border-gray-200 space-y-4">
                     <h3 class="text-lg font-bold text-gray-800 border-b pb-3 mb-4">
@@ -313,51 +312,12 @@
                         Image upload (placeholder)
                     </div>
                 </div>
-                <!-- card section statistics -->
-                <!-- <div class="w-full mx-auto p-6 rounded-lg shadow-md 
-                    bg-white border border-gray-200 space-y-4">
-                    <h3 class="text-lg font-bold text-gray-800 border-b pb-3 mb-4">
-                        Stats
-                    </h3>
-                    <div class="flex space-x-4">
-                        <div class="form-control w-full">
-                            <label class="label" for="category">
-                                <span class="label-text text-base text-gray-600 font-semibold input-required">
-                                    Category
-                                </span>    
-                            </label>
-                            <select class="select select-bordered w-full" class:input-error={formErrors.category}
-                                id="category" bind:value={formData.category}
-                                onchange={() => formErrors.category = undefined}>
-                                <option disabled value={''}>Select category</option>
-                                {#each categoryOptions as option }
-                                    <option value={option.value}>{option.label}</option>
-                                {/each}
-                            </select>
-                            {@render showInputError(formErrors.category)}
-                        </div>
-                        <div class="form-control w-full">
-                            <label class="label" for="prepTime">
-                                <span class="label-text text-base text-gray-600 font-semibold input-required">
-                                    Prep time (min)
-                                </span>
-                            </label>
-                            <input class="input input-bordered w-full" 
-                                class:input-error={formErrors.prepTimeMin} 
-                                type="number" id="prepTime" 
-                                bind:value={formData.prepTimeMin}
-                                onchange={() => formErrors.prepTimeMin = undefined}/>
-                            {@render showInputError(formErrors.prepTimeMin)}
-                        </div>
-                    </div>
-                </div> -->
                 <RecipeStatsSection 
                     bind:formData={statsFormData}
                     bind:formErrors={formErrors}
                     errContent={showInputError}/>
             </div>
         </div>
-        <!-- button -->
         <div class="flex justify-end gap-4 pt-6">
             <button type="button" class="btn w-36 bg-gray-200 hover:bg-gray-300"
                 onclick={() => cancelModalRef!.showModal()}>
@@ -371,9 +331,8 @@
             </button>
         </div>
     </form>
-</div>
+</div> -->
 
-<div class="mt-6"></div>
 <!-- BAODNQ 20260111 - FIX UI -->
 <form onsubmit={(e) => submitForm(e)}>
     <div class="flex flex-col max-w-[960px] flex-1 gap-6 pb-20">
@@ -437,18 +396,15 @@
         <!-- TODO: ingredients section (FIX LATER) -->
         <IngredientSection 
             {ingredientListData}
-            selectedRowId={selectedIngredientRowId}
-            selectedRow={selectedIngredientRow}
-            onSelectEditRow={onSelectedIngredient}
-            onCancelEdit={onCancelEditIngredient}
-            onAddNew={addNewIngredient}
-            onUpdateExisted={updateIngredient}
-            onRemove={removeIngredient}/>
+            onAddIngredient={addRecipeIngredient}
+            onUpdateIngredient={updateRecipeIngredient}
+            onRemoveIngredient={deleteRecipeIngredient}/>
         
         <div class="border-t border-base-300 my-2"></div>
         <RecipeInstructionsSection 
             {instructionListData}
             onAddInstruction={addNewInstruction}
+            onUpdateInstruction={(rowId, val) => updateInstruction(rowId, val)}
             onRemoveInstruction={removeInstruction}/>
         
         <div class="sticky bottom-0 left-0 right-0 p-4 bg-base-100 border-t border-base-300 
@@ -489,9 +445,9 @@
     <button type="submit" class="btn btn-primary w-40 gap-2 text-primary-content rounded-2xl font-semibold
         transition-all hover:scale-105 shadow-sm font-display text-sm">
         {#if formState === FormState.EDIT}
-            <SquarePenIcon class="size-4 text-primary-content" strokeWidth="3" />
-        {:else}
             <SaveIcon class="size-4 text-primary-content" strokeWidth="3" />
+        {:else}
+            <SquarePenIcon class="size-4 text-primary-content" strokeWidth="3" />
         {/if}
         {formState === FormState.EDIT ? 
             'Save changes' : 
