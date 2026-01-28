@@ -1,5 +1,5 @@
 import type { PageServerLoad } from "./$types";
-import { getRecipeById, getRecipeByIdWithIngredients } from '$lib/server/recipe-service';
+import { getRecipeByIdWithIngredients } from '$lib/server/recipe-service';
 import { BusinessError } from "$lib/server/business-errors";
 import { error } from "@sveltejs/kit";
 import { getAllIngredients } from "$lib/server/ingredient-service";

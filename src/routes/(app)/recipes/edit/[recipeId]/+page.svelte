@@ -1,11 +1,9 @@
 <script lang="ts">
-	import { goto } from "$app/navigation";
 	import RecipeForm from "$lib/components/recipe-form/RecipeForm.svelte";
 	import type { UpdateRecipeData } from "$lib/recipe-types";
 	import { notifyError, notifySuccess } from "$lib/stores/notification-stores";
-	import { ClientResponseError } from "pocketbase";
 	import type { PageProps } from "./$types";
-	import { navigateToRecipes } from "$lib/utils/navigation";
+	import { navigateToMyRecipes } from "$lib/utils/navigation";
 
     // path: /recipes/edit/{id}
 
@@ -30,8 +28,7 @@
             const result = await response.json();
             // success
             if(response.ok && result.success) {
-                // back to index /recipes
-                navigateToRecipes();
+                navigateToMyRecipes();
                 // show success noti
                 notiMessage = `Update recipe: ${result.data.recipeCode} success!`;
                 notifySuccess(notiMessage);
@@ -47,18 +44,18 @@
     };
     const onCancel = async () => {
         // redirect to index /recipes 
-        await navigateToRecipes();
+        await navigateToMyRecipes();
     }
 
 </script>
 
-<RecipeForm
-    recipeToEdit={data.recipeData}
-    ingredientSelects={data.ingredientSelects}
-    onSubmit={(recipeData) => onUpdateRecipe(recipeData as UpdateRecipeData)}
-    {onCancel}
+<main class="flex h-full grow flex-col px-4 md:px-10 lg:px-40 py-5 pt-8">
+    <RecipeForm
+        recipeToEdit={data.recipeData}
+        ingredientSelects={data.ingredientSelects}
+        onSubmit={(recipeData) => onUpdateRecipe(recipeData as UpdateRecipeData)}
+        {onCancel}
     />
+</main>
 
-<style>
-
-</style>
+<style></style>

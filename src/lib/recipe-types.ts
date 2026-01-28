@@ -109,3 +109,13 @@ export interface RecipeFilterCriteria {
     prepTimeMin: number | undefined;
     sortBy: string | undefined;
 }
+
+// recipe ingredient form vm
+export interface RecipeIngredientFormVM {
+    rowId: string;
+    id?: string;
+    ingredientId: string;
+    name: string; // for display
+    qty: number;
+    unit: string;
+}
