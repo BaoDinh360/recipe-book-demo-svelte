@@ -1,11 +1,9 @@
 <script lang="ts">
-	import { goto } from "$app/navigation";
 	import RecipeForm from "$lib/components/recipe-form/RecipeForm.svelte";
 	import type { UpdateRecipeData } from "$lib/recipe-types";
 	import { notifyError, notifySuccess } from "$lib/stores/notification-stores";
-	import { ClientResponseError } from "pocketbase";
 	import type { PageProps } from "./$types";
-	import { navigateToMyRecipes, navigateToRecipes } from "$lib/utils/navigation";
+	import { navigateToMyRecipes } from "$lib/utils/navigation";
 
     // path: /recipes/edit/{id}
 
@@ -30,7 +28,6 @@
             const result = await response.json();
             // success
             if(response.ok && result.success) {
-                // back to index /recipes
                 navigateToMyRecipes();
                 // show success noti
                 notiMessage = `Update recipe: ${result.data.recipeCode} success!`;
@@ -61,6 +58,4 @@
     />
 </main>
 
-<style>
-
-</style>
+<style></style>

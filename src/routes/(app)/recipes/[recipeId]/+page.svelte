@@ -3,9 +3,7 @@
 	import { notifyError } from "$lib/stores/notification-stores";
 	import type { PageProps } from "./$types";
 
-
     // path: /recipes/[recipeId]
-
     let { data }: PageProps = $props();
 
     $effect(() => {
@@ -24,7 +22,4 @@
     {/if}
 </main>
 
-
-<style>
-
-</style>
+<style></style>

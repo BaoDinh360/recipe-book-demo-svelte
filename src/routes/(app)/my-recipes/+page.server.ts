@@ -34,7 +34,6 @@ export const load: PageServerLoad = async ({ url, depends, locals }) => {
             sortBy: url.searchParams.get('sort') || '-created'
         }
         try {
-            //throw new Error('Test');
             logger.info('Fetching recipes data',
                 { pagination: { currentPage, itemsPerPage }, filters: recipeFilters });
              // depends tag used for invalidate --> trigger re fetch data

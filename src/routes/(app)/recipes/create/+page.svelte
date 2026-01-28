@@ -2,7 +2,7 @@
 	import RecipeForm from "$lib/components/recipe-form/RecipeForm.svelte";
 	import type { CreateRecipeData } from "$lib/recipe-types";
 	import { notifyError, notifySuccess } from "$lib/stores/notification-stores";
-	import { navigateToMyRecipes, navigateToRecipes } from "$lib/utils/navigation";
+	import { navigateToMyRecipes } from "$lib/utils/navigation";
 	import type { PageProps } from "./$types";
 
     // path: /recipes/create/
@@ -56,7 +56,4 @@
         {onCancel}/>
 </main>
 
-
-<style>
-
-</style>
+<style></style>

@@ -79,65 +79,6 @@
 
 </script>
 
-<!-- <div class="bg-white p-4 rounded-lg shadow-md border border-gray-100">
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 items-end">
-        <div class="col-span-1 md:col-span-2">
-            <label class="label" for="search">
-                <span class="label-text text-gray-700 text-sm font-semibold">Search keywords</span>
-            </label>
-            <label class="input input-bordered input-sm flex items-center gap-2">
-                <input type="text" class="grow" placeholder="Title, code..." id="search" 
-                    bind:value={filterInput.text}/>
-                <SearchIcon class="h-5 w-5 stroke-gray-600" />
-            </label>
-        </div>
-        <div class="form-control md:col-span-1">
-            <label class="label" for="filterCateg">
-                <span class="label-text text-gray-700 text-sm font-semibold">Category</span>
-            </label>
-            <select class="select select-sm select-bordered w-full" id="filterCateg"
-                bind:value={filterInput.category}
-                >
-                <option value={undefined}>---All---</option>
-                {#each categoryOptions as option }
-                    <option value={option.value}>{option.label}</option>
-                {/each}
-            </select>
-        </div>
-        <div class="form-control md:col-span-1">
-            <label class="label" for="filterPrep">
-                <span class="label-text text-gray-700 text-sm font-semibold">Prep Time (min)</span>
-            </label>
-            <input type="number" class="input input-sm input-bordered w-full" id="filterPrep"
-                placeholder="e.g., 26"
-                bind:value={filterInput.prepTimeMin}
-                />
-        </div>
-        <div class="form-control md:col-span-1">
-            <label class="label" for="sort">
-                <span class="label-text text-gray-700 text-sm font-semibold">Sort by</span>
-            </label>
-            <select class="select select-sm select-bordered w-full" id="sort"
-                bind:value={filterInput.sortBy}>
-                {#each sortingOptions as option }
-                    <option value={option.value}>{option.label}</option>
-                {/each}
-            </select>
-        </div>
-        <div class="md:col-span-1 flex flex-col justify-end gap-2 h-full">
-            <button type="button" class="btn btn-sm text-white w-full bg-sky-500 hover:bg-sky-600"
-                onclick={onFilterRecipe}>
-                Apply
-            </button>
-            <button type="button" class="btn btn-sm w-full"
-                onclick={onResetFilter}>
-                Reset
-            </button>
-        </div>
-    </div>
-</div> -->
-
-<!-- <div class="p-6"></div> -->
 <div class="flex flex-col lg:flex-row lg:items-end gap-4">
     <div class="w-2/5 pb-4">
         <label class="w-full input input-bordered flex items-center gap-2 relative group

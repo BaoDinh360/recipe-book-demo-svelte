@@ -56,8 +56,6 @@
         {
             title: recipeToEdit.title,
             description: recipeToEdit.description,
-            // instructions: recipeToEdit.instructions.length <= 0 ? '' 
-            //     : recipeToEdit.instructions.join('\n')
         }: 
         {...defaultGeneral}
     );
@@ -142,10 +140,10 @@
 
     const submitForm = (e: Event) => {
         e.preventDefault();
-        console.log('general info data: ', $state.snapshot(generalFormData));
-        console.log('stats data: ', $state.snapshot(statsFormData));
-        console.log('ingredient list data: ', $state.snapshot(ingredientListData));
-        console.log('instructions list data: ', $state.snapshot(instructionListData));
+        // console.log('general info data: ', $state.snapshot(generalFormData));
+        // console.log('stats data: ', $state.snapshot(statsFormData));
+        // console.log('ingredient list data: ', $state.snapshot(ingredientListData));
+        // console.log('instructions list data: ', $state.snapshot(instructionListData));
         //return;
 
         // validate form inputs
@@ -157,11 +155,6 @@
             title: generalFormData.title,
             description: generalFormData.description,
             instructions: instructionListData.map(i => i.instructionText.trim()),
-            // instructions: generalFormData.instructions === '' ? [] :
-            //     generalFormData.instructions
-            //     .split('\n') // split into string[]
-            //     .map(s => s.trim()) // foreach items, trim
-            //     .filter(Boolean), // filter in only valid string, no empty string
             prepTimeMin: statsFormData.prepTimeMin,
             category: statsFormData.category as RecipeCategory,
             // ingredients list form data
@@ -208,56 +201,6 @@
         ingredientListData = ingredientListData.filter(i => i.rowId !== rowId);
     }
 
-    // state for keep track of selected ingredient
-    // let selectedIngredientRowId: string | undefined = $state(undefined);
-    // let selectedIngredientRow  = $derived.by(() => {
-    //     if(selectedIngredientRowId) {
-    //         return ingredientListData.find(ingr => ingr.rowId === selectedIngredientRowId);
-    //     }
-    //     return undefined;
-    // });
-    // const addNewIngredient = (ingredientData: {
-    //     ingredientId: string;
-    //     name: string;
-    //     qty: number;
-    //     unit: string;
-    // }) => {
-    //     console.log('ingredientListData', $state.snapshot(ingredientListData));
-    //     const newRow = {
-    //         rowId: crypto.randomUUID(),
-    //         ...ingredientData
-    //     };
-    //     console.log('ingredient data: ', ingredientData);
-    //     console.log('new row: ', newRow);
-    //     ingredientListData = [...ingredientListData, newRow];
-    // }
-    // const updateIngredient = (rowId: string, ingredientData: {
-    //     ingredientId: string;
-    //     name: string;
-    //     qty: number;
-    //     unit: string;
-    // }) => {
-    //     console.log('ingredientListData', $state.snapshot(ingredientListData));
-    //     ingredientListData = ingredientListData.map(item => {
-    //         if(item.rowId === rowId) {
-    //             return {...item, ...ingredientData};
-    //         }
-    //         return item;
-    //     });
-    //     selectedIngredientRowId = undefined;
-    // }
-    // const removeIngredient =(rowId: string) => {
-    //     ingredientListData = ingredientListData.filter(item => item.rowId !== rowId);
-    // }
-    // const onSelectedIngredient = (rowId: string) => {
-    //     selectedIngredientRowId = rowId;
-    //     console.log('selectedIngredientRowId', $state.snapshot(selectedIngredientRowId));
-    //     console.log('selected ingred row: ', $state.snapshot(selectedIngredientRow));
-    // }
-    // const onCancelEditIngredient = () => {
-    //     selectedIngredientRowId = undefined;
-    // }
-
     const resetFormInput = () => {
         // reset input
         generalFormData = {...defaultGeneral};
@@ -290,50 +233,7 @@
     }
 </script>
 
-<!-- <div class="container mx-auto max-w-full">
-    <form class="space-y-4"
-        onsubmit={(e) => submitForm(e)}>
-        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
-            <div class="md:col-span-3 space-y-4">
-                <RecipeGeneralInfoSection 
-                    bind:formData={generalFormData}
-                    recipeCode={recipeToEdit ? recipeToEdit.recipeCode : undefined}
-                    bind:formErrors={formErrors}
-                    errContent={showInputError}/>
-                
-            </div>
-            <div class="md:col-span-2 space-y-4">
-                <div class="w-full mx-auto p-6 rounded-lg shadow-md 
-                    bg-white border border-gray-200 space-y-4">
-                    <h3 class="text-lg font-bold text-gray-800 border-b pb-3 mb-4">
-                        Media (future feat)
-                    </h3>
-                    <div class="text-center py-10 text-gray-500 italic border-4 border-dashed border-indigo-300/50 rounded-xl bg-indigo-50/50">
-                        Image upload (placeholder)
-                    </div>
-                </div>
-                <RecipeStatsSection 
-                    bind:formData={statsFormData}
-                    bind:formErrors={formErrors}
-                    errContent={showInputError}/>
-            </div>
-        </div>
-        <div class="flex justify-end gap-4 pt-6">
-            <button type="button" class="btn w-36 bg-gray-200 hover:bg-gray-300"
-                onclick={() => cancelModalRef!.showModal()}>
-                Cancel
-            </button>
-            <button type="submit" class="btn btn-primary w-36 text-white font-semibold">
-                {formState === FormState.EDIT ? 
-                    'Save changes' : 
-                    'Add recipe'
-                }
-            </button>
-        </div>
-    </form>
-</div> -->
 
-<!-- BAODNQ 20260111 - FIX UI -->
 <form onsubmit={(e) => submitForm(e)}>
     <div class="flex flex-col max-w-[960px] flex-1 gap-6 pb-20">
         <div class="flex flex-wrap justify-between gap-3 px-4">
@@ -380,7 +280,6 @@
             <div class="md:col-span-8 flex flex-col gap-6">
                 <RecipeGeneralInfoSection 
                     bind:formData={generalFormData}
-                    recipeCode={recipeToEdit ? recipeToEdit.recipeCode : undefined}
                     bind:formErrors={formErrors}
                     errContent={showInputError}/>
             </div>
@@ -392,8 +291,8 @@
                     errContent={showInputError}/>
             </div>
         </div>
+
         <div class="border-t border-base-300 my-2"></div>
-        <!-- TODO: ingredients section (FIX LATER) -->
         <IngredientSection 
             {ingredientListData}
             onAddIngredient={addRecipeIngredient}
@@ -416,19 +315,19 @@
     </div>
 </form>
 <!-- cancel form modal -->
-    {#snippet cancelContent()}
-        <p class="py-4 px-2 text-gray-600">
-            Discard changes from this recipe ?
-        </p>
-    {/snippet}
-    <ConfirmActionModal 
-        bind:this={cancelModalRef}
-        title='Discard Changes'
-        modalContent={cancelContent}
-        actionLabel='Discard'
-        modalStyle='neutral'
-        onConfirm={confirmCancelForm}
-        onCancel={() => {}} />
+{#snippet cancelContent()}
+    <p class="py-4 px-2 text-gray-600">
+        Discard changes from this recipe ?
+    </p>
+{/snippet}
+<ConfirmActionModal 
+    bind:this={cancelModalRef}
+    title='Discard Changes'
+    modalContent={cancelContent}
+    actionLabel='Discard'
+    modalStyle='neutral'
+    onConfirm={confirmCancelForm}
+    onCancel={() => {}} />
 
 {#snippet showInputError(message: string | undefined)}
     {#if message}

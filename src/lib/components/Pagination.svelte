@@ -71,24 +71,12 @@
     }
 
     const onSelectPerPage = (e: Event) => {
-        // change perPage, currentPage
         const perPageSelected = Number((e.target as HTMLSelectElement).value);
         if(itemsPerPage !== perPageSelected) {
-            // only perform when current perPage <> selected perPage
             // reset page params when change items per page
             onPaginationStateChange({currentPage: 1, perPage: perPageSelected});
         }
     }
-    // const onSelectPage = (e: Event) => {
-    //     // only change currentPage
-    //     const pageSelected = Number((e.target as HTMLSelectElement).value);
-    //     if(pageSelected >= 1 && 
-    //         pageSelected <= totalPages && 
-    //         currentPage !== pageSelected){
-    //         // perPage read value from props
-    //         onPaginationStateChange({currentPage: pageSelected, perPage: itemsPerPage});
-    //     }
-    // }
     const onPageClicked = (page: number) => {
         if (page >= 1 && page <= totalPages && currentPage !== page) {
             onPaginationStateChange({ currentPage: page, perPage: itemsPerPage });
@@ -113,53 +101,7 @@
 
 </script>
 
-<!-- <div class="flex flex-col md:flex-row items-center justify-between p-3 rounded-lg
-    bg-white border border-gray-100 shadow-sm">
-    <div class="flex items-center gap-8 mb-3 sm:mb-0">
-        <div class="flex items-center gap-2">
-            <span class="text-gray-600 whitespace-nowrap hidden sm:block">Per page:</span>
-            <select class="select select-bordered select-sm" id="perPage"
-                value={itemsPerPage}
-                onchange={onSelectPerPage}>
-                {#each itemsPerPageOptions as {label, value} }
-                    <option value={value}>{label}</option>
-                {/each}
-            </select>
-        </div>
-        <span class="text-gray-500">
-            Total: <span class="font-medium text-indigo-600">{totalItems}</span> recipes
-        </span>
-    </div>
-    <div class="flex items-center gap-4">
-        <button class="btn btn-ghost btn-sm group text-black" 
-            aria-label="Prev"
-            disabled={currentPage === 1}
-            onclick={previousPage}>
-            <ChevronLeftIcon class="h-4 w-4 stroke-current" strokeWidth=3 />
-            Prev
-        </button>
-        <div class="flex items-center gap-1 whitespace-nowrap">
-            <span class="text-gray-600">Page</span>
-            <select class="select select-bordered select-sm" id="currPage"
-                disabled={totalPages === 1}
-                value={currentPage}>
-                {#each Array(totalPages).keys() as pageNum }
-                    <option value={pageNum + 1}>{pageNum + 1}</option>
-                {/each}
-            </select>
-            <span class="text-gray-600"> of {totalPages}</span>
-        </div>
-        <button class="btn btn-ghost btn-sm group text-black" 
-            aria-label="Next"
-            disabled={currentPage === totalPages}
-            onclick={nextPage}>
-            Next
-            <ChevronRightIcon class="h-5 w-5 stroke-current"/>
-        </button>
-    </div>
-</div> -->
 
-<!-- baodnq 20251229 update ui -->
 <div class="flex flex-col md:flex-row items-center justify-between gap-4 pt-4 mt-6 border-t border-base-300">
     <div class="text-sm text-neutral/70 order-2 md:order-1 font-medium">
         Showing <span class="font-bold text-neutral">{startIndex} - {endIndex}</span> 

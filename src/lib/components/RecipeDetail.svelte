@@ -16,9 +16,9 @@
 
     const confirmDeleteRecipe = async () => {
         if(!recipeDetails) {
-            // do nothing if undefined
             return;
-        } 
+        }
+
         let notiMessage = '';
         let recipeId = recipeDetails.id;
         let recipeCode = recipeDetails.recipeCode;
@@ -48,123 +48,8 @@
 </script>
 
 {#if !recipeDetails}
-    <!-- fallback state (avoid race condition) -->
     <p>Recipe data not available</p>
 {:else}
-    <!-- <div class="space-y-4">
-        <div class="flex justify-end items-center mb-6 space-x-3 mx-auto">
-            <button class="btn btn-success btn-sm md:btn-md w-36 text-white"
-                onclick={() => goto(`/recipes/edit/${recipeDetails.id}`)}>
-                Edit
-            </button>
-            <button class="btn btn-sm md:btn-md w-36 text-white bg-red-500 hover:bg-red-600"
-                onclick={() => deleteModalRef!.showModal()}>
-                Delete
-            </button>
-        </div>
-        <div class="grid grid-cols-1 lg:grid-cols-5 gap-4">
-            <div class="lg:col-span-3 space-y-4">
-                <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-                    <h1 class="text-2xl font-bold text-indigo-700 mb-6 pb-2 border-b border-gray-100">
-                        {recipeDetails.title}
-                    </h1>
-                    <p class="text-base text-gray-600">
-                        {recipeDetails.description}
-                    </p>
-                </div>
-                <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-                    <div class="flex items-center gap-2 mb-6 pb-2 border-b border-gray-100">
-                        <ListChecksIcon class="h-5 w-5 stroke-gray-700"/>
-                        <h2 class="text-xl font-bold text-gray-700">
-                            Ingredients
-                        </h2>
-                    </div>
-                    <div class="space-y-4 mx-2">
-                        {#if (!recipeDetails.ingredients || recipeDetails.ingredients.length <= 0)}
-                            <p class="text-sm text-gray-400 pl-4 italic">No ingredients.</p>
-                        {:else}
-                            {#each recipeDetails.ingredients as item }
-                                {@render displayIngredientRow(item)}
-                            {/each}
-                        {/if}
-                    </div>
-                </div>
-                <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-                    <div class="flex items-center gap-2 mb-6 pb-2 border-b border-gray-100">
-                        <ListOrderedIcon class="h-5 w-5 stroke-gray-700"/>
-                        <h2 class="text-xl font-bold text-gray-700">
-                            Instructions
-                        </h2>
-                    </div>
-                    <ol class="list-decimal pl-6 space-y-4">
-                        {#each recipeDetails.instructions as instruction }
-                            <li>
-                                <h3 class="text-base text-gray-600 pl-2">{instruction}</h3>
-                            </li>
-                        {/each}
-                    </ol>
-                </div>
-            </div>
-            <div class="lg:col-span-2 space-y-4">
-                <div class="lg:sticky lg:top-10 bg-white p-6 rounded-lg shadow-md border-t-4 border-indigo-600">
-                    <div class="flex items-center gap-2 mb-6">
-                        <InfoIcon class="h-5 w-5 stroke-gray-700" />
-                        <h2 class="text-xl font-bold text-gray-700">Details</h2>
-                    </div>
-                    <div class="space-y-4">
-                        <div class="flex items-center justify-between p-3
-                            bg-gray-50 rounded-lg text-sm font-medium">
-                            <div class="flex items-center text-gray-700 gap-1">
-                            <ClipboardIcon class="h-5 w-5 stroke-indigo-700" />
-                                Recipe Code
-                            </div>
-                            <span class="font-semibold text-gray-800">
-                                {recipeDetails.recipeCode}
-                            </span>
-                        </div>
-                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg text-sm font-medium">
-                            <div class="flex items-center text-gray-700 gap-1">
-                                <TagIcon class="h-5 w-5 stroke-indigo-700" />
-                                Category
-                            </div>
-                            <CategoryBadge category={recipeDetails.category} />
-                        </div>
-                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg text-sm font-medium">
-                            <div class="flex items-center text-gray-700 gap-1">
-                                <Clock4Icon class="h-5 w-5 stroke-indigo-700" />
-                                Prep Time
-                            </div>
-                            <span class="font-bold text-indigo-700">
-                                {recipeDetails.prepTimeMin} Min
-                            </span>
-                        </div>
-                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg text-sm font-medium">
-                            <div class="flex items-center text-gray-700 gap-1">
-                                <CalendarIcon class="h-5 w-5 stroke-indigo-700" />
-                                Created
-                            </div>
-                            <span class="text-gray-600 font-normal text-xs italic">
-                                {recipeDetails.createdAt.toLocaleDateString('vi-VN')}, 
-                                {recipeDetails.createdAt.toLocaleTimeString('vi-VN', {hour12: false})}
-                            </span>
-                        </div>
-                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg text-sm font-medium">
-                            <div class="flex items-center text-gray-700 gap-1">
-                                <DownloadIcon class="h-5 w-5 stroke-indigo-700" />
-                                Last Updated
-                            </div>
-                            <span class="text-gray-600 font-normal text-xs italic">
-                                {recipeDetails.lastUpdatedAt.toLocaleDateString('vi-VN')}, 
-                                {recipeDetails.lastUpdatedAt.toLocaleTimeString('vi-VN', {hour12: false})}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div> 
-        </div>
-    </div> -->
-
-    <!-- BAODNQ 20260104 - fix ui -->
     <div class="w-full flex flex-col gap-8">
         <section class="flex flex-col gap-6">
             <div class="w-full h-[300px] md:h-[400px] rounded-[2rem] overflow-hidden shadow-xl relative group">
@@ -298,14 +183,6 @@
 {/if}
 
 {#snippet displayIngredientRow(item: RecipeIngredients)}
-    <!-- <div class="grid grid-cols-[3.5fr_0.5fr_1fr] gap-4 border-b border-gray-150 pb-3">
-        <div class="flex items-center space-x-3">
-            <input type="checkbox" class="checkbox checkbox-sm" aria-label="Check ingredients" />
-            <span class="text-base font-semibold">{item.name}</span>
-        </div>
-        <span class="text-center font-bold">{item.qty}</span>
-        <span class="text-left">{item.unit}</span>
-    </div> -->
     <li class="group flex items-start gap-3 p-2 rounded-3xl hover:bg-base-100 transition-colors cursor-pointer">
         <div class="relative flex items-center pt-0.5">
             <input class="checkbox checkbox-primary h-5 w-5 rounded-full border-base-300 cursor-pointer"
@@ -324,6 +201,4 @@
 {/snippet}
 
 
-
-<style>
-</style>
+<style></style>
