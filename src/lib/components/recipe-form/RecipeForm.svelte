@@ -418,15 +418,15 @@
 <!-- cancel form modal -->
     {#snippet cancelContent()}
         <p class="py-4 px-2 text-gray-600">
-            Cancel changes from this recipe?
+            Discard changes from this recipe ?
         </p>
     {/snippet}
     <ConfirmActionModal 
         bind:this={cancelModalRef}
-        title='Cancel Changes'
+        title='Discard Changes'
         modalContent={cancelContent}
-        actionLabel='Cancel changes'
-        modalStyle='NEUTRAL'
+        actionLabel='Discard'
+        modalStyle='neutral'
         onConfirm={confirmCancelForm}
         onCancel={() => {}} />
 
@@ -440,7 +440,7 @@
     <button type="button" class="btn w-36 gap-2 rounded-2xl text-base-content bg-base-100 hover:bg-base-200
         border border-base-300 hover:scale-105 text-sm transition-all shadow-sm"
         onclick={() => cancelModalRef!.showModal()}>
-        Cancel
+        Discard
     </button>
     <button type="submit" class="btn btn-primary w-40 gap-2 text-primary-content rounded-2xl font-semibold
         transition-all hover:scale-105 shadow-sm font-display text-sm">

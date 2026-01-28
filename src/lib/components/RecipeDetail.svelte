@@ -254,42 +254,45 @@
                     <h2 class="text-2xl font-bold font-display tracking-tight mb-6 px-2 text-base-content">
                         Instructions
                     </h2>
-                    <ul class="steps steps-vertical w-full px-2">
-                        {#each recipeDetails.instructions as item, index }
-                            <RecipeInstructionStep
-                                step={index + 1}>
-                                {#snippet stepContent()}
-                                    <h3 class="text-lg font-bold font-display text-base-content mb-2">
-                                        Step {index + 1}:
-                                    </h3>
-                                    <p class="text-base-content/80 leading-relaxed font-body">
-                                        {item}
-                                    </p>
-                                {/snippet}
-                            </RecipeInstructionStep>
-                        {/each}
-                    </ul>
+                    {#if !recipeDetails.instructions || recipeDetails.instructions.length <= 0}
+                        <p class="text-base text-base-content/60 text-left px-2 font-light italic">
+                            This recipe has no instructions.
+                        </p>
+                    {:else}
+                        <ul class="steps steps-vertical w-full px-2">
+                            {#each recipeDetails.instructions as item, index }
+                                <RecipeInstructionStep
+                                    step={index + 1}>
+                                    {#snippet stepContent()}
+                                        <h3 class="text-lg font-bold font-display text-base-content mb-2">
+                                            Step {index + 1}:
+                                        </h3>
+                                        <p class="text-base-content/80 leading-relaxed font-body">
+                                            {item}
+                                        </p>
+                                    {/snippet}
+                                </RecipeInstructionStep>
+                            {/each}
+                        </ul>
+                    {/if}
                 </div>
-                
             </div>
         </div>
     </div>
 
     <!-- delete modal -->
     {#snippet deleteRecipeContent()}
-        <p class="py-4 px-2 text-gray-600">
-            Are you sure you want to permanently delete 
-            <span class="font-semibold text-red-600">
-                {recipeDetails.recipeCode}: {recipeDetails.title}
-            </span>?
-        </p>
+        Are you sure you want to permanently delete recipe 
+        <span class="font-semibold text-error">
+            {recipeDetails.recipeCode}: {recipeDetails.title}
+        </span> ?
     {/snippet}
     <ConfirmActionModal 
         bind:this={deleteModalRef}
         title='Delete Recipe'
         modalContent={deleteRecipeContent}
         actionLabel='Delete'
-        modalStyle='ERROR'
+        modalStyle='error'
         onConfirm={confirmDeleteRecipe}
         onCancel={() => {}} />
 {/if}

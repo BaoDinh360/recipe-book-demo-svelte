@@ -99,19 +99,17 @@
 
     <!-- delete modal -->
     {#snippet deleteRecipeContent()}
-        <p class="py-4 px-2 text-gray-600">
-            Are you sure you want to permanently delete 
-            <span class="font-semibold text-red-600">
-                {recipe.recipeCode}: {recipe.title}
-            </span>?
-        </p>
+        Are you sure you want to permanently delete recipe
+        <span class="font-semibold text-error">
+            {recipe.recipeCode}: {recipe.title}
+        </span> ?
     {/snippet}
     <ConfirmActionModal 
         bind:this={deleteModalRef}
         title='Delete Recipe'
         modalContent={deleteRecipeContent}
         actionLabel='Delete'
-        modalStyle='ERROR'
+        modalStyle='error'
         onConfirm={confirmDeleteRecipe}
         onCancel={() => {}} />
 
