@@ -7,3 +7,8 @@ export const navigateToRecipes = async () => {
     const url = get(lastRecipeUrl);
     return goto(url ?? '/recipes');
 }
+
+export const navigateToMyRecipes = async () => {
+    const url = get(lastRecipeUrl);
+    return goto(url ?? '/my-recipes');
+}

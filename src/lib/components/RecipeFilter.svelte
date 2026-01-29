@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
 	import { page } from "$app/state";
-	import { categoryOptions, sortingOptions } from "$lib/constants";
+	import { categoryOptions, DEFAULT_ITEMS_PER_PAGE, DEFAULT_START_PAGE, sortingOptions } from "$lib/constants";
 	import type { RecipeCategory, RecipeFilterCriteria } from "$lib/recipe-types";
-	import { SearchIcon } from '$lib/icons';
+	import { FunnelXIcon, SearchIcon } from '$lib/icons';
 
     let { recipeFilters }: 
     { recipeFilters: RecipeFilterCriteria } = $props();
@@ -63,8 +63,8 @@
     }
 
     const resetPagination = (searchParams: URLSearchParams) => {
-        searchParams.set('page', String(1));
-        searchParams.set('perPage', String(3));
+        searchParams.set('page', String(DEFAULT_START_PAGE));
+        searchParams.set('perPage', String(DEFAULT_ITEMS_PER_PAGE));
     }
 
     const onResetFilter = () => {
@@ -79,67 +79,75 @@
 
 </script>
 
-<div class="bg-white p-4 rounded-lg shadow-md border border-gray-100">
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 items-end">
-        <div class="col-span-1 md:col-span-2">
-            <label class="label" for="search">
-                <span class="label-text text-gray-700 text-sm font-semibold">Search keywords</span>
-            </label>
-            <label class="input input-bordered input-sm flex items-center gap-2">
-                <input type="text" class="grow" placeholder="Title, code..." id="search" 
-                    bind:value={filterInput.text}/>
-                <SearchIcon class="h-5 w-5 stroke-gray-600" />
-            </label>
-        </div>
-        <div class="form-control md:col-span-1">
+<div class="flex flex-col lg:flex-row lg:items-end gap-4">
+    <div class="w-2/5 pb-4">
+        <label class="w-full input input-bordered flex items-center gap-2 relative group
+            border-base-300 rounded-lg bg-base-200 text-neutral placeholder-neutral/50 focus-within:outline-none focus-within:ring-2 focus-within:ring-primary focus-within:border-primary transition-all">
+            <SearchIcon class="h-5 w-5 text-neutral/50 group-focus-within:text-primary" />
+            <input type="text" class="grow" placeholder="Search your recipes..." id="search" 
+                bind:value={filterInput.text}/>
+        </label>
+    </div>
+    
+    <div class="w-2/5 flex gap-2 overflow-x-auto scrollbar-hide items-center pb-4">
+        <!-- category -->
+        <div class="form-control px-2 w-full">
             <label class="label" for="filterCateg">
-                <span class="label-text text-gray-700 text-sm font-semibold">Category</span>
+                <span class="label-text text-sm font-semibold text-neutral">
+                    Category
+                </span>
             </label>
-            <select class="select select-sm select-bordered w-full" id="filterCateg"
+            <select class="select select-bordered w-full bg-base-200 border border-base-300 rounded-lg text-base text-neutral focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                id="filterCateg"
                 bind:value={filterInput.category}
                 >
-                <option value={undefined}>---All---</option>
+                <option value={undefined}>All</option>
                 {#each categoryOptions as option }
                     <option value={option.value}>{option.label}</option>
                 {/each}
             </select>
         </div>
         <!-- prep time -->
-        <div class="form-control md:col-span-1">
+        <div class="form-control px-2 w-full">
             <label class="label" for="filterPrep">
-                <span class="label-text text-gray-700 text-sm font-semibold">Prep Time (min)</span>
+                <span class="label-text text-sm font-semibold text-neutral">
+                    Prep Time (min)
+                </span>
             </label>
-            <input type="number" class="input input-sm input-bordered w-full" id="filterPrep"
+            <input type="number" class="input input-bordered w-full py-3 px-4 flex items-center gap-2 relative group
+                border border-base-300 rounded-lg bg-base-200 text-neutral placeholder-neutral/50 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all"
+                id="filterPrep"
                 placeholder="e.g., 26"
                 bind:value={filterInput.prepTimeMin}
                 />
         </div>
         <!-- sorting -->
-        <div class="form-control md:col-span-1">
+        <div class="form-control px-2 w-full">
             <label class="label" for="sort">
-                <span class="label-text text-gray-700 text-sm font-semibold">Sort by</span>
+                <span class="label-text text-sm font-semibold text-neutral">
+                    Sort by
+                </span>
             </label>
-            <select class="select select-sm select-bordered w-full" id="sort"
+            <select class="select select-bordered w-full bg-base-200 border border-base-300 rounded-lg text-base text-neutral focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary" 
+                id="sort"
                 bind:value={filterInput.sortBy}>
                 {#each sortingOptions as option }
                     <option value={option.value}>{option.label}</option>
                 {/each}
             </select>
         </div>
-        <!-- button -->
-        <div class="md:col-span-1 flex flex-col justify-end gap-2 h-full">
-            <button type="button" class="btn btn-sm text-white w-full bg-sky-500 hover:bg-sky-600"
-                onclick={onFilterRecipe}>
-                Apply
-            </button>
-            <button type="button" class="btn btn-sm w-full"
-                onclick={onResetFilter}>
-                Reset
-            </button>
-        </div>
+    </div>
+
+    <div class="w-1/5 flex gap-2 items-center justify-end pb-4">
+        <button class="px-6 py-3 rounded-lg bg-primary text-base text-neutral-content font-semibold shadow-md shadow-primary/20 hover:brightness-95 transition-all"
+            onclick={onFilterRecipe} type="button">
+            Apply Filters
+        </button>
+        <button class="px-6 py-3 rounded-lg bg-white border border-base-300 text-neutral font-medium hover:bg-base-300/10 transition-colors"
+            onclick={onResetFilter} type="button" aria-label="reset filter">
+            <FunnelXIcon class="size-5" />
+        </button>
     </div>
 </div>
 
-<style>
-
-</style>
+<style></style>
