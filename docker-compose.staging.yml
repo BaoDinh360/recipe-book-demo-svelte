@@ -1,0 +1,9 @@
+services:
+  recipebook-app:
+    image: baodinh1999/recipebook-app:staging
+    ports:
+      - "3004:3000"
+    env_file:
+      - .env.staging
+    volumes:
+      - ./logs/container_logs:/app/logs

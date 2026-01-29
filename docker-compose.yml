@@ -1,16 +1,6 @@
 services:
   recipebook-app:
-    #image: baodinh1999/recipebook-app:0.1.0-test
-    build:
-      context: .
-      dockerfile: Dockerfile
     container_name: recipebook-app
-    ports:
-      - "2618:3000"
-    volumes:
-      - ./logs/container_logs:/app/logs
     restart: unless-stopped
-    env_file:
-      - .env.production
     extra_hosts:
       - "host.docker.internal:host-gateway"

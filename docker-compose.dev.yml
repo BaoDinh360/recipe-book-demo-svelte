@@ -1,0 +1,9 @@
+services:
+  recipebook-app:
+    image: baodinh1999/recipebook-app:dev
+    ports:
+      - "3002:3000"
+    env_file:
+      - .env.development
+    volumes:
+      - ./logs/container_logs:/app/logs
