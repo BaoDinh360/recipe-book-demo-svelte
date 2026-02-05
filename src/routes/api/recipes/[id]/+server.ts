@@ -9,10 +9,11 @@ import { ClientResponseError } from 'pocketbase';
 // api endpoint: PUT /api/recipes/[id]
 export const PUT = async({ request, url, locals }) => {
     const logger = locals.logger;
+    const pbClient = locals.pb;
     try {
         const recipeData: UpdateRecipeData = await request.json();
         logger.info('Updating recipe', { recipeId: recipeData.id, recipeCode: recipeData.recipeCode  });
-        const updated = await updateRecipe(recipeData, logger);
+        const updated = await updateRecipe(recipeData, pbClient, logger);
         logger.info('Recipe updated', { recipeId: updated.id, recipeCode: updated.recipeCode });
         const successRes: ApiResponse<{id: string, recipeCode: string}> = {
             success: true,
@@ -45,10 +46,11 @@ export const PUT = async({ request, url, locals }) => {
 // api endpoint: DELETE /api/recipes/[id]
 export const DELETE = async({ request, url, params, locals }) => {
     const logger = locals.logger;
+    const pbClient = locals.pb;
     try {
         const recipeId = params.id;
         logger.info('Deleting recipe', { recipeId  });
-        await deleteRecipe(recipeId, logger);
+        await deleteRecipe(recipeId, pbClient, logger);
         logger.info('Recipe deleted', { recipeId  });
         const successRes: ApiResponse<null> = {
             success: true

@@ -22,6 +22,7 @@ const RECIPES_TAG = 'app:recipes';
 // runs on server only
 export const load: PageServerLoad = async ({ url, depends, locals }) => {
     const logger = locals.logger;
+    const pbClient = locals.pb;
     // pagination
         const currentPage = Number(url.searchParams.get('page') || DEFAULT_START_PAGE);
         const itemsPerPage = Number(url.searchParams.get('perPage') || DEFAULT_ITEMS_PER_PAGE);
@@ -40,7 +41,8 @@ export const load: PageServerLoad = async ({ url, depends, locals }) => {
             depends(RECIPES_TAG);
     
             const paginatedResult = await getPaginatedRecipeList(
-                currentPage, itemsPerPage, recipeFilters, logger);
+                currentPage, itemsPerPage, recipeFilters, 
+                pbClient ,logger);
             const { totalPages, totalItems, items } = paginatedResult;
             logger.info('Recipes pagination data result',
                 { pagination: { currentPage, itemsPerPage, totalPages, totalItems } });

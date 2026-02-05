@@ -1,13 +1,14 @@
 import { type IngredientPbRecord, type IngredientSelect } from "$lib/types/ingredient-types";
 import { ClientResponseError } from "pocketbase";
 import { handlePocketbaseLogicError } from "./error-handler";
-import { INGREDIENTS, pocketbaseClient } from "./pocketbase-client";
+import { INGREDIENTS } from "./pocketbase-client";
 import type { Logger } from "winston";
+import PocketBase from 'pocketbase';
 
-const pbClient = pocketbaseClient;
+// const pbClient = pocketbaseClient;
 const COLLECTION_NAME = INGREDIENTS;
 
-export const getAllIngredients = async (logger: Logger): Promise<IngredientSelect[]> => {
+export const getAllIngredients = async (pbClient: PocketBase, logger: Logger): Promise<IngredientSelect[]> => {
     try {
         const ingredientRecords = await pbClient.collection(COLLECTION_NAME)
             .getFullList<IngredientPbRecord>();

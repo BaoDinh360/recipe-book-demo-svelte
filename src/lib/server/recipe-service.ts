@@ -1,14 +1,15 @@
 import { isUpdateRecipeDataType, type CreateRecipeData, type RecipeDetail, type RecipeFilterCriteria, type RecipeFormSubmissionData, type RecipeListItem, type RecipeListPagination, type RecipePbRecord, type UpdateRecipeData, type UpsertRecipePbRecord } from "$lib/recipe-types";
-import { pocketbaseClient, RECIPES, RECIPES_INGREDIENTS } from "$lib/server/pocketbase-client";
+import { RECIPES, RECIPES_INGREDIENTS } from "$lib/server/pocketbase-client";
 import { ClientResponseError } from "pocketbase";
 import { handlePocketbaseLogicError } from "./error-handler";
 import type { Logger } from "winston";
+import PocketBase from 'pocketbase';
 
-const pbClient = pocketbaseClient;
 
 // get paginated recipes, optional: filter, sort
 export const getPaginatedRecipeList = async (currentPage: number, itemsPerPage: number, 
-    recipeFilters: RecipeFilterCriteria, logger: Logger
+    recipeFilters: RecipeFilterCriteria, 
+    pbClient: PocketBase, logger: Logger
 ): Promise<RecipeListPagination> => {
 
     try {
@@ -63,8 +64,8 @@ export const getPaginatedRecipeList = async (currentPage: number, itemsPerPage: 
     
 }
 // get recipe by id
-export const getRecipeById = async (id: string, logger: Logger): Promise<RecipeDetail> => {
-    
+export const getRecipeById = async (id: string, 
+    pbClient: PocketBase, logger: Logger): Promise<RecipeDetail> => {
     try {
         const record = await pbClient.collection(RECIPES).getOne<RecipePbRecord>(id);
         logger.debug('DB query recipe', { recipeId: record.id });
@@ -80,7 +81,8 @@ export const getRecipeById = async (id: string, logger: Logger): Promise<RecipeD
     }
 };
 // get recipe and all ingredients
-export const getRecipeByIdWithIngredients = async(id: string, logger: Logger): Promise<RecipeDetail> => {
+export const getRecipeByIdWithIngredients = async(id: string, 
+    pbClient: PocketBase, logger: Logger): Promise<RecipeDetail> => {
     try {
         const record = await pbClient.collection(RECIPES).getOne<RecipePbRecord>(id);
         // get ingredients belongs to recipe
@@ -118,7 +120,7 @@ export const getRecipeByIdWithIngredients = async(id: string, logger: Logger): P
 }
 
 // create new recipe
-export const createRecipe = async (recipeData: CreateRecipeData, logger: Logger) => {
+export const createRecipe = async (recipeData: CreateRecipeData, pbClient: PocketBase, logger: Logger) => {
     try {
         const data: UpsertRecipePbRecord = mapRecipeDataToUpsertPbRecord(recipeData);
         // return new insert record
@@ -138,7 +140,7 @@ export const createRecipe = async (recipeData: CreateRecipeData, logger: Logger)
     }
 };
 // create new recipe with ingredient list
-export const createRecipeWithIngredients = async (recipeData: CreateRecipeData, logger: Logger) => {
+export const createRecipeWithIngredients = async (recipeData: CreateRecipeData, pbClient: PocketBase, logger: Logger) => {
     try {
         const recipeInsertedData: UpsertRecipePbRecord = mapRecipeDataToUpsertPbRecord(recipeData);
         // return new insert record
@@ -171,7 +173,7 @@ export const createRecipeWithIngredients = async (recipeData: CreateRecipeData, 
     }
 }
 // update recipe by id
-export const updateRecipe = async (recipeData: UpdateRecipeData, logger: Logger)  => {
+export const updateRecipe = async (recipeData: UpdateRecipeData, pbClient: PocketBase, logger: Logger)  => {
     try {
         // update master recipe 
         const recipeId = recipeData.id;
@@ -237,7 +239,7 @@ export const updateRecipe = async (recipeData: UpdateRecipeData, logger: Logger)
     }
 };
 // delete recipe by id
-export const deleteRecipe = async (id: string, logger: Logger): Promise<void> => {
+export const deleteRecipe = async (id: string, pbClient: PocketBase, logger: Logger): Promise<void> => {
     try {
         // find + delete recipe_ingredients relation records
         const rcp_ingredients = await pbClient.collection(RECIPES_INGREDIENTS).getFullList({

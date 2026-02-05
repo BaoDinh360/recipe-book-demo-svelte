@@ -9,12 +9,13 @@ import { ClientResponseError } from 'pocketbase';
 // POST /api/recipes/
 export const POST = async({ request, url, locals }) => {
     const logger = locals.logger;
+    const pbClient = locals.pb;
     try {
         const recipeData: CreateRecipeData = await request.json();
         logger.info('Creating new recipe', 
             { title: recipeData.title, category: recipeData.category, 
                 totalIngredients: recipeData.ingredients.length });
-        const created = await createRecipeWithIngredients(recipeData, logger);
+        const created = await createRecipeWithIngredients(recipeData, pbClient, logger);
         logger.info('Recipe created', { recipeId: created.id, recipeCode: created.recipeCode });
         const successRes: ApiResponse<{id: string, recipeCode: string}> = {
             success: true,

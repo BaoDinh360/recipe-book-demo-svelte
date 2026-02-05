@@ -7,9 +7,10 @@ import { ClientResponseError } from "pocketbase";
 
 export const load: PageServerLoad = async ({ locals }) => {
     const logger = locals.logger;
+    const pbClient = locals.pb;
     try {
         logger.info('Fetching ingredients data');
-        const ingredientSelects = await getAllIngredients(logger);
+        const ingredientSelects = await getAllIngredients(pbClient, logger);
         logger.info('Ingredients data result', { totals: ingredientSelects.length });
         return {
             ingredientSelects

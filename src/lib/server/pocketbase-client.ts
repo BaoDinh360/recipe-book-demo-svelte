@@ -1,12 +1,10 @@
-//import { POCKETBASE_HOST } from '$env/static/private';
-import { env } from '$env/dynamic/private';
-import PocketBase from 'pocketbase';
 
-const pocketbaseHost = env.POCKETBASE_HOST;
+// const pocketbaseHost = env.POCKETBASE_HOST;
 
-export const pocketbaseClient: PocketBase = new PocketBase(pocketbaseHost);
+// export const pocketbaseClient: PocketBase = new PocketBase(pocketbaseHost);
 
 // collection names
 export const RECIPES = 'recipes';
 export const INGREDIENTS = 'ingredients';
 export const RECIPES_INGREDIENTS = 'recipes_ingredients';
+export const USERS = 'users';

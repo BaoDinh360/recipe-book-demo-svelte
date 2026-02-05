@@ -1,9 +1,14 @@
+import { env } from "$env/dynamic/private";
 import { logger } from "$lib/server/logger";
 import type { Handle } from "@sveltejs/kit";
+import { sequence } from "@sveltejs/kit/hooks";
+import PocketBase from 'pocketbase';
+
+const pocketbaseHost = env.POCKETBASE_HOST;
 
 // SvelteKit middleware, intercept before requests, responses
 
-export const handle: Handle = async({ event, resolve }) => {
+const handleRequestLogging: Handle = async({ event, resolve }) => {
     // correlation id
     const requestId = crypto.randomUUID();
     // add additional context data to every log in a scoped request
@@ -35,3 +40,38 @@ export const handle: Handle = async({ event, resolve }) => {
         throw err;
     }
 }
+
+const handlePocketBaseAuthen: Handle = async({ event, resolve }) => {
+    // init new PB instance, set it to even locals
+    event.locals.pb = new PocketBase(pocketbaseHost);
+    // get current pb authStore state from cookie
+    event.locals.pb.authStore.loadFromCookie(event.request.headers.get('cookie') || '');
+
+    if(event.locals.pb.authStore.isValid) {
+        const authStoreRecord = event.locals.pb.authStore.record;
+        // mapping to current user state
+        event.locals.user = {
+            id: authStoreRecord?.id,
+            email: authStoreRecord?.email,
+            username: authStoreRecord?.username,
+            name: authStoreRecord?.name,
+            created: new Date(authStoreRecord?.created)   
+        }
+    } else {
+        event.locals.user = undefined;
+    }
+
+    event.locals.logger.info('pb authStore state: ', event.locals.pb.authStore);
+    event.locals.logger.info('logged in user: ', event.locals.user);
+    const response = await resolve(event);
+    // set new pb authStore state to cookie
+    response.headers.append('set-cookie', event.locals.pb.authStore.exportToCookie());
+
+    return response;
+}
+
+// run hooks in order 
+export const handle = sequence(
+    handleRequestLogging,
+    handlePocketBaseAuthen
+);

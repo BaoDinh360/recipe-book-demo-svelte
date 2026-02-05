@@ -8,16 +8,17 @@ import { ClientResponseError } from "pocketbase";
 
 export const load: PageServerLoad = async ({ params, locals }) => {
     const logger = locals.logger;
+    const pbClient = locals.pb;
     try {
         logger.info('Fetching recipe details', { recipeId: params.recipeId });
-        const recipe = await getRecipeByIdWithIngredients(params.recipeId, logger);
+        const recipe = await getRecipeByIdWithIngredients(params.recipeId, pbClient, logger);
         logger.info('Recipe details data', 
             { recipeId: recipe.id, totalIngredients: recipe.ingredients.length});
         // exclude unecessary props
         const { createdAt, lastUpdatedAt, ...included } = recipe;
 
         // get all ingredients for select
-        const ingredientSelects = await getAllIngredients(logger);
+        const ingredientSelects = await getAllIngredients(pbClient, logger);
 
         return {
             recipeData: included,
