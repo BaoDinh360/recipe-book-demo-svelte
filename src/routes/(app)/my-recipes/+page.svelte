@@ -4,18 +4,18 @@
 	import Pagination from "$lib/components/Pagination.svelte";
 	import RecipeFilter from "$lib/components/RecipeFilter.svelte";
 	import RecipeList from "$lib/components/RecipeList.svelte";
-	import type { RecipeFilterCriteria } from "$lib/recipe-types";
 	import { lastRecipeUrl } from "$lib/stores/navigation-state";
 	import { notifyError } from "$lib/stores/notification-stores";
 	import type { PageProps } from "./$types";
 	import { goto } from "$app/navigation";
+	import type { RecipeFilterPayload } from "$lib/types/recipe-types";
 	
     // /recipes/index
 
     // must import the correct level of './$ypes to get the correct ts types'
     let { data }: PageProps = $props();
-    let recipeFilters: RecipeFilterCriteria = $derived.by(() => {
-        let result: RecipeFilterCriteria = {
+    let recipeFilters: RecipeFilterPayload = $derived.by(() => {
+        let result: RecipeFilterPayload = {
             text: undefined,
             category: undefined,
             prepTimeMin: undefined,

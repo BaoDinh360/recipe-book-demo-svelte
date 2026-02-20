@@ -1,8 +1,8 @@
 <script lang="ts">
     import { twMerge } from 'tailwind-merge';
 	import { clsx } from 'clsx';
-	import type { RecipeCategory } from "$lib/recipe-types";
 	import { getCategoryColorStyle } from "$lib/utils/category-style";
+	import type { RecipeCategory } from '$lib/types/recipe-types';
     let { class: className = '', category, ...rest }: {
         category: RecipeCategory,
         class?: string,

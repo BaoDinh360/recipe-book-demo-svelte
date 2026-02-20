@@ -1,10 +1,17 @@
+import PocketBase from 'pocketbase';
+import { env } from "$env/dynamic/private";
+import type { TypedPocketBase } from "$lib/types/pocketbase-types";
 
-// const pocketbaseHost = env.POCKETBASE_HOST;
+const pocketbaseHost = env.POCKETBASE_HOST;
+export const pbClient: TypedPocketBase = new PocketBase(pocketbaseHost);
 
-// export const pocketbaseClient: PocketBase = new PocketBase(pocketbaseHost);
-
-// collection names
-export const RECIPES = 'recipes';
-export const INGREDIENTS = 'ingredients';
-export const RECIPES_INGREDIENTS = 'recipes_ingredients';
-export const USERS = 'users';
+export function genPocketbaseId(length = 15): string {
+    const alphabet = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    const randomValues = new Uint8Array(length);
+    crypto.getRandomValues(randomValues);
+    for (let i = 0; i < length; i++) {
+        result += alphabet[randomValues[i] % alphabet.length];
+    }
+    return result;
+}

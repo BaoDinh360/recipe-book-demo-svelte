@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { PlusIcon, Trash2Icon } from "$lib/icons";
+	import type { RecipeInstructionFormRow } from "$lib/types/recipe-types";
 
     //props
-    let { instructionListData, onAddInstruction, onUpdateInstruction, onRemoveInstruction }: {
-        instructionListData: {rowId: string, instructionText: string}[],
+    let { formListData, onAddInstruction, onUpdateInstruction, onRemoveInstruction }: {
+        formListData: RecipeInstructionFormRow[],
         onAddInstruction: () => void, 
         onUpdateInstruction: (rowId: string, text: string) => void,
         onRemoveInstruction: (rowId: string) => void,
@@ -13,13 +14,13 @@
 
 <div class="flex flex-col gap-2 px-4">
     <h3 class="text-charcoal text-xl font-bold font-display">Instruction Steps</h3>
-    {#if !instructionListData || instructionListData.length <= 0}
+    {#if !formListData || formListData.length <= 0}
         <p class="text-sm text-base-content/50 text-center font-medium mt-2 italic">
             No instruction steps
         </p>
     {/if}
     <ul class="steps steps-vertical w-full px-2">
-        {#each instructionListData as step, index (step.rowId) }
+        {#each formListData as step, index (step.rowId) }
             {@render instructionStep(step, index)}
         {/each}
     </ul>

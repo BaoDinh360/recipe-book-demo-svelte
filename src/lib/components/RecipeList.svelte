@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { SearchXIcon } from "$lib/icons";
-	import type { RecipeListItem } from "$lib/recipe-types";
+	import { type RecipeListItem } from "$lib/types/recipe-types";
 	import RecipeItem from "./RecipeItem.svelte";
 
     let { recipeList, 

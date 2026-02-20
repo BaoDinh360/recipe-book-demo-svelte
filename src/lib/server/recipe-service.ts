@@ -1,16 +1,17 @@
-import { isUpdateRecipeDataType, type CreateRecipeData, type RecipeDetail, type RecipeFilterCriteria, type RecipeFormSubmissionData, type RecipeListItem, type RecipeListPagination, type RecipePbRecord, type UpdateRecipeData, type UpsertRecipePbRecord } from "$lib/recipe-types";
-import { RECIPES, RECIPES_INGREDIENTS } from "$lib/server/pocketbase-client";
-import { ClientResponseError } from "pocketbase";
-import { handlePocketbaseLogicError } from "./error-handler";
+import { ClientResponseError, type ListResult } from "pocketbase";
+import { handlePocketbaseBatchError, handlePocketbaseLogicError } from "./error-handler";
 import type { Logger } from "winston";
 import PocketBase from 'pocketbase';
+import { Collections, type RecipesIngredientsResponse, type RecipesResponse } from "$lib/types/pocketbase-types";
+import type { CreateRecipePayload, RecipeDetailItem, RecipeFilterPayload, RecipeIngredientPayload, RecipeListItem, UpdateRecipePayload } from "$lib/types/recipe-types";
+import { genPocketbaseId } from "./pocketbase-client";
 
 
 // get paginated recipes, optional: filter, sort
 export const getPaginatedRecipeList = async (currentPage: number, itemsPerPage: number, 
-    recipeFilters: RecipeFilterCriteria, 
+    recipeFilters: RecipeFilterPayload, 
     pbClient: PocketBase, logger: Logger
-): Promise<RecipeListPagination> => {
+): Promise<ListResult<RecipeListItem>> => {
 
     try {
         // construct pocketbase filter
@@ -39,8 +40,9 @@ export const getPaginatedRecipeList = async (currentPage: number, itemsPerPage: 
         const filterString =  pbFilters.length > 0 ? pbFilters.join('&&') : undefined;
         const sortString = pbSorts.length > 0 ? pbSorts.join(',') : undefined;
         logger.debug('DB query param recipes', {filter: filterString, sort: sortString});
-        const recipeRecords = await pbClient.collection(RECIPES).getList<RecipePbRecord>(
-            currentPage, itemsPerPage, {
+        const recipeRecords = await pbClient.collection(Collections.Recipes)
+            .getList<RecipesResponse>(
+                currentPage, itemsPerPage, {
                 filter: filterString,
                 sort: sortString,
             });
@@ -49,11 +51,13 @@ export const getPaginatedRecipeList = async (currentPage: number, itemsPerPage: 
 
         // destructuring
         const { page, perPage, totalPages, totalItems, items } = recipeRecords;
-        const recipeListPagination: RecipeListPagination = {
+        
+        const recipeListItems: RecipeListItem[] = items.map(mapRecipeResToItemList);
+        
+        return {
             page, perPage, totalPages, totalItems,
-            items: items.map(mapPbRecordToRecipeListItem)
+            items: recipeListItems
         };
-        return recipeListPagination;
     } catch (err) {
         if(err instanceof ClientResponseError) {
             handlePocketbaseLogicError(err, logger);
@@ -64,50 +68,40 @@ export const getPaginatedRecipeList = async (currentPage: number, itemsPerPage: 
     
 }
 // get recipe by id
-export const getRecipeById = async (id: string, 
-    pbClient: PocketBase, logger: Logger): Promise<RecipeDetail> => {
-    try {
-        const record = await pbClient.collection(RECIPES).getOne<RecipePbRecord>(id);
-        logger.debug('DB query recipe', { recipeId: record.id });
-        const recipe: RecipeDetail = mapPbRecordToRecipeDetail(record);
-        return recipe;
-    } catch (err) {
-        // pocketbase error exception
-        if(err instanceof ClientResponseError) {
-            handlePocketbaseLogicError(err, logger);
-        }
-        // re throw / bubble up other error
-        throw err;
-    }
-};
+// export const getRecipeById = async (id: string, 
+//     pbClient: PocketBase, logger: Logger): Promise<RecipeDetailItem> => {
+//     try {
+//         // const record = await pbClient.collection(RECIPES).getOne<RecipePbRecord>(id);
+//         const recipeRes = await pbClient.collection(Collections.Recipes)
+//             .getOne<RecipesResponse>(id);
+//         logger.debug('DB query recipe', { recipeId: recipeRes.id });
+
+//         // const recipe: RecipeDetail = mapPbRecordToRecipeDetail(record);
+//         // return recipe;
+//     } catch (err) {
+//         // pocketbase error exception
+//         if(err instanceof ClientResponseError) {
+//             handlePocketbaseLogicError(err, logger);
+//         }
+//         // re throw / bubble up other error
+//         throw err;
+//     }
+// };
 // get recipe and all ingredients
 export const getRecipeByIdWithIngredients = async(id: string, 
-    pbClient: PocketBase, logger: Logger): Promise<RecipeDetail> => {
+    pbClient: PocketBase, logger: Logger): Promise<RecipeDetailItem> => {
     try {
-        const record = await pbClient.collection(RECIPES).getOne<RecipePbRecord>(id);
-        // get ingredients belongs to recipe
-        const recipeIngredientsRecord = await pbClient.collection(RECIPES_INGREDIENTS).getFullList({
-            filter: `recipe="${id}"`,
-            expand: 'ingredient'
-        });
-
+        const recipeRes = await pbClient.collection(Collections.Recipes).getOne<RecipesResponse>(id);
+        const recipeIngredResList = await pbClient.collection(Collections.RecipesIngredients)
+            .getFullList<RecipesIngredientsResponse>({
+                filter: `recipe="${id}"`,
+                expand: 'ingredient'
+            });
         // mapping
-        const { collectionId, collectionName, ...included  } = record;
-        const recipe: RecipeDetail = {
-            ...included,
-            lastUpdatedAt: new Date(included.updated),
-            createdAt: new Date(included.created),
-            ingredients: recipeIngredientsRecord.map((r:any) => ({
-                id: r.id,
-                recipeId: included.id,
-                ingredientId: r.expand.ingredient.id,
-                name: r.expand.ingredient.name,
-                qty: r.quantity,
-                unit: r.unit !== '' ? r.unit : r.expand.ingredient.unit
-            })),
-        };
+        const recipe = mapRecipeResToRecipeDetailWithIngredients(recipeRes, recipeIngredResList);
         logger.debug('DB query recipe', 
             { recipeId: recipe.id, totalIngredients: recipe.ingredients.length });
+        
         return recipe;
     } catch (err) {
         // pocketbase error exception
@@ -118,115 +112,101 @@ export const getRecipeByIdWithIngredients = async(id: string,
         throw err;
     }
 }
-
-// create new recipe
-export const createRecipe = async (recipeData: CreateRecipeData, pbClient: PocketBase, logger: Logger) => {
-    try {
-        const data: UpsertRecipePbRecord = mapRecipeDataToUpsertPbRecord(recipeData);
-        // return new insert record
-        const newRecord = await pbClient.collection(RECIPES).create<RecipePbRecord>(data);
-        logger.debug('DB insert recipe', { recipeId: newRecord.id });
-        return {
-            id: newRecord.id,
-            recipeCode: newRecord.recipeCode
-        };
-    } catch (err) {
-        // pocketbase error exception
-        if(err instanceof ClientResponseError) {
-            handlePocketbaseLogicError(err, logger);
-        }
-        // re throw / bubble up other error
-        throw err;
-    }
-};
 // create new recipe with ingredient list
-export const createRecipeWithIngredients = async (recipeData: CreateRecipeData, pbClient: PocketBase, logger: Logger) => {
+export const createRecipeWithIngredients = async (
+        recipePayload: CreateRecipePayload, pbClient: PocketBase, logger: Logger) => {
     try {
-        const recipeInsertedData: UpsertRecipePbRecord = mapRecipeDataToUpsertPbRecord(recipeData);
-        // return new insert record
-        const newRecipeRecord = await pbClient.collection(RECIPES).create<RecipePbRecord>
-            (recipeInsertedData);
-        logger.debug('DB insert recipe', { recipeId: newRecipeRecord.id });
-        const recipeId = newRecipeRecord.id;
-        for(const ingred of recipeData.ingredients) {
-            const ingredientData = {
+        const { ingredients, ...included } = recipePayload;
+        // mapping
+        const payload = {
+            ...included,
+            instructions: JSON.stringify(included.instructions)
+        };
+        // batch to upsert atomically
+        const batch = pbClient.createBatch();
+        // batch doesn't return inserted record --> must create id on client
+        const recipeId = genPocketbaseId();
+
+        // batch upsert recipe
+        batch.collection(Collections.Recipes).create({
+            id: recipeId,
+            ...payload
+        });
+
+        // batch upsert recipe_ingredients relation
+        for (const ingr of ingredients) {
+            const ingrPayload = {
                 recipe: recipeId,
-                ingredient: ingred.ingredientId,
-                quantity: ingred.qty,
-                unit: ingred.unit
+                ...ingr
             };
-            await pbClient.collection(RECIPES_INGREDIENTS).create(ingredientData);
+            batch.collection(Collections.RecipesIngredients).create(ingrPayload);
         }
+
+        const batchResult = await batch.send();
+        // destructuring
+        const [first, ...junctionRec] = batchResult;
+        const newRecipe = first as unknown as RecipesResponse;
+        logger.debug('DB insert recipe', { recipeId: newRecipe.id });
         logger.debug('DB insert recipe ingredients', 
-            { recipeId, totalIngredients: recipeData.ingredients.length });
+            { recipeId: newRecipe.id, totalIngredients: junctionRec });
+
         return {
-            id: newRecipeRecord.id,
-            recipeCode: newRecipeRecord.recipeCode
+            id: newRecipe.id,
+            recipeCode: newRecipe.recipeCode
         };
     } catch (err) {
         // pocketbase error exception
         if(err instanceof ClientResponseError) {
-            handlePocketbaseLogicError(err, logger);
+            // handlePocketbaseLogicError(err, logger);
+            handlePocketbaseBatchError(err, logger);
         }
         // re throw / bubble up other error
         throw err;
     }
 }
 // update recipe by id
-export const updateRecipe = async (recipeData: UpdateRecipeData, pbClient: PocketBase, logger: Logger)  => {
+export const updateRecipe = async (
+    recipePayload: UpdateRecipePayload, pbClient: PocketBase, logger: Logger)  => {
     try {
-        // update master recipe 
-        const recipeId = recipeData.id;
-        const recipeCode = recipeData.recipeCode;
-        const data: UpsertRecipePbRecord = mapRecipeDataToUpsertPbRecord(recipeData);
-        await pbClient.collection(RECIPES).update<RecipePbRecord>(recipeId, data);
-        logger.debug('DB upsert recipe', { recipeId });
-        // load existing recipes_ingredients relation records
-        const existedRecipeIngreLinks = await pbClient.collection(RECIPES_INGREDIENTS).getFullList({
-            filter: `recipe="${recipeId}"`
+        const { ingredients, ...included } = recipePayload;
+        const recipeId = recipePayload.id;
+        // mapping
+        const payload = {
+            ...included,
+            instructions: JSON.stringify(included.instructions)
+        };
+        // batch to upsert atomically
+        const batch = pbClient.createBatch();
+        // update master recipe
+        batch.collection(Collections.Recipes).update(recipeId, payload);
+        // find existing links to delete and re-insert
+        const existingLinks = await pbClient.collection(Collections.RecipesIngredients)
+            .getFullList({
+                filter: `recipe="${recipeId}"`
         });
-        // use for delete recipes_ingredients links
-        const existingRecordMap = new Map(
-            existedRecipeIngreLinks.map(link => [link.id, link])
-        );
-        const existedIdSet = new Set();
-
-        // upsert recipes_ingredients records
-        for(const ingred of recipeData.ingredients) {
-            // if has id, then update
-            if(ingred.id) {
-                existedIdSet.add(ingred.id);
-                await pbClient.collection(RECIPES_INGREDIENTS).update(ingred.id, {
-                    ingredient: ingred.ingredientId,
-                    quantity: ingred.qty,
-                    unit: ingred.unit
-                });
-            } else {
-                // if id undefined --> new --> create
-                    const ingredientData = {
-                    recipe: recipeId,
-                    ingredient: ingred.ingredientId,
-                    quantity: ingred.qty,
-                    unit: ingred.unit
-                };
-                await pbClient.collection(RECIPES_INGREDIENTS)
-                    .create(ingredientData);
+        console.log('existing links: ', existingLinks);
+        for (const link of existingLinks) {
+            batch.collection(Collections.RecipesIngredients).delete(link.id);
+        }
+        // re-insert
+        for(const ingr of ingredients) {
+            const ingrPayload = {
+                recipe: recipeId,
+                ...ingr
             };
+            batch.collection(Collections.RecipesIngredients).create(ingrPayload);
         }
-        logger.debug('DB upsert recipe ingredients', 
-            { recipeId, totalIngredients: recipeData.ingredients.length });
-        // delete recipes_ingredients records
-        for(const existedLink of existedRecipeIngreLinks) {
-            // if the existedIdSet set doesn't have existed id, delete it
-            if(!existedIdSet.has(existedLink.id)) {
-                await pbClient.collection(RECIPES_INGREDIENTS)
-                    .delete(existedLink.id);
-            }
-        }
+        const batchResult = await batch.send();
+        // destructuring
+        const [first, ...junctionRec] = batchResult;
+        const updatedRecipe = first as unknown as RecipesResponse;
+        logger.debug('DB update recipe', { recipeId: updatedRecipe.id });
+        logger.debug('DB update recipe ingredients', 
+            { recipeId: updatedRecipe.id, totalIngredients: junctionRec });
 
         return {
-            id: recipeId,
-            recipeCode
+            id: updatedRecipe.id,
+            recipeCode: updatedRecipe.recipeCode
         };
 
     } catch (err) {
@@ -241,20 +221,22 @@ export const updateRecipe = async (recipeData: UpdateRecipeData, pbClient: Pocke
 // delete recipe by id
 export const deleteRecipe = async (id: string, pbClient: PocketBase, logger: Logger): Promise<void> => {
     try {
-        // find + delete recipe_ingredients relation records
-        const rcp_ingredients = await pbClient.collection(RECIPES_INGREDIENTS).getFullList({
+        const batch = pbClient.createBatch();
+        // find relation links ingredients
+        const existingLinks = await pbClient.collection(Collections.RecipesIngredients).getFullList({
             filter: `recipe="${id}"`
         });
-        logger.debug(`Recipe: ${id} ingredients records`, { total: rcp_ingredients.length });
-        // delete relation records if found
-        if (rcp_ingredients !== null && rcp_ingredients.length > 0) {
-            await Promise.all(
-                rcp_ingredients.map((ri) => pbClient.collection(RECIPES_INGREDIENTS).delete(ri.id))
-            );
-            logger.debug(` DB delete recipe: ${id} ingredients records deleted`);
+        logger.debug(`Recipe: ${id} ingredients found`, { total: existingLinks.length });
+        // delete relation links
+        if (existingLinks && existingLinks.length > 0) {
+            for (const link of existingLinks) {
+                batch.collection(Collections.RecipesIngredients).delete(link.id)
+            }
         }
-        // delete parent record
-        await pbClient.collection(RECIPES).delete(id);
+        // delete master recipe
+        batch.collection(Collections.Recipes).delete(id);
+        await batch.send();
+        logger.debug(` DB delete recipe: ${id} ingredients records deleted`);
         logger.debug('DB delete recipe', { recipeId: id });
     } catch (err) {
         // pocketbase error exception
@@ -267,39 +249,32 @@ export const deleteRecipe = async (id: string, pbClient: PocketBase, logger: Log
 };
 
 // mapper func
-const mapPbRecordToRecipeListItem = (pbRecord: RecipePbRecord): RecipeListItem => {
-    const { instructions, collectionId, collectionName, ...included } = pbRecord;
+const mapRecipeResToItemList = (recipeRes: RecipesResponse): RecipeListItem => {
+    const { instructions, collectionId, collectionName, expand, updated,
+            ...included } = recipeRes;
     return {
         ...included,
         description: included.description.trim(),
-        createdAt: new Date(included.created)
+        created: new Date(included.created)
     };
 }
-const mapPbRecordToRecipeDetail = (pbRecord: RecipePbRecord): RecipeDetail => {
-    // return only RecipeDetail, ignore recipe ingredients relation
-    // exclude props
-    const { collectionId, collectionName, ...included  } = pbRecord;
+const mapRecipeResToRecipeDetailWithIngredients = (recipeRes: RecipesResponse, 
+    recipeIngredResList: RecipesIngredientsResponse[]): RecipeDetailItem => {
+    const { collectionId, collectionName, expand, ...included } = recipeRes;
+
     return {
         ...included,
-        lastUpdatedAt: new Date(included.updated),
-        createdAt: new Date(included.created),
-        ingredients: []
-    };
-}
-const mapRecipeDataToUpsertPbRecord = 
-    (recipeData: RecipeFormSubmissionData): UpsertRecipePbRecord => {
-    if(isUpdateRecipeDataType(recipeData)) {
-        // if update recipe data, exclude id
-        // exclude id from obj using destructuring
-        const { id, recipeCode, ...included } = recipeData;
-        return {
-            ...included,
-            instructions: JSON.stringify(included.instructions)
-        };
+        instructions: included.instructions as string[],
+        created: new Date(included.created),
+        updated: new Date(included.updated),
+        // mapping recipe ingredients list
+        ingredients: recipeIngredResList.map((r:any) => ({
+            id: r.id,
+            recipeId: included.id,
+            ingredient: r.expand.ingredient.id,
+            name: r.expand.ingredient.name,
+            quantity: r.quantity,
+            unit: r.unit !== '' ? r.unit : r.expand.ingredient.unit
+        }))
     }
-    // if create recipe data, map normally
-    return {
-        ...recipeData,
-        instructions: JSON.stringify(recipeData.instructions)
-    };
 }

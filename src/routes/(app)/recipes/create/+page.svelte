@@ -1,7 +1,7 @@
 <script lang="ts">
 	import RecipeForm from "$lib/components/recipe-form/RecipeForm.svelte";
-	import type { CreateRecipeData } from "$lib/recipe-types";
 	import { notifyError, notifySuccess } from "$lib/stores/notification-stores";
+	import type { CreateRecipePayload } from "$lib/types/recipe-types";
 	import { navigateToMyRecipes } from "$lib/utils/navigation";
 	import type { PageProps } from "./$types";
 
@@ -16,13 +16,13 @@
         }
     })
 
-    const onCreateRecipe = async(recipeData: CreateRecipeData): Promise<void> => {
+    const onCreateRecipe = async(recipePayload: CreateRecipePayload): Promise<void> => {
         let notiMessage = '';
         try {
             const response = await fetch('/api/recipes', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(recipeData)
+                body: JSON.stringify(recipePayload)
             });
             const result = await response.json();
             // success

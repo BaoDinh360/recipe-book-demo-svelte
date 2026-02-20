@@ -1,8 +1,8 @@
-import type { UpdateRecipeData } from '$lib/recipe-types';
 import { BusinessError } from '$lib/server/business-errors';
 import { handlePocketbaseError } from '$lib/server/error-handler';
 import { deleteRecipe, updateRecipe } from '$lib/server/recipe-service';
 import type { ApiResponse } from '$lib/types.js';
+import type { UpdateRecipePayload } from '$lib/types/recipe-types.js';
 import { json } from '@sveltejs/kit';
 import { ClientResponseError } from 'pocketbase';
 
@@ -11,9 +11,9 @@ export const PUT = async({ request, url, locals }) => {
     const logger = locals.logger;
     const pbClient = locals.pb;
     try {
-        const recipeData: UpdateRecipeData = await request.json();
-        logger.info('Updating recipe', { recipeId: recipeData.id, recipeCode: recipeData.recipeCode  });
-        const updated = await updateRecipe(recipeData, pbClient, logger);
+        const recipePayload: UpdateRecipePayload = await request.json();
+        logger.info('Updating recipe', { recipeId: recipePayload.id });
+        const updated = await updateRecipe(recipePayload, pbClient, logger);
         logger.info('Recipe updated', { recipeId: updated.id, recipeCode: updated.recipeCode });
         const successRes: ApiResponse<{id: string, recipeCode: string}> = {
             success: true,

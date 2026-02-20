@@ -2,11 +2,11 @@
 	import { goto } from "$app/navigation";
 	import { page } from "$app/state";
 	import { categoryOptions, DEFAULT_ITEMS_PER_PAGE, DEFAULT_START_PAGE, sortingOptions } from "$lib/constants";
-	import type { RecipeCategory, RecipeFilterCriteria } from "$lib/recipe-types";
 	import { FunnelXIcon, SearchIcon } from '$lib/icons';
+	import type { RecipeCategory, RecipeFilterPayload } from "$lib/types/recipe-types";
 
     let { recipeFilters }: 
-    { recipeFilters: RecipeFilterCriteria } = $props();
+    { recipeFilters: RecipeFilterPayload } = $props();
 
     // local input state
     let filterInput: {

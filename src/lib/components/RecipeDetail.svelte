@@ -1,15 +1,15 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
-	import type { RecipeDetail, RecipeIngredients } from "$lib/recipe-types";
 	import { notifySuccess, notifyError } from "$lib/stores/notification-stores";
 	import CategoryBadge from "./CategoryBadge.svelte";
 	import ConfirmActionModal from "./shared/ConfirmActionModal.svelte";
-    import { CalendarIcon, ClipboardIcon, Clock4Icon, SquarePenIcon, Trash2Icon } from '$lib/icons';
+    import { CalendarIcon, Clock4Icon, SquarePenIcon, Trash2Icon } from '$lib/icons';
 	import { navigateToRecipes } from "$lib/utils/navigation";
 	import RecipeInstructionStep from "./RecipeInstructionStep.svelte";
+	import type { RecipeDetailItem, RecipeIngredientDetail } from "$lib/types/recipe-types";
 
     let { recipeDetails }: {
-        recipeDetails: RecipeDetail | undefined
+        recipeDetails: RecipeDetailItem | undefined
     } = $props();
 
     let deleteModalRef: ConfirmActionModal | undefined = $state();
@@ -76,13 +76,12 @@
                             <span>{recipeDetails.prepTimeMin} min</span>
                         </div>
                         <div class="flex items-center gap-1.5 font-semibold bg-base-200 px-3 py-1.5 rounded-full border border-base-300">
-                            <ClipboardIcon class="size-4 text-primary" />
                             <span>{recipeDetails.recipeCode}</span>
                         </div>
                         <div class="flex items-center gap-1.5 font-light italic bg-base-200 px-3 py-1.5 text-base-content/60 rounded-full border border-base-300">
                             <CalendarIcon class="size-4 text-primary" />
                             <span>
-                                {recipeDetails.createdAt.toLocaleDateString('vi-VN')}
+                                {recipeDetails.created.toLocaleDateString('vi-VN')}
                             </span>
                         </div>
                     </div>
@@ -182,7 +181,7 @@
         onCancel={() => {}} />
 {/if}
 
-{#snippet displayIngredientRow(item: RecipeIngredients)}
+{#snippet displayIngredientRow(item: RecipeIngredientDetail)}
     <li class="group flex items-start gap-3 p-2 rounded-3xl hover:bg-base-100 transition-colors cursor-pointer">
         <div class="relative flex items-center pt-0.5">
             <input class="checkbox checkbox-primary h-5 w-5 rounded-full border-base-300 cursor-pointer"
@@ -191,7 +190,7 @@
         <div class="flex flex-col text-sm gap-1">
             <span
                 class="font-bold text-base-content group-hover:text-primary transition-colors">
-                {item.qty} {item.unit}
+                {item.quantity} {item.unit}
             </span>
             <span class="text-base-content/70">
                 {item.name}

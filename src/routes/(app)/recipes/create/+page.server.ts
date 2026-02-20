@@ -1,16 +1,16 @@
 import { BusinessError } from "$lib/server/business-errors";
-import { getAllIngredients } from "$lib/server/ingredient-service";
 import { error } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
 import { handlePocketbaseError } from "$lib/server/error-handler";
 import { ClientResponseError } from "pocketbase";
+import { getAllIngredientsSelect } from "$lib/server/ingredient-service";
 
 export const load: PageServerLoad = async ({ locals }) => {
     const logger = locals.logger;
     const pbClient = locals.pb;
     try {
         logger.info('Fetching ingredients data');
-        const ingredientSelects = await getAllIngredients(pbClient, logger);
+        const ingredientSelects = await getAllIngredientsSelect(pbClient, logger);
         logger.info('Ingredients data result', { totals: ingredientSelects.length });
         return {
             ingredientSelects

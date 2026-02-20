@@ -30,7 +30,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
             handlePocketbaseError(err, logger);
         } else {
             // other error
-            logger.error('Unhandled server error', {err});
+            logger.error('Unhandled server error: ', err);
         }
         // display error page for 500
         throw error(500, 'An unexpected server error occurred!');

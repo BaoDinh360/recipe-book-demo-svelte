@@ -1,6 +1,6 @@
 // See https://svelte.dev/docs/kit/types#app.d.ts
 import type { Logger } from "winston";
-import PocketBase from 'pocketbase';
+// import PocketBase from 'pocketbase';
 import type { UserData } from "$lib/types/user-authen-types";
 // for information about these interfaces
 declare global {
@@ -8,7 +8,7 @@ declare global {
 		// interface Error {}
 		interface Locals {
 			logger: Logger;
-			pb: PocketBase;
+			pb: TypedPocketBase;
 			user: UserData | undefined;
 		}
 		// interface PageData {}

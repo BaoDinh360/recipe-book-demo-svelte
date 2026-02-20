@@ -1,4 +1,3 @@
-import type { RecipeCategory, RecipeFilterCriteria } from '$lib/recipe-types';
 import { BusinessError } from '$lib/server/business-errors';
 import { getPaginatedRecipeList } from '$lib/server/recipe-service';
 import { ClientResponseError } from 'pocketbase';
@@ -6,6 +5,7 @@ import type { PageServerLoad } from './$types';
 import { error } from '@sveltejs/kit';
 import { handlePocketbaseError } from '$lib/server/error-handler';
 import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_START_PAGE } from '$lib/constants';
+import type { RecipeCategory, RecipeFilterPayload } from '$lib/types/recipe-types';
 
 const RECIPES_TAG = 'app:recipes';
 // const DEFAULT_START_PAGE = 1;
@@ -27,7 +27,7 @@ export const load: PageServerLoad = async ({ url, depends, locals }) => {
         const currentPage = Number(url.searchParams.get('page') || DEFAULT_START_PAGE);
         const itemsPerPage = Number(url.searchParams.get('perPage') || DEFAULT_ITEMS_PER_PAGE);
         // filter
-        const recipeFilters: RecipeFilterCriteria = {
+        const recipeFilters: RecipeFilterPayload = {
             text: url.searchParams.get('text') || undefined,
             category: url.searchParams.get('category') as RecipeCategory || undefined,
             prepTimeMin: url.searchParams.get('prepTimeMin') !== null ? Number(url.searchParams.get('prepTimeMin'))

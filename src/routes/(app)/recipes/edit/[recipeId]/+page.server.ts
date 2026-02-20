@@ -2,9 +2,9 @@ import type { PageServerLoad } from "./$types";
 import { getRecipeByIdWithIngredients } from '$lib/server/recipe-service';
 import { BusinessError } from "$lib/server/business-errors";
 import { error } from "@sveltejs/kit";
-import { getAllIngredients } from "$lib/server/ingredient-service";
 import { handlePocketbaseError } from "$lib/server/error-handler";
 import { ClientResponseError } from "pocketbase";
+import { getAllIngredientsSelect } from "$lib/server/ingredient-service";
 
 export const load: PageServerLoad = async ({ params, locals }) => {
     const logger = locals.logger;
@@ -15,13 +15,13 @@ export const load: PageServerLoad = async ({ params, locals }) => {
         logger.info('Recipe details data', 
             { recipeId: recipe.id, totalIngredients: recipe.ingredients.length});
         // exclude unecessary props
-        const { createdAt, lastUpdatedAt, ...included } = recipe;
+        // const { created, updated, ...included } = recipe;
 
         // get all ingredients for select
-        const ingredientSelects = await getAllIngredients(pbClient, logger);
+        const ingredientSelects = await getAllIngredientsSelect(pbClient, logger);
 
         return {
-            recipeData: included,
+            recipeData: recipe,
             ingredientSelects,
         };
     } catch (err) {

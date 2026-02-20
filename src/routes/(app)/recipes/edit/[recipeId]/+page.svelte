@@ -1,9 +1,9 @@
 <script lang="ts">
 	import RecipeForm from "$lib/components/recipe-form/RecipeForm.svelte";
-	import type { UpdateRecipeData } from "$lib/recipe-types";
 	import { notifyError, notifySuccess } from "$lib/stores/notification-stores";
 	import type { PageProps } from "./$types";
 	import { navigateToMyRecipes } from "$lib/utils/navigation";
+	import type { UpdateRecipePayload } from "$lib/types/recipe-types";
 
     // path: /recipes/edit/{id}
 
@@ -16,25 +16,26 @@
         }
     })
 
-    const onUpdateRecipe = async (recipeData: UpdateRecipeData) : Promise<void> => {
+    const onUpdateRecipe = async (recipePayload: UpdateRecipePayload) : Promise<void> => {
         let notiMessage = '';
-        let recipeId = recipeData.id;
+        const recipeId = recipePayload.id;
+        const recipeCode = data.recipeData?.recipeCode;
         try {
             const response = await fetch(`/api/recipes/${recipeId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(recipeData)
+                body: JSON.stringify(recipePayload)
             });
             const result = await response.json();
             // success
             if(response.ok && result.success) {
                 navigateToMyRecipes();
                 // show success noti
-                notiMessage = `Update recipe: ${result.data.recipeCode} success!`;
+                notiMessage = `Update recipe: ${recipeCode} success!`;
                 notifySuccess(notiMessage);
             } else {
                 // failed
-                notiMessage = result.message ?? `Failed to update recipe: ${recipeData.recipeCode}!`;
+                notiMessage = result.message ?? `Failed to update recipe: ${recipeCode}!`;
                 notifyError(notiMessage);
             }
         } catch (err) {
@@ -53,7 +54,7 @@
     <RecipeForm
         recipeToEdit={data.recipeData}
         ingredientSelects={data.ingredientSelects}
-        onSubmit={(recipeData) => onUpdateRecipe(recipeData as UpdateRecipeData)}
+        onSubmit={(recipePayload) => onUpdateRecipe(recipePayload as UpdateRecipePayload)}
         {onCancel}
     />
 </main>

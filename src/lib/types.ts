@@ -1,5 +1,5 @@
 
-export enum FormState {
+export enum FormMode {
     ADD = 'ADD',
     EDIT = 'EDIT'
 };

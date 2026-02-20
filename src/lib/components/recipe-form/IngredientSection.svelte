@@ -1,18 +1,18 @@
 <script lang="ts">
 	import { PlusIcon, Trash2Icon } from "$lib/icons";
-	import type { RecipeIngredientFormVM } from "$lib/recipe-types";
 	import type {  IngredientSelect } from "$lib/types/ingredient-types";
+	import { type RecipeIngredientsFormRow } from "$lib/types/recipe-types";
 	import { getContext } from "svelte";
 
     // get ingredientSelect from context
     const ingredientSelects: IngredientSelect[] = getContext('ingredientSelects');
 
-    let { ingredientListData,
+    let { formListData,
         onAddIngredient, onUpdateIngredient, onRemoveIngredient
     }: {
-        ingredientListData: RecipeIngredientFormVM[],
+        formListData: RecipeIngredientsFormRow[] | undefined,
         onAddIngredient: () => void,
-        onUpdateIngredient: (rowId: string, updated: Partial<RecipeIngredientFormVM>) => void,
+        onUpdateIngredient: (rowId: string, updated: Partial<RecipeIngredientsFormRow>) => void,
         onRemoveIngredient: (rowId: string) => void
     } = $props();
 
@@ -20,9 +20,13 @@
         // find ingredient in list
         const index = ingredientSelects.findIndex(i => i.id === ingredientId);
         if(index !== -1) {
-            const ingredientData = ingredientSelects[index];
-            const updatedData = { ingredientId, unit: ingredientData.unit, name: ingredientData.name };
-            onUpdateIngredient(rowId, updatedData);
+            const selectedIngr = ingredientSelects[index];
+            // const updatedData = { ingredientId, unit: ingredientData.unit, name: ingredientData.name };
+            const updatedIngr: Partial<RecipeIngredientsFormRow> = {
+                ingredient: ingredientId,
+                unit: selectedIngr.unit,
+            }
+            onUpdateIngredient(rowId, updatedIngr);
         };
     }
 
@@ -43,12 +47,12 @@
                 Unit</div>
             <div class="w-10"></div>
         </div>
-        {#if !ingredientListData || ingredientListData.length <= 0}
+        {#if !formListData || formListData.length <= 0}
             <p class="text-sm text-base-content/50 text-center font-medium mt-2 italic">
                 No ingredients
             </p>
         {/if}
-        {#each ingredientListData as item (item.rowId) }
+        {#each formListData as item (item.rowId) }
             {@render ingredientItemRow(item)}
         {/each}
         <div class="border-t border-base-300 w-full self-center mt-1"></div>
@@ -64,13 +68,7 @@
     </div>
 </div>
 
-{#snippet ingredientItemRow(item: {
-        rowId: string;
-        ingredientId: string;
-        name: string; // for display
-        qty: number;
-        unit: string;
-    })}
+{#snippet ingredientItemRow(item: RecipeIngredientsFormRow)}
     <div class="flex flex-col md:flex-row gap-3 items-start md:items-center bg-white p-3 rounded-lg 
         shadow-sm border border-transparent hover:border-primary/20 transition-colors group">
         <div class="w-full md:flex-[3]">
@@ -79,7 +77,7 @@
                     text-base text-neutral font-normal focus:outline-none focus:ring-1 focus:ring-primary 
                     focus:border-primary cursor-pointer transition-shadow text-sm"
                     id="ingrd_name"
-                    value={item.ingredientId}
+                    value={item.ingredient}
                     onchange={(e) => onSelectIngredientId(item.rowId, e.currentTarget.value)}>
                     <option disabled value={''}>Select ingredient</option>
                     {#each ingredientSelects as ingredient }
@@ -93,8 +91,8 @@
                 <input class="w-full input input-bordered input-sm rounded-xl bg-base-200 border border-base-300 
                     focus:outline-none focus:ring-1 focus:ring-primary text-neutral text-sm"
                     type="number" id="ingrd_qty" 
-                    value={item.qty}
-                    oninput={(e) => onUpdateIngredient(item.rowId, { qty: Number(e.currentTarget.value) })}/>
+                    value={item.quantity}
+                    oninput={(e) => onUpdateIngredient(item.rowId, { quantity: Number(e.currentTarget.value) })}/>
             </div>
             <div class="w-1/2 md:flex-1">
                 <input class="input input-bordered input-sm w-full rounded-xl bg-base-200 border border-base-300 

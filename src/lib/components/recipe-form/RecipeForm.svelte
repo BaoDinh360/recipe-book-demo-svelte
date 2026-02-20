@@ -1,20 +1,19 @@
 <script lang="ts">
-	import type { CreateRecipeData, RecipeCategory, RecipeFormSubmissionData, RecipeIngredientFormVM, UpdateRecipeData } from "$lib/recipe-types";
-	import { FormState, type RecipeFormErrors } from "$lib/types";
     import { z } from "zod";
-	import RecipeGeneralInfoSection from "./RecipeGeneralSection.svelte";
+	import RecipeGeneralInfoSection from "./RecipeGeneralInfoSection.svelte";
 	import IngredientSection from "./IngredientSection.svelte";
-	import RecipeStatsSection from "./RecipeStatsSection.svelte";
 	import type { IngredientSelect } from "$lib/types/ingredient-types";
 	import { setContext } from "svelte";
 	import ConfirmActionModal from "../shared/ConfirmActionModal.svelte";
 	import { ImageUpIcon, SaveIcon, SquarePenIcon } from "$lib/icons";
 	import RecipeInstructionsSection from "./RecipeInstructionsSection.svelte";
+	import type { CreateRecipePayload, RecipeCategory, RecipeDetailItem, RecipeFormData, RecipeIngredientsFormRow, RecipePayload, UpdateRecipePayload, UpsertRecipePayload } from "$lib/types/recipe-types";
+	import { FormMode, type RecipeFormErrors } from "$lib/types";
 
     let { recipeToEdit, ingredientSelects, onSubmit, onCancel }: {
-        recipeToEdit?: UpdateRecipeData | undefined,
+        recipeToEdit?: RecipeDetailItem | undefined,
         ingredientSelects: IngredientSelect[],
-        onSubmit: (recipeData: RecipeFormSubmissionData) => Promise<void>,
+        onSubmit: (recipePayload: UpsertRecipePayload) => Promise<void>,
         onCancel: () => void,
     } = $props();
 
@@ -30,73 +29,43 @@
         onCancel();
     }
 
-    // split form state into multiple state obj section
-    const defaultGeneral = {
-        title: '',
-        description: '',
-        instructions: '',
-    };
-    const defaultStats = {
-        category: '',
-        prepTimeMin: 0
-    };
-    const defaultIngredientList:RecipeIngredientFormVM[] = [];
-    
     // if recipeToEdit obj is passed in, set formData input local state to recipeToEdit value
     // esle use the defaultFormData value
     // recipeToEdit: edit form mode, else add form mode
-    // Add form mode won't have id, recipeCode
 
-    // form state for general info section
-    let generalFormData: {
-        title: string,
-        description: string,
-        // instructions: string
-    } = $state(recipeToEdit ? 
+    let defaultRecipeFormDataState: RecipeFormData = {
+        title: '',
+        description: '',
+        category: '',
+        prepTimeMin: 0,
+        instructions: [],
+        ingredients: [],
+    };
+
+    let recipeFormDataState: RecipeFormData = $state(recipeToEdit ? 
         {
             title: recipeToEdit.title,
             description: recipeToEdit.description,
-        }: 
-        {...defaultGeneral}
-    );
-
-    // form state for recipe stats section
-    let statsFormData: {
-        category: RecipeCategory | string,
-        prepTimeMin: number,
-    } = $state(recipeToEdit ? 
-        {
             category: recipeToEdit.category,
-            prepTimeMin: recipeToEdit.prepTimeMin
-        }: 
-        {...defaultStats}
+            prepTimeMin: recipeToEdit.prepTimeMin,
+            instructions: recipeToEdit.instructions.map(ins => ({
+                rowId: crypto.randomUUID(),
+                instructionText: ins
+            })),
+            ingredients: recipeToEdit.ingredients.map(ingr => ({
+                rowId: crypto.randomUUID(),
+                ingredient: ingr.ingredient,
+                quantity: ingr.quantity,
+                unit: ingr.unit
+            }))
+        } : {...defaultRecipeFormDataState}
     );
-
-    // form state for recipe ingredient list
-    let ingredientListData:RecipeIngredientFormVM[] = $state(recipeToEdit ? 
-    recipeToEdit.ingredients.map(ingr => ({
-        rowId: crypto.randomUUID(),
-        id: ingr.id,
-        ingredientId: ingr.ingredientId,
-        name: ingr.name!,
-        qty: ingr.qty,
-        unit: ingr.unit
-    })): defaultIngredientList);
-    
-    // form state for list of instruction steps
-    let instructionListData: {
-        rowId: string, instructionText: string 
-    }[] = $state(recipeToEdit ?
-    recipeToEdit.instructions.map(ins => ({
-        rowId: crypto.randomUUID(),
-        instructionText: ins
-    })) : []);
 
     // update formState mode based on recipeToEdit props
-    let formState: FormState = $derived.by(() => {
+    let formMode: FormMode = $derived.by(() => {
         if(recipeToEdit) 
-            return FormState.EDIT;
-        return FormState.ADD;
+            return FormMode.EDIT;
+        return FormMode.ADD;
     });
 
     // client side input validation
@@ -117,95 +86,94 @@
             .positive('Please input a positive number'),
     });
 
-    const isFormValid = (): Boolean => {
-        // combined props of multiple obj section --> 1 obj
-        const combinedFormData = {...generalFormData, ...statsFormData};
-        console.log('recipe form data: ', $state.snapshot(combinedFormData));
-        // validate form 
-        const validateResult = recipeSchema.safeParse(combinedFormData);
-        console.log('form validate result: ', validateResult);
-        // form invalid
-        if (!validateResult.success) {
-            resetFormErrors();
-            for(const issue of validateResult.error.issues) {
-                // mapping erros with keys
-                let key = issue.path[0] as keyof RecipeFormErrors;
-                formErrors[key] = issue.message;
-            }
-            return false;
-        }
-        resetFormErrors();
-        return true;
-    }
+    // const isFormValid = (): Boolean => {
+    //     // combined props of multiple obj section --> 1 obj
+    //     const combinedFormData = {...generalFormData, ...statsFormData};
+    //     console.log('recipe form data: ', $state.snapshot(combinedFormData));
+    //     // validate form 
+    //     const validateResult = recipeSchema.safeParse(combinedFormData);
+    //     console.log('form validate result: ', validateResult);
+    //     // form invalid
+    //     if (!validateResult.success) {
+    //         resetFormErrors();
+    //         for(const issue of validateResult.error.issues) {
+    //             // mapping erros with keys
+    //             let key = issue.path[0] as keyof RecipeFormErrors;
+    //             formErrors[key] = issue.message;
+    //         }
+    //         return false;
+    //     }
+    //     resetFormErrors();
+    //     return true;
+    // }
 
     const submitForm = (e: Event) => {
         e.preventDefault();
-        // console.log('general info data: ', $state.snapshot(generalFormData));
-        // console.log('stats data: ', $state.snapshot(statsFormData));
-        // console.log('ingredient list data: ', $state.snapshot(ingredientListData));
-        // console.log('instructions list data: ', $state.snapshot(instructionListData));
+        // console.log('recipe form state: ', $state.snapshot(recipeFormDataState));
         //return;
 
         // validate form inputs
-        if(!isFormValid()) {
-            return;
-        }
+        // if(!isFormValid()) {
+        //     return;
+        // }
         // form valid
-        const recipeInputData = {
-            title: generalFormData.title,
-            description: generalFormData.description,
-            instructions: instructionListData.map(i => i.instructionText.trim()),
-            prepTimeMin: statsFormData.prepTimeMin,
-            category: statsFormData.category as RecipeCategory,
-            // ingredients list form data
-            ingredients: ingredientListData.map(ingr => {
-                const { rowId, ...included } = ingr;
-                return included;
-            }),
+        // construct recipe payload
+        const { title, description, category, prepTimeMin, instructions, ingredients } 
+            = $state.snapshot(recipeFormDataState);
+        const recipePayload: RecipePayload = {
+            title,
+            description,
+            instructions: instructions.map(i => i.instructionText.trim()),
+            prepTimeMin,
+            category: category as RecipeCategory,
+            ingredients: ingredients.map(ingr => ({
+                ingredient: ingr.ingredient!,
+                quantity: ingr.quantity!,
+                unit: ingr.unit!
+            })),
         }
-        if(formState === FormState.EDIT && recipeToEdit) {
-            // edit recipe
-            const recipeData: UpdateRecipeData = {
-                ...recipeInputData,
+        if(formMode === FormMode.EDIT && recipeToEdit) {            
+            const updatePayload: UpdateRecipePayload = {
                 id: recipeToEdit.id,
-                recipeCode: recipeToEdit.recipeCode,
+                ...recipePayload,
             };
-            onSubmit(recipeData);
+            onSubmit(updatePayload);
         }
         else {
-            // add recipe
-            const recipeData: CreateRecipeData = {
-                ...recipeInputData,
+            const createPayload: CreateRecipePayload = {
+                ...recipePayload
             };
-            onSubmit(recipeData);
+            onSubmit(createPayload);
         }
     }
 
     // ingredient func section
     const addRecipeIngredient = () => {
-        ingredientListData.push({
+        recipeFormDataState.ingredients.push({
             rowId: crypto.randomUUID(),
-            ingredientId: '',
-            name: '',
-            qty: 0,
+            ingredient: '',
+            quantity: 0,
             unit: ''
         });
     }
-    const updateRecipeIngredient = (rowId: string, updated: Partial<RecipeIngredientFormVM>) => {
-        const currIndex = ingredientListData.findIndex(ingr => ingr.rowId === rowId);
+    const updateRecipeIngredient = (rowId: string, updated: Partial<RecipeIngredientsFormRow>) => {
+        const currIndex = recipeFormDataState.ingredients
+            .findIndex(ingr => ingr.rowId === rowId);
         if (currIndex !== -1) {
-            ingredientListData[currIndex] = {...ingredientListData[currIndex], ...updated};
+            recipeFormDataState.ingredients[currIndex] = 
+                {
+                    ...recipeFormDataState.ingredients[currIndex], 
+                    ...updated
+                };
         }
     }
     const deleteRecipeIngredient = (rowId: string) => {
-        ingredientListData = ingredientListData.filter(i => i.rowId !== rowId);
+        recipeFormDataState.ingredients = recipeFormDataState.ingredients
+            .filter(i => i.rowId !== rowId);
     }
 
     const resetFormInput = () => {
-        // reset input
-        generalFormData = {...defaultGeneral};
-        statsFormData = {...defaultStats};
-        ingredientListData = defaultIngredientList;
+        recipeFormDataState = {...defaultRecipeFormDataState};
     }
     const resetFormErrors = () => {
         formErrors = {
@@ -217,19 +185,21 @@
 
     // function for instruction list data
     const addNewInstruction = () => {
-        instructionListData.push({
+        recipeFormDataState.instructions.push({
             rowId: crypto.randomUUID(),
             instructionText: ''
         });
     }
     const updateInstruction = (rowId: string,instruction: string) => {
-        const current = instructionListData.find(i => i.rowId === rowId);
+        const current = recipeFormDataState.instructions
+            .find(i => i.rowId === rowId);
         if (current) {
             current.instructionText = instruction;
         }
     }
     const removeInstruction = (rowId: string) => {
-        instructionListData = instructionListData.filter(i => i.rowId !== rowId);
+        recipeFormDataState.instructions = recipeFormDataState.instructions
+            .filter(i => i.rowId !== rowId);
     }
 </script>
 
@@ -240,12 +210,12 @@
             <div class="flex flex-col gap-2">
                 <h1 class="text-base-content text-3xl md:text-4xl font-display 
                     font-semibold leading-tight tracking-tight">
-                    {formState === FormState.EDIT ?
+                    {formMode === FormMode.EDIT ?
                         'Edit Recipe' :
                         'Create New Recipe'
                     }
                 </h1>
-                {#if formState === FormState.EDIT}
+                {#if formMode === FormMode.EDIT}
                     <p class="text-primary text-xl font-bold font-display">
                         {recipeToEdit?.recipeCode}
                     </p>
@@ -276,32 +246,22 @@
             </div>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-12 gap-6 px-4">
-            <!-- left col -->
-            <div class="md:col-span-8 flex flex-col gap-6">
-                <RecipeGeneralInfoSection 
-                    bind:formData={generalFormData}
-                    bind:formErrors={formErrors}
-                    errContent={showInputError}/>
-            </div>
-            <!-- right col -->
-            <div class="md:col-span-4 flex flex-col gap-6">
-                <RecipeStatsSection 
-                    bind:formData={statsFormData}
-                    bind:formErrors={formErrors}
-                    errContent={showInputError}/>
-            </div>
+            <RecipeGeneralInfoSection 
+                bind:formData={recipeFormDataState}
+                bind:formErrors={formErrors}
+                errContent={showInputError}/>
         </div>
 
         <div class="border-t border-base-300 my-2"></div>
         <IngredientSection 
-            {ingredientListData}
+            formListData={recipeFormDataState.ingredients}
             onAddIngredient={addRecipeIngredient}
             onUpdateIngredient={updateRecipeIngredient}
             onRemoveIngredient={deleteRecipeIngredient}/>
         
         <div class="border-t border-base-300 my-2"></div>
         <RecipeInstructionsSection 
-            {instructionListData}
+            formListData={recipeFormDataState.instructions}
             onAddInstruction={addNewInstruction}
             onUpdateInstruction={(rowId, val) => updateInstruction(rowId, val)}
             onRemoveInstruction={removeInstruction}/>
@@ -343,12 +303,12 @@
     </button>
     <button type="submit" class="btn btn-primary w-40 gap-2 text-primary-content rounded-2xl font-semibold
         transition-all hover:scale-105 shadow-sm font-display text-sm">
-        {#if formState === FormState.EDIT}
+        {#if formMode === FormMode.EDIT}
             <SaveIcon class="size-4 text-primary-content" strokeWidth="3" />
         {:else}
             <SquarePenIcon class="size-4 text-primary-content" strokeWidth="3" />
         {/if}
-        {formState === FormState.EDIT ? 
+        {formMode === FormMode.EDIT ? 
             'Save changes' : 
             'Add recipe'
         }

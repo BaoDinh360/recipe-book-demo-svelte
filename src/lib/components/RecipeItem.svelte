@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { goto, invalidate } from "$app/navigation";
-	import type { RecipeListItem } from "$lib/recipe-types";
 	import { notifyError, notifySuccess } from "$lib/stores/notification-stores";
 	import CategoryBadge from "./CategoryBadge.svelte";
 	import ConfirmActionModal from "./shared/ConfirmActionModal.svelte";
     import { Clock4Icon, EyeIcon, SquarePenIcon, Trash2Icon } from '$lib/icons';
+	import type { RecipeListItem } from "$lib/types/recipe-types";
 
     let { recipe, 
     }: {
@@ -73,6 +73,12 @@
             <div class="w-full h-full bg-center bg-cover transform group-hover:scale-105 transition-transform duration-500"
                 data-alt="Close up of avocado toast with red chili flakes and poached egg"
                 style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAbk9SsFLIRHYb9pzloxcyiZFl0xGf8KYQWMq73Z_TuPj1_tHgGwybHyfV3Lv-T3IU1zOLXy2xRBBuT9CGR7RVyWN8O09ELjVH4c_NivhmBVLVvg6f0Vdk17DFfXDp0idh9TZ8tzOUd5MRmUrl9vyc-8pivdwjRWxvp6xgV0_Ko6RN8fcqnJX7qIqlGs4ysR-9y8B8LPKmD81PNQ1wb_TZPy9RArMb7Tg7Bgms3HKjRg6acVEWlnj36sRBWptwyn84FiVHyQon2ltk");'>
+            </div>
+            <!-- recipe code  -->
+            <div class="absolute top-3 left-3">
+                <span class="px-2 py-1 rounded-md bg-base-100/90 text-xs font-bold text-neutral backdrop-blur-sm shadow-sm flex items-center gap-1">
+                    {recipe.recipeCode}
+                </span>
             </div>
             <!-- prep time  -->
             <div class="absolute top-3 right-3">

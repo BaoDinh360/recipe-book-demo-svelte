@@ -1,10 +1,9 @@
-import { env } from "$env/dynamic/private";
+
 import { logger } from "$lib/server/logger";
+import { pbClient } from "$lib/server/pocketbase-client";
 import type { Handle } from "@sveltejs/kit";
 import { sequence } from "@sveltejs/kit/hooks";
-import PocketBase from 'pocketbase';
 
-const pocketbaseHost = env.POCKETBASE_HOST;
 
 // SvelteKit middleware, intercept before requests, responses
 
@@ -43,7 +42,7 @@ const handleRequestLogging: Handle = async({ event, resolve }) => {
 
 const handlePocketBaseAuthen: Handle = async({ event, resolve }) => {
     // init new PB instance, set it to even locals
-    event.locals.pb = new PocketBase(pocketbaseHost);
+    event.locals.pb = pbClient;
     // get current pb authStore state from cookie
     event.locals.pb.authStore.loadFromCookie(event.request.headers.get('cookie') || '');
 

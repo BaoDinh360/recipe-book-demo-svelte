@@ -1,6 +1,5 @@
 import { createLogger, format, transports } from 'winston';
 import 'winston-daily-rotate-file';
-import { fullFormat } from 'winston-error-format';
 
 const isProdEnv = process.env.NODE_ENV === 'production';
 
@@ -28,7 +27,7 @@ const fileTransport = new transports.DailyRotateFile({
     zippedArchive: true,
     maxSize: '10m',
     maxFiles: '7d',
-    format: combine(uppercaseLevel(), timestamp(), json()),
+    format: combine(format.errors({stack: true}), uppercaseLevel(), timestamp(), json()),
 });
 logTransports.push(fileTransport);
 
@@ -37,6 +36,7 @@ if(!isProdEnv) {
     const consoleTransport = new transports.Console({
         level: 'debug',
         format: combine(
+            format.errors({stack: true}),
             uppercaseLevel(),
             colorize(),
             timestamp({format: 'HH:mm:ss'}),
