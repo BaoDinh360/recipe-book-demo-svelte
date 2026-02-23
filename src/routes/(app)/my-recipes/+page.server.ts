@@ -1,11 +1,11 @@
-import { BusinessError } from '$lib/server/business-errors';
+import { AppError, BusinessError } from '$lib/server/business-errors';
 import { getPaginatedRecipeList } from '$lib/server/recipe-service';
 import { ClientResponseError } from 'pocketbase';
 import type { PageServerLoad } from './$types';
 import { error } from '@sveltejs/kit';
 import { handlePocketbaseError } from '$lib/server/error-handler';
 import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_START_PAGE } from '$lib/constants';
-import type { RecipeCategory, RecipeFilterPayload } from '$lib/types/recipe-types';
+import type { RecipeCategory, RecipeFilterPayload, RecipeListItem } from '$lib/types/recipe-types';
 
 const RECIPES_TAG = 'app:recipes';
 // const DEFAULT_START_PAGE = 1;
@@ -57,11 +57,8 @@ export const load: PageServerLoad = async ({ url, depends, locals }) => {
             }
     
         } catch (err) {
-            let errorMsg: string | undefined;
-            // business logic error
-            if(err instanceof BusinessError) {
-                errorMsg = err.message;
-                // return error msg back to page
+            if (err instanceof AppError && err.status === 400) {
+                let errorMsg = err.message;
                 return {
                     recipeListData: [],
                     currentPage,
@@ -70,13 +67,28 @@ export const load: PageServerLoad = async ({ url, depends, locals }) => {
                     totalItems: 0,
                     errorMsg,
                 };  
-            } else if (err instanceof ClientResponseError) {
-                handlePocketbaseError(err, logger);
-            } else {
-                // other error
-                logger.error('Unhandled server error', {err});
             }
-            // display error page for 500
-            throw error(500, 'An unexpected server error occurred!');
+            throw err;
+            // let errorMsg: string | undefined;
+            // // business logic error
+            // if(err instanceof BusinessError) {
+            //     errorMsg = err.message;
+            //     // return error msg back to page
+            //     return {
+            //         recipeListData: [],
+            //         currentPage,
+            //         itemsPerPage,
+            //         totalPages: 0,
+            //         totalItems: 0,
+            //         errorMsg,
+            //     };  
+            // } else if (err instanceof ClientResponseError) {
+            //     handlePocketbaseError(err, logger);
+            // } else {
+            //     // other error
+            //     logger.error('Unhandled server error', {err});
+            // }
+            // // display error page for 500
+            // throw error(500, 'An unexpected server error occurred!');
         }
 }

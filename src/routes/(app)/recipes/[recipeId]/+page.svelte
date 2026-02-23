@@ -6,11 +6,11 @@
     // path: /recipes/[recipeId]
     let { data }: PageProps = $props();
 
-    $effect(() => {
-        if(data.errorMsg) {
-            notifyError(data.errorMsg);
-        }
-    })
+    // $effect(() => {
+    //     if(data.errorMsg) {
+    //         notifyError(data.errorMsg);
+    //     }
+    // })
 
 </script>
 

@@ -35,12 +35,12 @@
                 notifySuccess(notiMessage);
             } else {
                 // failed
-                notiMessage = result.message ?? `Failed to delete recipe: ${recipeCode}!`;
+                notiMessage = `Delete recipe ${recipeCode} failed!: ${result.message}`;
                 notifyError(notiMessage);
             }
         } catch (err) {
-            console.error('An exception occurs: ', err);
-            notifyError('An unexpected error occurs!');
+            // unhandled error occurs at UI level
+            notifyError(`An unexpected error occurs!: ${(err as any).message}`);
         }
     };
 

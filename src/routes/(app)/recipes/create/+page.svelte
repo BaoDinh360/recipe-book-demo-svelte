@@ -9,12 +9,12 @@
 
     let { data }: PageProps = $props();
 
-    $effect(() => {
-        // display error noti if error
-        if(data.errorMsg) {
-            notifyError(data.errorMsg);
-        }
-    })
+    // $effect(() => {
+    //     // display error noti if error
+    //     if(data.errorMsg) {
+    //         notifyError(data.errorMsg);
+    //     }
+    // })
 
     const onCreateRecipe = async(recipePayload: CreateRecipePayload): Promise<void> => {
         let notiMessage = '';
@@ -34,12 +34,12 @@
                 notifySuccess(notiMessage);
             } else {
                 // failed
-                notiMessage = result.message ?? 'Failed to create new recipe!';
+                notiMessage = `Create recipe failed: ${result.message}`;
                 notifyError(notiMessage);
             }
         } catch (err) {
-            console.error('An exception occurs: ', err);
-            notifyError('An unexpected error occurs!');
+            // unhandled error occurs at UI level
+            notifyError(`An unexpected error occurs!: ${(err as any).message}`);
         }
     }
     const onCancel = async () => {

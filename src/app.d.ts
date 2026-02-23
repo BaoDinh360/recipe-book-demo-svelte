@@ -1,7 +1,7 @@
 // See https://svelte.dev/docs/kit/types#app.d.ts
 import type { Logger } from "winston";
 // import PocketBase from 'pocketbase';
-import type { UserData } from "$lib/types/user-authen-types";
+import type { UserInfo } from "$lib/types/user-authen-types";
 // for information about these interfaces
 declare global {
 	namespace App {
@@ -9,7 +9,7 @@ declare global {
 		interface Locals {
 			logger: Logger;
 			pb: TypedPocketBase;
-			user: UserData | undefined;
+			userInfo: UserInfo | undefined;
 		}
 		// interface PageData {}
 		// interface PageState {}

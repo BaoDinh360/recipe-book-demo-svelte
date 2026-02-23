@@ -1,9 +1,9 @@
 import { ClientResponseError, type ListResult } from "pocketbase";
-import { handlePocketbaseBatchError, handlePocketbaseLogicError } from "./error-handler";
+import { handlePocketbaseBatchError, handlePocketbaseLogicError, handleServiceError } from "./error-handler";
 import type { Logger } from "winston";
 import PocketBase from 'pocketbase';
 import { Collections, type RecipesIngredientsResponse, type RecipesResponse } from "$lib/types/pocketbase-types";
-import type { CreateRecipePayload, RecipeDetailItem, RecipeFilterPayload, RecipeIngredientPayload, RecipeListItem, UpdateRecipePayload } from "$lib/types/recipe-types";
+import type { CreateRecipePayload, RecipeDetailItem, RecipeFilterPayload, RecipeListItem, UpdateRecipePayload } from "$lib/types/recipe-types";
 import { genPocketbaseId } from "./pocketbase-client";
 
 
@@ -59,11 +59,12 @@ export const getPaginatedRecipeList = async (currentPage: number, itemsPerPage: 
             items: recipeListItems
         };
     } catch (err) {
-        if(err instanceof ClientResponseError) {
-            handlePocketbaseLogicError(err, logger);
-        }
-        // re throw / bubble up other error
-        throw err;
+        // if(err instanceof ClientResponseError) {
+        //     handlePocketbaseLogicError(err, logger);
+        // }
+        // // re throw / bubble up other error
+        // throw err;
+        throw handleServiceError(err, logger);
     }
     
 }
