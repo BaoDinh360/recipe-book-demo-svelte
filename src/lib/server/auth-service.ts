@@ -1,8 +1,8 @@
 import type { Logger } from "winston";
-import PocketBase, { ClientResponseError } from 'pocketbase';
-import { handlePocketbaseAuthenError, handlePocketbaseBatchError } from "./error-handler";
+import PocketBase from 'pocketbase';
+import { handleServiceError } from "./error-handler";
 import { Collections, type UsersResponse } from "$lib/types/pocketbase-types";
-import type { UserInfo, UserLoginPayload, UserRegistrationPayload } from "$lib/types/user-authen-types";
+import type { UserInfo, UserLoginPayload, UserRegisterPayload, UserRegisterResult } from "$lib/types/user-authen-types";
 
 
 export const authenticateUser = async(loginPayload: UserLoginPayload,
@@ -20,18 +20,13 @@ export const authenticateUser = async(loginPayload: UserLoginPayload,
         };
         return userInfo;
     } catch (err) {
-        // pocketbase error exception
-        if(err instanceof ClientResponseError) {
-            handlePocketbaseAuthenError(err, logger);
-        }
-        // re throw / bubble up other error
-        throw err;
+        throw handleServiceError(err, logger);
     }
 }
 
-export const registerUser = async(registerPayload: UserRegistrationPayload, 
+export const addUser = async(registerPayload: UserRegisterPayload, 
     pbClient: PocketBase, logger: Logger
-) => {
+): Promise<UserRegisterResult> => {
     try {
         const registerRes = await pbClient.collection(Collections.Users)
             .create<UsersResponse>(registerPayload);
@@ -40,11 +35,6 @@ export const registerUser = async(registerPayload: UserRegistrationPayload,
             username: registerRes.username
         }
     } catch (err) {
-        // pocketbase error exception
-        if(err instanceof ClientResponseError) {
-            handlePocketbaseBatchError(err, logger);
-        }
-        // re throw / bubble up other error
-        throw err;
+        throw handleServiceError(err, logger);
     }
 }

@@ -1,10 +1,8 @@
-import { BusinessError } from '$lib/server/business-errors';
-import { handlePocketbaseError } from '$lib/server/error-handler';
+
 import { createRecipeWithIngredients } from '$lib/server/recipe-service.js';
-import type { ApiResponse } from '$lib/types';
 import type { CreateRecipePayload } from '$lib/types/recipe-types.js';
-import { json, error } from '@sveltejs/kit'
-import { ClientResponseError } from 'pocketbase';
+import { ResultFactory, type ResultSuccess } from '$lib/types/result-types.js';
+import { json } from '@sveltejs/kit'
 
 // POST /api/recipes/
 export const POST = async({ request, url, locals }) => {
@@ -16,10 +14,7 @@ export const POST = async({ request, url, locals }) => {
             totalIngredients: recipePayload.ingredients.length });
     const created = await createRecipeWithIngredients(recipePayload, pbClient, logger);
     logger.info('Recipe created', { recipeId: created.id, recipeCode: created.recipeCode });
-    const successRes: ApiResponse<{id: string, recipeCode: string}> = {
-        success: true,
-        data: created
-    };
+    const successRes: ResultSuccess<{id: string, recipeCode: string}> = ResultFactory.success(created);
     return json(successRes, { status: 201 });
     // try {
     //     const recipePayload: CreateRecipePayload = await request.json();

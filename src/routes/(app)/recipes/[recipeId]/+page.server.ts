@@ -1,9 +1,5 @@
-import { BusinessError } from '$lib/server/business-errors';
 import { getRecipeByIdWithIngredients } from '$lib/server/recipe-service';
-import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { handlePocketbaseError } from '$lib/server/error-handler';
-import { ClientResponseError } from 'pocketbase';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
     const logger = locals.logger;

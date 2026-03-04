@@ -1,5 +1,5 @@
 import { ClientResponseError, type ListResult } from "pocketbase";
-import { handlePocketbaseBatchError, handlePocketbaseLogicError, handleServiceError } from "./error-handler";
+import { handleServiceError } from "./error-handler";
 import type { Logger } from "winston";
 import PocketBase from 'pocketbase';
 import { Collections, type RecipesIngredientsResponse, type RecipesResponse } from "$lib/types/pocketbase-types";
@@ -105,12 +105,7 @@ export const getRecipeByIdWithIngredients = async(id: string,
         
         return recipe;
     } catch (err) {
-        // pocketbase error exception
-        if(err instanceof ClientResponseError) {
-            handlePocketbaseLogicError(err, logger);
-        }
-        // re throw / bubble up other error
-        throw err;
+        throw handleServiceError(err, logger);
     }
 }
 // create new recipe with ingredient list
@@ -156,13 +151,7 @@ export const createRecipeWithIngredients = async (
             recipeCode: newRecipe.recipeCode
         };
     } catch (err) {
-        // pocketbase error exception
-        if(err instanceof ClientResponseError) {
-            // handlePocketbaseLogicError(err, logger);
-            handlePocketbaseBatchError(err, logger);
-        }
-        // re throw / bubble up other error
-        throw err;
+        throw handleServiceError(err, logger);
     }
 }
 // update recipe by id
@@ -211,12 +200,7 @@ export const updateRecipe = async (
         };
 
     } catch (err) {
-        // pocketbase error exception
-        if(err instanceof ClientResponseError) {
-            handlePocketbaseLogicError(err, logger);
-        }
-        // re throw / bubble up other error
-        throw err;
+        throw handleServiceError(err, logger);
     }
 };
 // delete recipe by id
@@ -240,12 +224,7 @@ export const deleteRecipe = async (id: string, pbClient: PocketBase, logger: Log
         logger.debug(` DB delete recipe: ${id} ingredients records deleted`);
         logger.debug('DB delete recipe', { recipeId: id });
     } catch (err) {
-        // pocketbase error exception
-        if(err instanceof ClientResponseError) {
-            handlePocketbaseLogicError(err, logger);
-        }
-        // re throw / bubble up other error
-        throw err;
+        throw handleServiceError(err, logger);
     }
 };
 

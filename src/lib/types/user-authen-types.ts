@@ -9,5 +9,10 @@ export type UserInfo = Pick<UserBase, 'id' | 'email' | 'name' | 'username'>;
 export type UserLoginPayload = Pick<UserBase, 'username'> & 
     { password: string };
 // user registration payload
-export type UserRegistrationPayload = Pick<UserBase, 'email' | 'name' | 'username' | 'password'> & 
+export type UserRegisterPayload = Pick<UserBase, 'email' | 'name' | 'username' | 'password'> & 
     { passwordConfirm: string };
+
+export type UserRegisterResult = Pick<UserBase, 'id' | 'username'>;
+
+// form input state
+export type UserRegisterForm = Omit<UserRegisterPayload, 'passwordConfirm'>;

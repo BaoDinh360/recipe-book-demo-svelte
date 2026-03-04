@@ -3,75 +3,75 @@ import { AppError, AuthenticationError, BusinessError, ErrorCode } from "./busin
 import type { Logger } from "winston";
 
 // handle Pocketbase Logic error
-export const handlePocketbaseLogicError = (err: ClientResponseError, logger: Logger) => {
-    // Pocketbase Logic error
-    if(err.status >= 400) {
-        logger.error('Pocketbase business error: ', err);
-        throw new BusinessError(err.status, err.message, err.data);
-    }
-    else {
-        throw err;
-    }
-}
+// export const handlePocketbaseLogicError = (err: ClientResponseError, logger: Logger) => {
+//     // Pocketbase Logic error
+//     if(err.status >= 400) {
+//         logger.error('Pocketbase business error: ', err);
+//         throw new BusinessError(err.status, err.message, err.data);
+//     }
+//     else {
+//         throw err;
+//     }
+// }
 
 // handle Pocketbase batch error
-export const handlePocketbaseBatchError = (err: ClientResponseError, logger: Logger) => {
-    if(err.status >= 400) {
-        logger.error('Pocketbase batch error: ', err);
-        console.log('batch err: ', err);
-        const requests = err.response?.data?.requests;
+// export const handlePocketbaseBatchError = (err: ClientResponseError, logger: Logger) => {
+//     if(err.status >= 400) {
+//         logger.error('Pocketbase batch error: ', err);
+//         console.log('batch err: ', err);
+//         const requests = err.response?.data?.requests;
 
-        if (requests) {
-            const firstIdx = Object.keys(requests)[0];
-            const firstFailedReq = requests[firstIdx];
+//         if (requests) {
+//             const firstIdx = Object.keys(requests)[0];
+//             const firstFailedReq = requests[firstIdx];
 
-            const validationErr = firstFailedReq?.response?.data;
-            if (!validationErr) {
-                throw new BusinessError(
-                    err.status, 
-                    firstFailedReq?.message || "Validation failed", 
-                    err.data
-                );
-            }
-            const field = Object.keys(validationErr)[0];
-            const fieldErr = validationErr[field];
-            const errMsg = `${field}: ${fieldErr.message}`;
+//             const validationErr = firstFailedReq?.response?.data;
+//             if (!validationErr) {
+//                 throw new BusinessError(
+//                     err.status, 
+//                     firstFailedReq?.message || "Validation failed", 
+//                     err.data
+//                 );
+//             }
+//             const field = Object.keys(validationErr)[0];
+//             const fieldErr = validationErr[field];
+//             const errMsg = `${field}: ${fieldErr.message}`;
             
-            throw new BusinessError(
-                err.status,
-                `Error: ${errMsg}`,
-                err.data
-            );
-        }
-        throw new BusinessError(err.status, err.message, err.data);
-    } else {
-        throw err;
-    }
-}
+//             throw new BusinessError(
+//                 err.status,
+//                 `Error: ${errMsg}`,
+//                 err.data
+//             );
+//         }
+//         throw new BusinessError(err.status, err.message, err.data);
+//     } else {
+//         throw err;
+//     }
+// }
 
-export const handlePocketbaseAuthenError = (err: ClientResponseError, logger: Logger) => {
-    // Pocketbase authentication error
-    if(err.status == 400) {
-        logger.error('Pocketbase authentication failed: ', err);
-        throw new AuthenticationError(err.status, 'Invalid credentials', err.data);
-    }
-    else {
-        throw err;
-    }
-}
+// export const handlePocketbaseAuthenError = (err: ClientResponseError, logger: Logger) => {
+//     // Pocketbase authentication error
+//     if(err.status == 400) {
+//         logger.error('Pocketbase authentication failed: ', err);
+//         throw new AuthenticationError(err.status, 'Invalid credentials', err.data);
+//     }
+//     else {
+//         throw err;
+//     }
+// }
 
-export const handlePocketbaseError = (err: ClientResponseError, logger: Logger) => {
-    // handle other Pocketbase error
-    if(err.status === 0){
-        logger.error('Error connecting to Pocketbase: ', err);
-    }
-    else {
-        logger.error('Pocketbase error: ', err);
-    }
-}
+// export const handlePocketbaseError = (err: ClientResponseError, logger: Logger) => {
+//     // handle other Pocketbase error
+//     if(err.status === 0){
+//         logger.error('Error connecting to Pocketbase: ', err);
+//     }
+//     else {
+//         logger.error('Pocketbase error: ', err);
+//     }
+// }
 
 // handle pocketbase batch error
-const handlePocketbaseBatchError_2 = (err: ClientResponseError, logger: Logger) => {
+const handlePocketbaseBatchError = (err: ClientResponseError, logger: Logger) => {
     // batch 403 error
     if (err.status == 403) {
         logger.error('Pocketbase batch req permission error: ', err);
@@ -115,12 +115,12 @@ const handlePocketbaseBatchError_2 = (err: ClientResponseError, logger: Logger) 
 }
 
 // handle pocketbase related error
-const handlePocketbaseError_2 = (err: ClientResponseError, logger: Logger) => {
+const handlePocketbaseError = (err: ClientResponseError, logger: Logger) => {
     const url = err.url || '';
     const hasErrData = Object.keys(err.response.data || {}).length > 0;
     // handle pocketbase batch error
     if (url.includes('/batch')) {
-        handlePocketbaseBatchError_2(err, logger);
+        handlePocketbaseBatchError(err, logger);
     }    
 
     // handle pocketbase 400 error
@@ -166,7 +166,7 @@ const handlePocketbaseError_2 = (err: ClientResponseError, logger: Logger) => {
 export const handleServiceError = (err: any, logger: Logger) => {
     // handle pocketbase error
     if (err instanceof ClientResponseError) {
-        return handlePocketbaseError_2(err, logger);
+        return handlePocketbaseError(err, logger);
     }
     // handle other errors
     logger.error('An exception error occurs: ', err);

@@ -1,28 +1,25 @@
 <script lang="ts">
-	import { goto, invalidateAll } from "$app/navigation";
-	import LoginForm from "$lib/components/auth/LoginForm.svelte";
+	import RegisterForm from "$lib/components/auth/RegisterForm.svelte";
 	import { notifyError, notifySuccess } from "$lib/stores/notification-stores";
 	import type { Result } from "$lib/types/result-types";
-	import { navigateToHomePage } from "$lib/utils/navigation";
+	import type { UserRegisterPayload } from "$lib/types/user-authen-types";
+	import { navigateToLogin } from "$lib/utils/navigation";
 
-    const login = async({ username, password }: { username: string; password: string; }) => {
+    const addUser = async(registerPayload: UserRegisterPayload) => {
         let notiMessage = '';
         try {
-            const response = await fetch('/api/auth/login', {
+            const response = await fetch(`/api/auth/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({username, password})
+                body: JSON.stringify(registerPayload)
             });
-
             const result: Result<{id: string, username: string}> = await response.json();
-            if (response.ok && result.success) {
-                // reload all load func to update new locals.userInfo
-                await invalidateAll();
-                navigateToHomePage();
-                notiMessage = 'Login successfully!';
+            if(response.ok && result.success) {
+                navigateToLogin();
+                notiMessage = `Create account successfully! You can login now`;
                 notifySuccess(notiMessage);
             } else {
-                notiMessage = `Login failed: ${result.message}`;
+                notiMessage = `Create account failed: ${result.message}`;
                 notifyError(notiMessage);
             }
         } catch (err) {
@@ -34,6 +31,6 @@
 </script>
 
 <main class="flex-1 flex items-center justify-center p-6 bg-base-100">
-    <LoginForm
-        onFormSubmitted={login} />
+    <RegisterForm 
+        onFormSubmitted={addUser}/>
 </main>

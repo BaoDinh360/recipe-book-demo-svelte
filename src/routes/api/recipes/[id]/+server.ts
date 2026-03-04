@@ -1,10 +1,7 @@
-import { BusinessError } from '$lib/server/business-errors';
-import { handlePocketbaseError } from '$lib/server/error-handler';
 import { deleteRecipe, updateRecipe } from '$lib/server/recipe-service';
-import type { ApiResponse } from '$lib/types.js';
 import type { UpdateRecipePayload } from '$lib/types/recipe-types.js';
+import { ResultFactory, type Result } from '$lib/types/result-types.js';
 import { json } from '@sveltejs/kit';
-import { ClientResponseError } from 'pocketbase';
 
 // api endpoint: PUT /api/recipes/[id]
 export const PUT = async({ request, url, locals }) => {
@@ -14,10 +11,7 @@ export const PUT = async({ request, url, locals }) => {
     logger.info('Updating recipe', { recipeId: recipePayload.id });
     const updated = await updateRecipe(recipePayload, pbClient, logger);
     logger.info('Recipe updated', { recipeId: updated.id, recipeCode: updated.recipeCode });
-    const successRes: ApiResponse<{id: string, recipeCode: string}> = {
-        success: true,
-        data: updated
-    };
+    const successRes: Result<{id: string, recipeCode: string}> = ResultFactory.success(updated);
     return json(successRes, { status: 200 });
     // try {
     //     const recipePayload: UpdateRecipePayload = await request.json();
@@ -62,9 +56,7 @@ export const DELETE = async({ request, url, params, locals }) => {
     await deleteRecipe(recipeId, pbClient, logger);
     
     logger.info('Recipe deleted', { recipeId  });
-    const successRes: ApiResponse<null> = {
-        success: true
-    };
+    const successRes: Result = ResultFactory.success();
     return json(successRes, { status: 200 });
     // try {
     //     const recipeId = params.id;

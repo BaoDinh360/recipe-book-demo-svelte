@@ -1,7 +1,13 @@
 <script lang="ts">
     import '../../app.css';
 	import HeaderBar from '$lib/components/layout/HeaderBar.svelte';
-    let { children } = $props();
+	import { authState } from '$lib/states/AuthState.svelte';
+    let { data, children } = $props();
+
+    // sync server locals.userInfo with UI global user state
+    $effect(() => {
+        authState.currentUser = data.userInfo ?? null;
+    })
 
 </script>
 

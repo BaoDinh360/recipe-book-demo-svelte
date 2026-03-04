@@ -14,3 +14,9 @@ export const navigateToMyRecipes = async () => {
 export const navigateToHomePage = async () => {
     return goto('/');
 }
+export const navigateToLogin = async () => {
+    return goto('/login');
+}
+export const navigateToRegister = async () => {
+    return goto('/register');
+}

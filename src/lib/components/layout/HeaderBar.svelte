@@ -2,10 +2,15 @@
 	import { page } from "$app/state";
 	import { NAV_MENU_ITEMS } from "$lib/constants";
 	import { UtensilsCrossedIcon } from "$lib/icons";
+	import { authState } from "$lib/states/AuthState.svelte";
+	import { navigateToLogin, navigateToRegister } from "$lib/utils/navigation";
+	import UserInfo from "../user/UserInfo.svelte";
+
+    const navItems = NAV_MENU_ITEMS;
 
     let currentPath = $derived(page.url.pathname);
-    
-    const navItems = NAV_MENU_ITEMS;
+    let showRegisterBtn = $derived(currentPath === '/login' && !authState.isLoggedIn);
+
 
 </script>
 
@@ -33,14 +38,21 @@
                     </a>
                 {/each}
             </nav>
-            <div class="flex items-center gap-4 pl-4 border-l border-base-300">
-                <button class="relative group" aria-label="view user info">
-                    <div class="bg-center bg-no-repeat bg-cover rounded-full size-10 ring-2 ring-transparent group-hover:ring-primary transition-all"
-                        data-alt="User profile avatar showing a smiling person"
-                        style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDVOJBXDLmJId5AXGVdGmEOuv-czVbwXkJW8XHxZeb2aP8xtbqq43sf0Vdi-i26EbMft3VJsxnu25xxr-n5Eo0GdRPBIWbNT4llij40Y2pGSd_A7Xbde5wANVO2kqMACf6go5rELwoyQTyDEkZ2NKFl_kyDIijqLiazcAEFvcZqtqjoOWloffS6V_I4QqtxcxjEFl454NOvBpF9UrV--txUSwN647U-y3vQaoM4i9VjQCLIRGldFrPbAMwE9b7Mu_9PkAnkDOtowyI");'>
-                    </div>
+            {#if authState.isLoggedIn}
+                <UserInfo />
+            {:else if showRegisterBtn}
+                <button class="btn btn-sm btn-primary w-24 h-10 rounded-lg text-primary-content 
+                    text-sm font-bold transition-all"
+                    onclick={() => navigateToRegister()}>
+                    Register
                 </button>
-            </div>
+            {:else}
+                <button class="btn btn-sm btn-primary w-24 h-10 rounded-lg text-primary-content 
+                    text-sm font-bold transition-all"
+                    onclick={() => navigateToLogin()}>
+                    Login
+                </button>
+            {/if}
         </div>
         <!-- collapsible menu do later-->
         <div class="md:hidden text-neutral">

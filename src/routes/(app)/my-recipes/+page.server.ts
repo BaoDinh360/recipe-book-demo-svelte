@@ -1,9 +1,6 @@
-import { AppError, BusinessError } from '$lib/server/business-errors';
+import { AppError } from '$lib/server/business-errors';
 import { getPaginatedRecipeList } from '$lib/server/recipe-service';
-import { ClientResponseError } from 'pocketbase';
 import type { PageServerLoad } from './$types';
-import { error } from '@sveltejs/kit';
-import { handlePocketbaseError } from '$lib/server/error-handler';
 import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_START_PAGE } from '$lib/constants';
 import type { RecipeCategory, RecipeFilterPayload, RecipeListItem } from '$lib/types/recipe-types';
 

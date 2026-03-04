@@ -1,9 +1,8 @@
 import { type IngredientSelect } from "$lib/types/ingredient-types";
-import { ClientResponseError } from "pocketbase";
-import { handlePocketbaseLogicError } from "./error-handler";
 import type { Logger } from "winston";
 import PocketBase from 'pocketbase';
 import { Collections, type IngredientsResponse } from "$lib/types/pocketbase-types";
+import { handleServiceError } from "./error-handler";
 
 
 export const getAllIngredientsSelect = async (pbClient: PocketBase, logger: Logger): Promise<IngredientSelect[]> => {
@@ -16,13 +15,7 @@ export const getAllIngredientsSelect = async (pbClient: PocketBase, logger: Logg
             .map(ingr => mapIngredientResToSelect(ingr));
         return ingredientsSelect;
     } catch (err) {
-        // pocketbase error exception
-        console.error('Pocketbase Error: ', err);
-        if(err instanceof ClientResponseError) {
-            handlePocketbaseLogicError(err, logger);
-        }
-        // re throw / bubble up other error
-        throw err;
+        throw handleServiceError(err, logger);
     }
 }
 

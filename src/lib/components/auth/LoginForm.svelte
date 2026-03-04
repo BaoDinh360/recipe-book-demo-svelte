@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { ChefHatIcon, LockKeyholeIcon, UserRoundIcon } from "$lib/icons";
+	import { ChefHatIcon, EyeIcon, EyeOffIcon, LockKeyholeIcon, UserRoundIcon } from "$lib/icons";
     import { z } from "zod";
 
     // props
@@ -16,6 +16,9 @@
         username: '',
         password: ''
     });
+
+    let showPassword = $state(false);
+    let passInputType = $derived(showPassword ? 'text' : 'password');
 
     // login form inputs errors state
     let loginFormErrors: {
@@ -91,7 +94,7 @@
             <label class="h-14 input input-bordered w-full flex items-center gap-2 overflow-hidden rounded-2xl text-neutral leading-normal text-base
                 border border-base-300 bg-base-200 placeholder:text-neutral/40 px-5 font-normal
                 focus-within:outline-none focus-within:ring-1 focus-within:ring-primary focus-within:border-primary transition-all">
-                <UserRoundIcon class="size-4 text-base-content" />
+                <UserRoundIcon class="size-5 text-base-content/40" />
                 <input type="text" class="grow" placeholder="Enter your username..."
                     bind:value={loginFormState.username} />
             </label>
@@ -104,9 +107,17 @@
             <label class="h-14 input input-bordered w-full flex items-center gap-2 overflow-hidden rounded-2xl text-neutral leading-normal text-base
                 border border-base-300 bg-base-200 placeholder:text-neutral/40 px-5 font-normal
                 focus-within:outline-none focus-within:ring-1 focus-within:ring-primary focus-within:border-primary transition-all">
-                <LockKeyholeIcon class="size-4 text-base-content" />
-                <input type="password" class="grow" placeholder="Enter your password..."
+                <LockKeyholeIcon class="size-5 text-base-content/40" />
+                <input type={passInputType} class="grow" placeholder="Enter your password..."
                     bind:value={loginFormState.password} />
+                <button class="btn btn-sm btn-circle btn-ghost"
+                    type="button" onclick={() => showPassword = !showPassword}>
+                    {#if showPassword}
+                        <EyeOffIcon class="size-5 text-base-content/40" />
+                    {:else}
+                        <EyeIcon class="size-5 text-base-content/40" />
+                    {/if}
+                </button>
             </label>
             {@render showInputError(loginFormErrors.password)}
         </div>
@@ -122,7 +133,7 @@
     <div class="mt-8 text-center border-t border-base-300 pt-6">
         <p class="text-base-content font-light text-sm">
             Don't have an account?
-            <a class="text-primary font-semibold hover:underline ml-1" href="#">Create an account</a>
+            <a class="text-primary font-semibold hover:underline ml-1" href="/register">Create an account</a>
         </p>
     </div>
 </div>
