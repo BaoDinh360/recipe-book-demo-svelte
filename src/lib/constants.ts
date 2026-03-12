@@ -29,3 +29,14 @@ export const NAV_MENU_ITEMS = [
     { name: 'Meal Planner', url: '#' },
     { name: 'Create recipe', url: '/recipes/create' }
 ]
+
+// allowed public paths
+export const PUBLIC_PATHS = [
+    // page routes
+    '/login',
+    '/register',
+
+    // api routes
+    '/api/auth/login',
+    '/api/auth/register'
+];

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { invalidateAll } from "$app/navigation";
 	import { LogoutIcon, SettingsIcon, UserRoundIcon } from "$lib/icons";
-	import { notifyError, notifySuccess } from "$lib/stores/notification-stores";
+	import { notiManager } from "$lib/states/notification-state.svelte";
 	import type { Result } from "$lib/types/result-types";
 	import { navigateToLogin } from "$lib/utils/navigation";
 
@@ -19,11 +19,11 @@
                 navigateToLogin();
             } else {
                 notiMessage = 'An error occurs when logging out';
-                notifyError(notiMessage);
+                notiManager.notifyError(notiMessage);
             }
         } catch (err) {
             // unhandled error occurs at UI level
-            notifyError(`An unexpected error occurs when logging out!`);
+            notiManager.notifyError(`An unexpected error occurs when logging out!`);
         }
     }
 

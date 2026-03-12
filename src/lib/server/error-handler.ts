@@ -107,7 +107,7 @@ const handlePocketbaseBatchError = (err: ClientResponseError, logger: Logger) =>
     const errMsg = `${field} - ${fieldErr.message}`;
     logger.error('Pocketbase batch req validation error: ', err);
     return new AppError(
-        `Error: ${errMsg}`,
+        `${errMsg}`,
         400,
         ErrorCode.VALIDATION_FAILED,
         err.data
@@ -120,7 +120,7 @@ const handlePocketbaseError = (err: ClientResponseError, logger: Logger) => {
     const hasErrData = Object.keys(err.response.data || {}).length > 0;
     // handle pocketbase batch error
     if (url.includes('/batch')) {
-        handlePocketbaseBatchError(err, logger);
+        return handlePocketbaseBatchError(err, logger);
     }    
 
     // handle pocketbase 400 error

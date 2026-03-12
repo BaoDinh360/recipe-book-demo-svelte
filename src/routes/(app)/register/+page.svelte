@@ -1,12 +1,14 @@
 <script lang="ts">
+	import { page } from "$app/state";
 	import RegisterForm from "$lib/components/auth/RegisterForm.svelte";
-	import { notifyError, notifySuccess } from "$lib/stores/notification-stores";
+	import { notiManager } from "$lib/states/notification-state.svelte";
 	import type { Result } from "$lib/types/result-types";
 	import type { UserRegisterPayload } from "$lib/types/user-authen-types";
 	import { navigateToLogin } from "$lib/utils/navigation";
 
     const addUser = async(registerPayload: UserRegisterPayload) => {
         let notiMessage = '';
+        const redirectTo = page.url.searchParams.get('redirectTo');
         try {
             const response = await fetch(`/api/auth/register`, {
                 method: 'POST',
@@ -15,16 +17,16 @@
             });
             const result: Result<{id: string, username: string}> = await response.json();
             if(response.ok && result.success) {
-                navigateToLogin();
+                navigateToLogin(redirectTo);
                 notiMessage = `Create account successfully! You can login now`;
-                notifySuccess(notiMessage);
+                notiManager.notifySuccess(notiMessage);
             } else {
                 notiMessage = `Create account failed: ${result.message}`;
-                notifyError(notiMessage);
+                notiManager.notifyError(notiMessage);
             }
         } catch (err) {
             // unhandled error occurs at UI level
-            notifyError(`An unexpected error occurs!: ${(err as any).message}`);
+            notiManager.notifyError(`An unexpected error occurs!: ${(err as any).message}`);
         }
     }
 

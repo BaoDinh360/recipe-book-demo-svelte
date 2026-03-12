@@ -2,7 +2,7 @@
 	import { page } from "$app/state";
 	import { NAV_MENU_ITEMS } from "$lib/constants";
 	import { UtensilsCrossedIcon } from "$lib/icons";
-	import { authState } from "$lib/states/AuthState.svelte";
+	import { authState } from "$lib/states/auth state.svelte";
 	import { navigateToLogin, navigateToRegister } from "$lib/utils/navigation";
 	import UserInfo from "../user/UserInfo.svelte";
 
@@ -11,6 +11,7 @@
     let currentPath = $derived(page.url.pathname);
     let showRegisterBtn = $derived(currentPath === '/login' && !authState.isLoggedIn);
 
+    const redirectToParams = page.url.searchParams.get('redirectTo');
 
 </script>
 
@@ -43,13 +44,13 @@
             {:else if showRegisterBtn}
                 <button class="btn btn-sm btn-primary w-24 h-10 rounded-lg text-primary-content 
                     text-sm font-bold transition-all"
-                    onclick={() => navigateToRegister()}>
+                    onclick={() => navigateToRegister(redirectToParams)}>
                     Register
                 </button>
             {:else}
                 <button class="btn btn-sm btn-primary w-24 h-10 rounded-lg text-primary-content 
                     text-sm font-bold transition-all"
-                    onclick={() => navigateToLogin()}>
+                    onclick={() => navigateToLogin(redirectToParams)}>
                     Login
                 </button>
             {/if}

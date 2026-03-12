@@ -17,17 +17,17 @@
         },
         'info': {
             btnClasses: 'btn-info', 
-            iconClasses: 'bg-info/10 text-info', 
+            iconClasses: 'bg-info-100 text-info-500', 
             iconComp: Trash2Icon
         },
         'error': {
             btnClasses: 'btn-error', 
-            iconClasses: 'bg-error/10 text-error', 
+            iconClasses: 'bg-error-100 text-error-500', 
             iconComp: Trash2Icon
         },
         'neutral': {
             btnClasses: 'btn-neutral', 
-            iconClasses: 'bg-info/10 text-neutral', 
+            iconClasses: 'bg-info-100 text-neutral', 
             iconComp: null
         }
     }

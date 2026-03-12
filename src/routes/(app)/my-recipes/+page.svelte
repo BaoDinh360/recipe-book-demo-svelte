@@ -5,10 +5,10 @@
 	import RecipeFilter from "$lib/components/RecipeFilter.svelte";
 	import RecipeList from "$lib/components/RecipeList.svelte";
 	import { lastRecipeUrl } from "$lib/stores/navigation-state";
-	import { notifyError } from "$lib/stores/notification-stores";
 	import type { PageProps } from "./$types";
 	import { goto } from "$app/navigation";
 	import type { RecipeFilterPayload } from "$lib/types/recipe-types";
+	import { notiManager } from "$lib/states/notification-state.svelte";
 	
     // /recipes/index
 
@@ -29,7 +29,7 @@
     
     $effect(() => {
         if(data.errorMsg) {
-            notifyError(data.errorMsg);
+            notiManager.notifyError(data.errorMsg);
         }
     })
     $effect(() => {

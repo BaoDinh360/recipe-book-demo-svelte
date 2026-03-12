@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
-	import { notifySuccess, notifyError } from "$lib/stores/notification-stores";
 	import CategoryBadge from "./CategoryBadge.svelte";
 	import ConfirmActionModal from "./shared/ConfirmActionModal.svelte";
     import { CalendarIcon, Clock4Icon, SquarePenIcon, Trash2Icon } from '$lib/icons';
 	import { navigateToRecipes } from "$lib/utils/navigation";
 	import RecipeInstructionStep from "./RecipeInstructionStep.svelte";
 	import type { RecipeDetailItem, RecipeIngredientDetail } from "$lib/types/recipe-types";
+	import { notiManager } from "$lib/states/notification-state.svelte";
 
     let { recipeDetails }: {
         recipeDetails: RecipeDetailItem | undefined
@@ -32,16 +32,16 @@
                 // back to index /recipes
                 navigateToRecipes();
                 // show success noti
-                notiMessage = `Delete recipe: ${recipeCode} success!`;
-                notifySuccess(notiMessage);
+                notiMessage = `Recipe deleted successfully !`;
+                notiManager.notifySuccess(notiMessage);
             } else {
                 // failed
-                notiMessage = `Delete recipe ${recipeCode} failed!: ${result.message}`;
-                notifyError(notiMessage);
+                notiMessage = `Failed to delete recipe ${recipeCode}: ${result.message}`;
+                notiManager.notifyError(notiMessage);
             }
         } catch (err) {
             // unhandled error occurs at UI level
-            notifyError(`An unexpected error occurs!: ${(err as any).message}`);
+            notiManager.notifyError(`An unexpected error occurs!: ${(err as any).message}`);
         }
     };
 
@@ -167,7 +167,7 @@
     <!-- delete modal -->
     {#snippet deleteRecipeContent()}
         Are you sure you want to permanently delete recipe 
-        <span class="font-semibold text-error">
+        <span class="font-semibold text-error-500">
             {recipeDetails.recipeCode}: {recipeDetails.title}
         </span> ?
     {/snippet}

@@ -1,9 +1,10 @@
 
+import { PUBLIC_PATHS } from "$lib/constants";
 import { AppError, ErrorCode } from "$lib/server/business-errors";
 import { logger } from "$lib/server/logger";
 import { createPocketbaseClient } from "$lib/server/pocketbase-client";
 import { ResultFactory } from "$lib/types/result-types";
-import type { Handle, HandleServerError } from "@sveltejs/kit";
+import { error, redirect, type Handle, type HandleServerError } from "@sveltejs/kit";
 import { sequence } from "@sveltejs/kit/hooks";
 
 
@@ -21,27 +22,17 @@ const handleRequestLogging: Handle = async({ event, resolve }) => {
     };
     event.locals.logger = logger.child(logMetadata);
     const reqStartDateTime = Date.now();
-    // event.locals.logger.info('Incoming request');
-    try {
-        const response = await resolve(event);
-        const status = response.status;
-        const responseMetadata = {
-            userId: event.locals.userInfo?.username,
-            status,
-            duration: `${Date.now() - reqStartDateTime} ms`,
-            contentType: response.headers.get('content-type') || 'unknow'
-        }
-        // event.locals.logger.info(`Request completed! HTTP Status ${status}`, responseMetadata);
-        event.locals.logger.info(`${event.request.method} ${event.url.pathname}`, responseMetadata);
-        return response;
-    } catch (err) {
-        event.locals.logger.error('Unhandled error in middleware',{
-            err,
-            duration: `${Date.now() - reqStartDateTime} ms`
-        });
-
-        throw err;
+    const response = await resolve(event);
+    const status = response.status;
+    const responseMetadata = {
+        userId: event.locals.userInfo?.username,
+        status,
+        duration: `${Date.now() - reqStartDateTime} ms`,
+        contentType: response.headers.get('content-type') || 'unknow'
     }
+    event.locals.logger.info(`${event.request.method} ${event.url.pathname}`, responseMetadata);
+    
+    return response;
 }
 
 const handlePocketBaseRequest: Handle = async({ event, resolve }) => {
@@ -62,6 +53,7 @@ const handlePocketBaseRequest: Handle = async({ event, resolve }) => {
     } catch (err) {
         event.locals.pb.authStore.clear();
         event.locals.userInfo = undefined;
+        throw error(500, 'An unexpected internal server error occurs');
     }
 
     const response = await resolve(event);
@@ -71,10 +63,36 @@ const handlePocketBaseRequest: Handle = async({ event, resolve }) => {
     return response;
 }
 
+const isPathAllowed = (path: string) => {
+    return PUBLIC_PATHS.some(allowed => 
+        path === allowed || path.startsWith(allowed + '/')
+    );
+}
+// routes guard (page + api)
+const handleRoutesAuthGuard: Handle = async ({ event, resolve }) => {
+    let currentUser = event.locals.userInfo;
+    const hasRedirectTo = event.url.searchParams.get('redirectTo');
+    const path = event.url.pathname;
+    if (!currentUser && !isPathAllowed(path)) {
+        throw redirect(302, `/login?redirectTo=${path}`);
+    }
+    if (currentUser) {
+        // if user logged in, and has no redirectTo(from UI), redirect to index
+        // avoid race condition with goto UI
+        if((path === '/login' || path === '/register') && !hasRedirectTo) {
+            throw redirect(302, '/my-recipes');
+        }
+    }
+
+    const response = await resolve(event);
+    return response;
+}
+
 // run hooks in order 
 export const handle = sequence(
     handleRequestLogging,
-    handlePocketBaseRequest
+    handlePocketBaseRequest,
+    handleRoutesAuthGuard
 );
 
 // global error handler
@@ -84,7 +102,6 @@ export const handleError: HandleServerError = ({ error, event }) => {
     const isProdEnv = process.env.NODE_ENV === 'production';
     const stackTrace = !isProdEnv ? (error as any).stack : undefined;
 
-    event.locals.logger.error(`Unexpected error occurs at ${path}: `, error);
     // handle AppError
     if (error instanceof AppError) {
         return ResultFactory.fail(
@@ -94,6 +111,7 @@ export const handleError: HandleServerError = ({ error, event }) => {
             stackTrace
         );
     }
+    event.locals.logger.error(`Unexpected error occurs at ${path}: `, error);
     // handle Sveltekit built in error()
     if (typeof error === 'object' && error !== null && 'status' in error) {
         return ResultFactory.fail(

@@ -101,7 +101,7 @@
                     value={item.unit}
                     oninput={(e) => onUpdateIngredient(item.rowId, { unit: e.currentTarget.value })}/>
             </div>
-            <button class="flex items-center justify-center bg-base-100 text-error hover:text-neutral-content transition-colors
+            <button class="flex items-center justify-center bg-base-100 text-error-500 hover:text-neutral-content transition-colors
                 btn btn-sm btn-circle btn-error"
                 type="button" onclick={() => onRemoveIngredient(item.rowId)}>
                 <Trash2Icon class="h-4 w-4" />

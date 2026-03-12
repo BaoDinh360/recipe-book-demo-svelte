@@ -1,12 +1,14 @@
 <script lang="ts">
 	import { goto, invalidateAll } from "$app/navigation";
+	import { page } from "$app/state";
 	import LoginForm from "$lib/components/auth/LoginForm.svelte";
-	import { notifyError, notifySuccess } from "$lib/stores/notification-stores";
+	import { notiManager } from "$lib/states/notification-state.svelte";
 	import type { Result } from "$lib/types/result-types";
-	import { navigateToHomePage } from "$lib/utils/navigation";
+	import { navigateToHomePage, redirectToUrl } from "$lib/utils/navigation";
 
     const login = async({ username, password }: { username: string; password: string; }) => {
         let notiMessage = '';
+        const redirectTo = page.url.searchParams.get('redirectTo');
         try {
             const response = await fetch('/api/auth/login', {
                 method: 'POST',
@@ -14,20 +16,21 @@
                 body: JSON.stringify({username, password})
             });
 
-            const result: Result<{id: string, username: string}> = await response.json();
+            const result: Result = await response.json();
             if (response.ok && result.success) {
                 // reload all load func to update new locals.userInfo
                 await invalidateAll();
-                navigateToHomePage();
+                redirectToUrl(redirectTo);
+                
                 notiMessage = 'Login successfully!';
-                notifySuccess(notiMessage);
+                notiManager.notifySuccess(notiMessage);
             } else {
                 notiMessage = `Login failed: ${result.message}`;
-                notifyError(notiMessage);
+                notiManager.notifyError(notiMessage);
             }
         } catch (err) {
             // unhandled error occurs at UI level
-            notifyError(`An unexpected error occurs!: ${(err as any).message}`);
+            notiManager.notifyError(`An unexpected error occurs!: ${(err as any).message}`);
         }
     }
 

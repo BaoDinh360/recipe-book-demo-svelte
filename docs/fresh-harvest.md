@@ -55,6 +55,7 @@ module.exports = {
           "base-content": "#212121",     // Main Text color
           "info": "#1E88E5",
           "success": "#45A049",
+          "success-bg": "#e7f4e8",
           "warning": "#FB8C00",
           "error": "#E53935",
         },

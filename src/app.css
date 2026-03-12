@@ -11,8 +11,8 @@
     font-weight: theme('fontWeight.semibold');
     margin-left: theme('margin.2');
     font-size: theme('fontSize.lg'); */
-    @apply text-error font-semibold ml-2;
+    @apply text-error-500 font-semibold ml-2;
 }
 .input-error-msg {
-    @apply text-red-500 mt-1 text-sm;
+    @apply text-error-500 mt-1 text-sm;
 }

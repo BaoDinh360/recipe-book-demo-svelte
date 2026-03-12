@@ -1,20 +1,13 @@
 <script lang="ts">
 	import RecipeForm from "$lib/components/recipe-form/RecipeForm.svelte";
-	import { notifyError, notifySuccess } from "$lib/stores/notification-stores";
 	import type { PageProps } from "./$types";
 	import { navigateToMyRecipes } from "$lib/utils/navigation";
 	import type { UpdateRecipePayload } from "$lib/types/recipe-types";
+	import { notiManager } from "$lib/states/notification-state.svelte";
 
     // path: /recipes/edit/{id}
 
     let { data }: PageProps = $props();
-
-    // $effect(() => {
-    //     // display error noti if error
-    //     if(data.errorMsg) {
-    //         notifyError(data.errorMsg);
-    //     }
-    // })
 
     const onUpdateRecipe = async (recipePayload: UpdateRecipePayload) : Promise<void> => {
         let notiMessage = '';
@@ -31,16 +24,16 @@
             if(response.ok && result.success) {
                 navigateToMyRecipes();
                 // show success noti
-                notiMessage = `Update recipe: ${recipeCode} success!`;
-                notifySuccess(notiMessage);
+                notiMessage = `Recipe: ${recipeCode} updated successfully !`;
+                notiManager.notifySuccess(notiMessage);
             } else {
                 // failed
-                notiMessage = `Update recipe ${recipeCode} failed!: ${result.message}`;
-                notifyError(notiMessage);
+                notiMessage = `Failed to update recipe ${recipeCode}: ${result.message}`;
+                notiManager.notifyError(notiMessage);
             }
         } catch (err) {
             // unhandled error occurs at UI level
-            notifyError(`An unexpected error occurs!: ${(err as any).message}`);
+            notiManager.notifyError(`An unexpected error occurs!: ${(err as any).message}`);
         }
     };
     const onCancel = async () => {

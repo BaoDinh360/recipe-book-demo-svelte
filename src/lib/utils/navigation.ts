@@ -14,9 +14,27 @@ export const navigateToMyRecipes = async () => {
 export const navigateToHomePage = async () => {
     return goto('/');
 }
-export const navigateToLogin = async () => {
-    return goto('/login');
+export const navigateToLogin = async (redirectTo?: string | null) => {
+    const baseUrl = '/login';
+    if (redirectTo) {
+        return goto(`${baseUrl}?redirectTo=${redirectTo}`);
+    }
+    return goto(baseUrl);
 }
-export const navigateToRegister = async () => {
-    return goto('/register');
+export const navigateToRegister = async (redirectTo?: string | null) => {
+    const baseUrl = '/register';
+    if (redirectTo) {
+        return goto(`${baseUrl}?redirectTo=${redirectTo}`);
+    }
+    return goto(baseUrl);
+}
+
+export const redirectToUrl = async (redirectTo?: string | null, defaultUrl: string = '/') => {
+    if (!redirectTo) {
+        return goto(defaultUrl);
+    }
+    if (!redirectTo?.startsWith('/') || redirectTo.startsWith('//')) {
+        return goto(defaultUrl);
+    }
+    return goto(redirectTo);
 }

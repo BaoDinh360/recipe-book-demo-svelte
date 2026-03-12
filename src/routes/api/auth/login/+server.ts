@@ -1,5 +1,5 @@
 import { authenticateUser } from "$lib/server/auth-service"
-import { ResultFactory } from "$lib/types/result-types.js";
+import { ResultFactory, type Result } from "$lib/types/result-types.js";
 import type { UserLoginPayload } from "$lib/types/user-authen-types.js";
 import { json } from '@sveltejs/kit'
 
@@ -13,7 +13,7 @@ export const POST = async({ request, url, locals }) => {
     // update locals.userInfo new data
     locals.userInfo = structuredClone(authenticatedData);
     logger.info(`Successfully authenticated user: ${locals.userInfo.username}`);
-
+    console.log('url: ', url.searchParams);
     const successRes = ResultFactory.success();
     return json(successRes, { status: 200 });
 

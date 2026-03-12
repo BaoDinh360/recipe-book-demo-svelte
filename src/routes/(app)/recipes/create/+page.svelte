@@ -1,6 +1,6 @@
 <script lang="ts">
 	import RecipeForm from "$lib/components/recipe-form/RecipeForm.svelte";
-	import { notifyError, notifySuccess } from "$lib/stores/notification-stores";
+	import { notiManager } from "$lib/states/notification-state.svelte";
 	import type { CreateRecipePayload } from "$lib/types/recipe-types";
 	import { navigateToMyRecipes } from "$lib/utils/navigation";
 	import type { PageProps } from "./$types";
@@ -30,16 +30,16 @@
                 // back to index /recipes
                 await navigateToMyRecipes();
                 // show success noti
-                notiMessage = `Create new recipe: ${result.data.recipeCode} success!`;
-                notifySuccess(notiMessage);
+                notiMessage = `New recipe created successfully !`;
+                notiManager.notifySuccess(notiMessage);
             } else {
                 // failed
-                notiMessage = `Create recipe failed: ${result.message}`;
-                notifyError(notiMessage);
+                notiMessage = `Failed to create new recipe: ${result.message}`;
+                notiManager.notifyError(notiMessage);
             }
         } catch (err) {
             // unhandled error occurs at UI level
-            notifyError(`An unexpected error occurs!: ${(err as any).message}`);
+            notiManager.notifyError(`An unexpected error occurs!: ${(err as any).message}`);
         }
     }
     const onCancel = async () => {

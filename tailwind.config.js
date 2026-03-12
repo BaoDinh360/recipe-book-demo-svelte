@@ -1,4 +1,21 @@
 /** @type {import('tailwindcss').Config} */
+
+import Color from 'color'
+
+const generateColorScale = (base) => {
+  const c = Color(base);
+  return {
+    100: c.mix(Color("white"), 0.85).hex(),   // background
+    200: c.mix(Color("white"), 0.7).hex(),    // hover background
+    300: c.mix(Color("white"), 0.5).hex(),   // border
+    400: c.mix(Color("white"), 0.3).hex(),    // hover border
+    500: base,                    // main color
+    600: c.mix(Color("black"), 0.15).hex(),     // text
+    700: c.mix(Color("black"), 0.25).hex(),
+    800: c.mix(Color("black"), 0.35).hex()
+  }
+}
+
 export default {
   content: [
     './src/**/*.{html,js,svelte,ts}'
@@ -10,6 +27,12 @@ export default {
         body: ["Roboto", "sans-serif"],
         'display': ["Poppins", "sans-serif"],
         'body': ["Roboto", "sans-serif"]
+      },
+      colors: {
+        success: generateColorScale("#45A049"),
+        error: generateColorScale("#E53935"),
+        info: generateColorScale("#1E88E5"),
+        warning: generateColorScale("#FB8C00"),
       }
     },
   },

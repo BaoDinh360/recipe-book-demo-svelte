@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { goto, invalidate } from "$app/navigation";
-	import { notifyError, notifySuccess } from "$lib/stores/notification-stores";
 	import CategoryBadge from "./CategoryBadge.svelte";
 	import ConfirmActionModal from "./shared/ConfirmActionModal.svelte";
     import { Clock4Icon, EyeIcon, SquarePenIcon, Trash2Icon } from '$lib/icons';
 	import type { RecipeListItem } from "$lib/types/recipe-types";
+	import { notiManager } from "$lib/states/notification-state.svelte";
 
     let { recipe, 
     }: {
@@ -31,16 +31,16 @@
                 // invalidate page.server.ts tag to trigger reupdate
                 await invalidate('app:recipes');
                 // show success noti
-                notiMessage = `Delete recipe: ${recipeCode} success!`;
-                notifySuccess(notiMessage);
+                notiMessage = `Recipe deleted successfully !`;
+                notiManager.notifySuccess(notiMessage);
             } else {
                 // failed
-                notiMessage = `Delete recipe ${recipeCode} failed!: ${result.message}`;
-                notifyError(notiMessage);
+                notiMessage = `Failed to delete recipe ${recipeCode}: ${result.message}`;
+                notiManager.notifyError(notiMessage);
             }
         } catch (err) {
             // unhandled error occurs at UI level
-            notifyError(`An unexpected error occurs!: ${(err as any).message}`);
+            notiManager.notifyError(`An unexpected error occurs!: ${(err as any).message}`);
         }
     };
 
@@ -110,13 +110,13 @@
                     Edit
                 </button>
                 <button class="flex items-center justify-center px-3 py-2 rounded-lg bg-base-100
-                    border border-info/60 hover:bg-info/90 hover:border-info hover:text-neutral-content text-info transition-colors"
+                    border border-info-300 hover:bg-info-500 hover:border-info-400 hover:text-neutral-content text-info-500 transition-colors"
                     title="View Recipe Details"
                     onclick={() => goto(`/recipes/${recipe.id}`)}>
                     <EyeIcon class="size-5" />
                 </button>
                 <button class="flex items-center justify-center px-3 py-2 rounded-lg bg-base-100
-                    border border-error/60 hover:bg-error/90 hover:border-error hover:text-neutral-content text-error transition-colors"
+                    border border-error-300 hover:bg-error-500 hover:border-error-400 hover:text-neutral-content text-error-500 transition-colors"
                     title="Delete Recipe"
                     onclick={() => deleteModalRef!.showModal()}>
                     <Trash2Icon class="size-5" />
